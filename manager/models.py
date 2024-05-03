@@ -19,10 +19,10 @@ def country_validator(country: str) -> None:
         #     COUNTRIES.append(data['name'])
         import os
         import csv
-        countries_csv = open(f'{os.getcwd()}/countries.csv', 'r', encoding='utf-8')
-        reader = csv.reader(countries_csv)
-        COUNTRIES.extend(next(reader))
-        countries_csv.close()
+        file_path = f'{os.getcwd()}/countries.csv'
+        with open(file_path, 'r', encoding='utf-8') as countries_csv:
+            reader = csv.reader(countries_csv)
+            COUNTRIES.extend(next(reader))
     if country not in COUNTRIES:
         raise ValidationError(
             _('This country does not exists.'),
