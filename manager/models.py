@@ -49,7 +49,7 @@ class Agency(UUIDMixin, NameMixin, models.Model):
         on_delete=models.CASCADE
     )
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         return f'{self.name}, {self.phone_number}'
 
     class Meta:
@@ -73,7 +73,7 @@ class Tour(UUIDMixin, NameMixin, models.Model):
         through='TourCity'
     )
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         return f'{self.name}, {self.agency}'
 
     class Meta:
@@ -164,6 +164,11 @@ class Address(UUIDMixin, models.Model):
         blank = True,
     )
 
+    def __str__(self) -> str:
+        not_null_part = ' '.join([self.city.name, self.street, self.house_number])
+        can_be_null_parts = ' '.join([self.entrance_number, self.floor, self.flat_number])
+        return f'{not_null_part}{can_be_null_parts}'.strip()
+
     class Meta:
         db_table = '"tours_data"."address"'
         verbose_name = _('address')
@@ -201,6 +206,9 @@ class Review(UUIDMixin, models.Model):
         null=True,
         blank=True
     )
+
+    def __str__(self) -> str:
+        return _(f'{self.rating} ({self.account.username}) for {self.agency}')
 
     class Meta:
         db_table = '"tours_data"."review"'
