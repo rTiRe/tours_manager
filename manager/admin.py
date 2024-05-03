@@ -5,6 +5,7 @@ from .models import Agency, Tour, City, TourCity
 class TourCityInline(admin.TabularInline):
     model = TourCity
     extra = 0
+    min_num = 1
 
 
 @admin.register(Agency)
@@ -21,6 +22,7 @@ class TourAdmin(admin.ModelAdmin):
     list_display = ['name', 'description']
     search_fields = ['name', 'description']
     list_filter = ('name',)
+    inlines = (TourCityInline,)
 
 
 @admin.register(City)
@@ -28,7 +30,6 @@ class CityAdmin(admin.ModelAdmin):
     model = City
     list_display = ['name', 'country']
     search_fields = ['name', 'country']
-    inlines = (TourCityInline,)
 
 
 @admin.register(TourCity)
