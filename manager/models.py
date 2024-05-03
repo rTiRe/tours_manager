@@ -40,6 +40,12 @@ class Agency(UUIDMixin, NameMixin, models.Model):
         max_length=PHONE_NUMBER_MAX_LEN,
         validators=[phone_number_validator]
     )
+    address = models.OneToOneField(
+        'Address',
+        verbose_name=_('address'),
+        unique=True,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self) -> None:
         return f'{self.name}, {self.phone_number}'
