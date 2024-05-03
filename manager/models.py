@@ -64,7 +64,7 @@ class Agency(UUIDMixin, NameMixin, models.Model):
     )
 
     def __str__(self) -> None:
-        return self.name
+        return f'{self.name}, {self.phone_number}'
 
     class Meta:
         db_table = '"tours_data"."agency"'
@@ -83,7 +83,7 @@ class Tour(UUIDMixin, NameMixin, models.Model):
     )
 
     def __str__(self) -> None:
-        return self.name
+        return f'{self.name}, {self.agency}'
 
     class Meta:
         db_table = '"tours_data"."tour"'
