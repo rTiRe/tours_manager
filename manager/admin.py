@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Agency, Tour, City, TourCity, Address, Country
-from .forms import AddressForm
+from .models import Agency, Tour, City, TourCity, Address, Country, Review
+from .forms import AddressForm, ReviewForm
 
 
 class TourCityInline(admin.TabularInline):
@@ -58,3 +58,24 @@ class AddressAdmin(admin.ModelAdmin):
 @admin.register(TourCity)
 class TourCityAdmin(admin.ModelAdmin):
     model = TourCity
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    model = Review
+    list_display = [
+        'agency',
+        'account',
+        'rating',
+        'text',
+    ]
+    search_fields = [
+        'agency',
+        'account',
+        'rating',
+    ]
+    autocomplete_fields = [
+        'agency',
+        'account',
+    ]
+    form = ReviewForm
