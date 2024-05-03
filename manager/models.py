@@ -221,3 +221,18 @@ class Account(UUIDMixin, models.Model):
         db_table = '"tours_data"."account"'
         verbose_name = _('account')
         verbose_name_plural = _('accounts')
+
+    def __str__(self) -> str:
+        return f'{self.account.username} ({self.account.first_name} {self.account.last_name})'
+
+    @property
+    def username(self) -> str:
+        return self.account.username
+
+    @property
+    def first_name(self) -> str:
+        return self.account.first_name
+
+    @property
+    def last_name(self) -> str:
+        return self.account.last_name
