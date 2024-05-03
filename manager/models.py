@@ -11,6 +11,7 @@ PHONE_NUMBER_MAX_LEN = 12
 COUNTRY_MAX_LEN = 255
 STREET_MAX_LEN = 255
 HOUSE_NUMBER_MAX_LEN = 8
+REVIEW_TEXT_MAX_LEN = 8192
 
 
 class UUIDMixin(models.Model):
@@ -116,7 +117,11 @@ class TourCity(UUIDMixin, models.Model):
 
 
 class Address(UUIDMixin, models.Model):
-    city = models.ForeignKey(City, verbose_name=_('city'), on_delete=models.CASCADE)
+    city = models.ForeignKey(
+        City,
+        verbose_name=_('city'),
+        on_delete=models.CASCADE
+    )
     street = models.CharField(
         _('street name'),
         max_length=STREET_MAX_LEN,
@@ -128,17 +133,35 @@ class Address(UUIDMixin, models.Model):
         validators=[house_number_validator]
     )
     entrance_number = models.SmallIntegerField(
-        verbose_name=_('entrance number'),
+        _('entrance number'),
         null = True,
         blank = True,
     )
     floor = models.SmallIntegerField(
-        verbose_name=_('floor number'),
+        _('floor number'),
         null = True,
         blank = True,
     )
     flat_number = models.SmallIntegerField(
-        verbose_name=_('flat number'),
+        _('flat number'),
         null = True,
         blank = True,
+    )
+
+
+class Review(UUIDMixin, models.Model):
+    agency_id = models.ForeignKey(
+        Agency,
+        verbose_name=_('agencies'),
+        on_delete=models.CASCADE
+    )
+    rating = models.FloatField(
+        _('rating'),
+        validators=[]
+    )
+    text = models.TextField(
+        _('text'),
+        max_length=REVIEW_TEXT_MAX_LEN,
+        null=True,
+        blank=True
     )
