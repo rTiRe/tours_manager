@@ -6,6 +6,23 @@ from django.core.exceptions import ValidationError
 
 NAME_MAX_LEN = 255
 PHONE_NUMBER_MAX_LEN = 12
+COUNTRY_MAX_LEN = 255
+
+COUNTRIES = []
+
+
+def country_validator(country: str) -> None:
+    if not COUNTRIES:
+        import requests
+        result = requests.get('https://data-api.oxilor.com/rest/countries?key=RNL837orCkY7TKJ4ClQROfMIQN_Vg-&lng=ru').json()
+        for data in result:
+            COUNTRIES.append(data['name'])
+    if country not in COUNTRIES:
+        raise ValidationError(
+            _('This country does not exists.'),
+            params={'country': country}
+        )
+        
 
 
 def phone_number_validator(number: str) -> None:
@@ -42,8 +59,6 @@ class NameMixin(models.Model):
 class Agency(UUIDMixin, NameMixin, models.Model):
     phone_number = models.CharField(
         _('phone number'),
-        null=False,
-        blank=False,
         max_length=PHONE_NUMBER_MAX_LEN,
         validators=[phone_number_validator]
     )
@@ -76,3 +91,20 @@ class Tour(UUIDMixin, NameMixin, models.Model):
         verbose_name = _('tour')
         verbose_name_plural = _('tours')
         unique_together = (('name', 'description', 'agency'),)
+
+
+class City(UUIDMixin, NameMixin, models.Model):
+    country = models.CharField(
+        _('country'),
+        max_length=COUNTRY_MAX_LEN,
+        validators=[country_validator]
+    )
+
+    def __str__(self) -> None:
+        return f'{self.name}, {self.country}'
+
+    class Meta:
+        db_table = '"tours_data"."city"'  
+        verbose_name = _('city')
+        verbose_name_plural = _('cities'),
+        unique_together = (('name', 'country'),)
