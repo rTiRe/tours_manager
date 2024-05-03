@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('city', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='manager.city', verbose_name='city')),
             ],
             options={
-                'abstract': False,
+                'db_table': '"tours_data"."address"',
             },
         ),
     ]
