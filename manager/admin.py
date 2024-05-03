@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Agency, Tour, City, TourCity, Address
+from .forms import AddressForm
 
 
 class TourCityInline(admin.TabularInline):
@@ -43,6 +44,7 @@ class AddressAdmin(admin.ModelAdmin):
         'flat_number'
     ]
     search_fields = ['city', 'street', 'house_number']
+    form = AddressForm
 
 
 @admin.register(TourCity)
