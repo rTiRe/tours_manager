@@ -13,10 +13,6 @@ COUNTRIES = []
 
 def country_validator(country: str) -> None:
     if not COUNTRIES:
-        # import requests
-        # result = requests.get('https://data-api.oxilor.com/rest/countries?key=RNL837orCkY7TKJ4ClQROfMIQN_Vg-&lng=ru').json()
-        # for data in result:
-        #     COUNTRIES.append(data['name'])
         import os
         import csv
         file_path = f'{os.getcwd()}/countries.csv'
