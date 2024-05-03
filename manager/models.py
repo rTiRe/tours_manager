@@ -15,6 +15,15 @@ HOUSE_NUMBER_MAX_LEN = 8
 COUNTRIES = []
 
 
+def street_name_validator(name: str) -> None:
+    rule = re.compile(r'^[^\W\d_]+\.?(?:[-\s\'’][^\W\d_]+\.?)*$')
+    if not rule.search(name):
+        raise ValidationError(
+            _('Street name contains incorrect symbols.'),
+            params={'street_name': name}
+        )
+
+
 def house_number_validator(number: str) -> None:
     rule = re.compile(r'^[1-9]\d*(?: ?(?:[а-я]|[/-] ?\d+[я-я]?))?$')
     if not rule.search(number):
@@ -151,6 +160,7 @@ class Address(UUIDMixin, models.Model):
     street = models.CharField(
         _('street name'),
         max_length=STREET_MAX_LEN,
+        validators=[street_name_validator]
     )
     house_number = models.CharField(
         _('house number'),
