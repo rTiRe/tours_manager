@@ -158,11 +158,17 @@ class Address(UUIDMixin, models.Model):
         validators=[house_number_validator]
     )
     entrance_number = models.SmallIntegerField(
-        verbose_name=_('entrance number')
+        verbose_name=_('entrance number'),
+        null = True,
+        blank = True,
     )
     floor = models.SmallIntegerField(
-        verbose_name=_('floor number')
+        verbose_name=_('floor number'),
+        null = True,
+        blank = True,
     )
     flat_number = models.SmallIntegerField(
-        verbose_name=_('flat number')
+        verbose_name=_('flat number'),
+        null = True,
+        blank = True,
     )
