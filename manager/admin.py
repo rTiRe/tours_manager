@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Agency, Tour, City, TourCity
+from .models import Agency, Tour, City, TourCity, Address
 
 
 class TourCityInline(admin.TabularInline):
@@ -30,6 +30,19 @@ class CityAdmin(admin.ModelAdmin):
     model = City
     list_display = ['name', 'country']
     search_fields = ['name', 'country']
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    model = Address
+    list_display = [
+        'city',
+        'street',
+        'house_number',
+        'entrance_number',
+        'floor',
+        'flat_number'
+    ]
+    search_fields = ['city', 'street', 'house_number']
 
 
 @admin.register(TourCity)
