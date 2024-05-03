@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('agency_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='manager.agency', verbose_name='agencies')),
             ],
             options={
-                'abstract': False,
+                'db_table': '"tours_data"."review"',
             },
         ),
     ]

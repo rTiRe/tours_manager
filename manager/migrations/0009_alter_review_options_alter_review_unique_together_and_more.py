@@ -18,8 +18,4 @@ class Migration(migrations.Migration):
             name='review',
             unique_together={('agency', 'account')},
         ),
-        migrations.AlterModelTable(
-            name='review',
-            table='"tours_data"."review"',
-        ),
     ]
