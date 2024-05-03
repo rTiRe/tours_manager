@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 
 NAME_MAX_LEN = 255
+PHONE_NUMBER_MAX_LEN = 12
 
 
 class UUIDMixin(models.Model):
@@ -35,6 +36,7 @@ class Agency(UUIDMixin, NameMixin, models.Model):
         _('phone number'),
         null=False,
         blank=False,
+        max_length=PHONE_NUMBER_MAX_LEN,
     )
     rating = models.FloatField(
         _('rating'),
