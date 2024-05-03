@@ -49,11 +49,6 @@ class Agency(UUIDMixin, NameMixin, models.Model):
         max_length=PHONE_NUMBER_MAX_LEN,
         validators=[phone_number_validator]
     )
-    rating = models.FloatField(
-        _('rating'),
-        null=False,
-        blank=False
-    )
 
     def __str__(self) -> None:
         return self.name
