@@ -32,8 +32,6 @@ class UUIDMixin(models.Model):
 class NameMixin(models.Model):
     name = models.CharField(
         verbose_name = _('name'),
-        null = False,
-        blank = False,
         max_length = NAME_MAX_LEN
     )
 
@@ -59,3 +57,22 @@ class Agency(UUIDMixin, NameMixin, models.Model):
         verbose_name = _('agency')
         verbose_name_plural = _('agencies')
         unique_together = (('name',),)
+
+
+class Tour(UUIDMixin, NameMixin, models.Model):
+    description = models.TextField(_('description'))
+    agency = models.ForeignKey(
+        Agency,
+        verbose_name=_('agency'),
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self) -> None:
+        return self.name
+
+    class Meta:
+        db_table = '"tours_data"."tour"'
+        ordering = ['name']
+        verbose_name = _('tour')
+        verbose_name_plural = _('tours')
+        unique_together = (('name', 'description', 'agency'),)
