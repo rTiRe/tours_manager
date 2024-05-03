@@ -3,12 +3,26 @@ from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
+import re
+
 
 NAME_MAX_LEN = 255
 PHONE_NUMBER_MAX_LEN = 12
 COUNTRY_MAX_LEN = 255
+STREET_MAX_LEN = 255
+HOUSE_NUMBER_MAX_LEN = 8
 
 COUNTRIES = []
+
+
+def house_number_validator(number: str) -> None:
+    rule = re.compile(r'^[1-9]\d*(?: ?(?:[а-я]|[/-] ?\d+[я-я]?))?$')
+    if not rule.search(number):
+        raise ValidationError(
+            _("""Incorrect house number format. Use one of this:
+12, 12а, 12А,12 А, 12 а, 12 б, 12 я, 121 б, 56/58, 56/58а, 56-58, 56 - 58, 56-58а"""),
+            params={'house_number': number}
+        )
 
 
 def country_validator(country: str) -> None:
@@ -28,7 +42,6 @@ def country_validator(country: str) -> None:
 
 
 def phone_number_validator(number: str) -> None:
-    import re
     rule = re.compile(r'^\+7[0-9]{3}[0-9]{7}$')
     if not rule.search(number):
         raise ValidationError(
@@ -131,3 +144,25 @@ class TourCity(UUIDMixin, models.Model):
         unique_together = (('tour', 'city'),)
         verbose_name = _('relationship tour city')
         verbose_name_plural = _('relationships tour city')
+
+
+class Address(UUIDMixin, models.Model):
+    city = models.ForeignKey(City, verbose_name=_('city'), on_delete=models.CASCADE)
+    street = models.CharField(
+        _('street name'),
+        max_length=STREET_MAX_LEN,
+    )
+    house_number = models.CharField(
+        _('house number'),
+        max_length=HOUSE_NUMBER_MAX_LEN,
+        validators=[house_number_validator]
+    )
+    entrance_number = models.SmallIntegerField(
+        verbose_name=_('entrance number')
+    )
+    floor = models.SmallIntegerField(
+        verbose_name=_('floor number')
+    )
+    flat_number = models.SmallIntegerField(
+        verbose_name=_('flat number')
+    )
