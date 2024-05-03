@@ -23,22 +23,6 @@ def house_number_validator(number: str) -> None:
         )
 
 
-def country_validator(country: str) -> None:
-    if not COUNTRIES:
-        import os
-        import csv
-        file_path = f'{os.getcwd()}/countries.csv'
-        with open(file_path, 'r', encoding='utf-8') as countries_csv:
-            reader = csv.reader(countries_csv)
-            COUNTRIES.extend(next(reader))
-    if country not in COUNTRIES:
-        raise ValidationError(
-            _('This country does not exists.'),
-            params={'country': country}
-        )
-        
-
-
 def phone_number_validator(number: str) -> None:
     rule = re.compile(r'^\+7[0-9]{3}[0-9]{7}$')
     if not rule.search(number):

@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 from django.conf.global_settings import AUTH_USER_MODEL
 
-from .validators import phone_number_validator, country_validator, \
+from .validators import phone_number_validator, \
     street_name_validator, house_number_validator
 
 
@@ -88,7 +88,6 @@ class Country(UUIDMixin, models.Model):
     name = models.CharField(
         _('country'),
         max_length=COUNTRY_MAX_LEN,
-        validators=[country_validator]
     )
 
     def __str__(self) -> str:
