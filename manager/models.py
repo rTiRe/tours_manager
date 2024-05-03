@@ -1,6 +1,7 @@
 from django.db import models
 from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
+from django.conf.global_settings import AUTH_USER_MODEL
 
 from .validators import phone_number_validator, country_validator, \
     street_name_validator, house_number_validator
@@ -150,9 +151,14 @@ class Address(UUIDMixin, models.Model):
 
 
 class Review(UUIDMixin, models.Model):
-    agency_id = models.ForeignKey(
+    agency = models.ForeignKey(
         Agency,
-        verbose_name=_('agencies'),
+        verbose_name=_('agency'),
+        on_delete=models.CASCADE
+    )
+    account = models.ForeignKey(
+        'Account',
+        verbose_name=_('account'),
         on_delete=models.CASCADE
     )
     rating = models.FloatField(
@@ -165,3 +171,17 @@ class Review(UUIDMixin, models.Model):
         null=True,
         blank=True
     )
+
+
+class Account(UUIDMixin, models.Model):
+    account = models.OneToOneField(
+        AUTH_USER_MODEL,
+        unique=True,
+        verbose_name=True,
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        db_table = '"tours_data"."account"'
+        verbose_name = _('account')
+        verbose_name_plural = _('accounts')
