@@ -28,3 +28,26 @@ class NameMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Agency(UUIDMixin, NameMixin, models.Model):
+    phone_number = models.CharField(
+        _('phone number'),
+        null=False,
+        blank=False,
+    )
+    rating = models.FloatField(
+        _('rating'),
+        null=False,
+        blank=False
+    )
+
+    def __str__(self) -> None:
+        return self.name
+
+    class Meta:
+        db_table = '"tours_data"."agency"'
+        ordering = ['name']
+        verbose_name = _('agency')
+        verbose_name_plural = _('agencies')
+        unique_together = (('name',),)
