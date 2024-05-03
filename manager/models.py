@@ -187,6 +187,12 @@ class Review(UUIDMixin, models.Model):
         blank=True
     )
 
+    class Meta:
+        db_table = '"tours_data"."review"'
+        verbose_name = _('review')
+        verbose_name_plural = _('reviews')
+        unique_together = (('agency', 'account'),)
+
 
 class Account(UUIDMixin, models.Model):
     account = models.OneToOneField(
