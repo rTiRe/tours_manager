@@ -8,6 +8,16 @@ NAME_MAX_LEN = 255
 PHONE_NUMBER_MAX_LEN = 12
 
 
+def phone_number_validator(number: str) -> None:
+    import re
+    rule = re.compile(r'^\+7[0-9]{3}[0-9]{7}$')
+    if not rule.search(number):
+        raise ValidationError(
+            _('Number must be in format +79999999999'),
+            params={'phone_number': number}
+        )
+
+
 class UUIDMixin(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -37,6 +47,7 @@ class Agency(UUIDMixin, NameMixin, models.Model):
         null=False,
         blank=False,
         max_length=PHONE_NUMBER_MAX_LEN,
+        validators=[phone_number_validator]
     )
     rating = models.FloatField(
         _('rating'),
