@@ -149,6 +149,21 @@ class Address(UUIDMixin, models.Model):
         blank = True,
     )
 
+    class Meta:
+        db_table = '"tours_data"."address"'
+        verbose_name = _('address')
+        verbose_name_plural = _('addresses')
+        unique_together = (
+            (
+                'city',
+                'street',
+                'house_number', 
+                'entrance_number',
+                'floor',
+                'flat_number'
+            ),
+        )
+
 
 class Review(UUIDMixin, models.Model):
     agency = models.ForeignKey(
