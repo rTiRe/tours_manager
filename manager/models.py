@@ -84,11 +84,27 @@ class Tour(UUIDMixin, NameMixin, models.Model):
         unique_together = (('name', 'description', 'agency'),)
 
 
-class City(UUIDMixin, NameMixin, models.Model):
-    country = models.CharField(
+class Country(UUIDMixin, models.Model):
+    name = models.CharField(
         _('country'),
         max_length=COUNTRY_MAX_LEN,
         validators=[country_validator]
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        db_table = '"tours_data"."country"'
+        verbose_name = _('country')
+        verbose_name_plural = _('countries')
+
+
+class City(UUIDMixin, NameMixin, models.Model):
+    country = models.ForeignKey(
+        Country, 
+        verbose_name=_('country'),
+        on_delete=models.CASCADE
     )
     tours = models.ManyToManyField(
         'Tour',
