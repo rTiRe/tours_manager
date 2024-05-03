@@ -2,7 +2,8 @@ from django.db import models
 from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 
-import validators
+from .validators import phone_number_validator, country_validator, \
+    street_name_validator, house_number_validator
 
 
 NAME_MAX_LEN = 255
@@ -37,7 +38,7 @@ class Agency(UUIDMixin, NameMixin, models.Model):
     phone_number = models.CharField(
         _('phone number'),
         max_length=PHONE_NUMBER_MAX_LEN,
-        validators=[validators.phone_number_validator]
+        validators=[phone_number_validator]
     )
 
     def __str__(self) -> None:
@@ -79,7 +80,7 @@ class City(UUIDMixin, NameMixin, models.Model):
     country = models.CharField(
         _('country'),
         max_length=COUNTRY_MAX_LEN,
-        validators=[validators.country_validator]
+        validators=[country_validator]
     )
     tours = models.ManyToManyField(
         'Tour',
@@ -113,12 +114,12 @@ class Address(UUIDMixin, models.Model):
     street = models.CharField(
         _('street name'),
         max_length=STREET_MAX_LEN,
-        validators=[validators.street_name_validator]
+        validators=[street_name_validator]
     )
     house_number = models.CharField(
         _('house number'),
         max_length=HOUSE_NUMBER_MAX_LEN,
-        validators=[validators.house_number_validator]
+        validators=[house_number_validator]
     )
     entrance_number = models.SmallIntegerField(
         verbose_name=_('entrance number'),
