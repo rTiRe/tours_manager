@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Agency, Tour, City, TourCity, Address
+from .models import Agency, Tour, City, TourCity, Address, Country
 from .forms import AddressForm
 
 
@@ -26,11 +26,19 @@ class TourAdmin(admin.ModelAdmin):
     inlines = (TourCityInline,)
 
 
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    model = Country
+    list_display = ['name']
+    search_fields = ['name']
+
+
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     model = City
     list_display = ['name', 'country']
     search_fields = ['name', 'country']
+    autocomplete_fields = ['country']
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
