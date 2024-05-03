@@ -116,7 +116,7 @@ class City(UUIDMixin, NameMixin, models.Model):
     class Meta:
         db_table = '"tours_data"."city"'  
         verbose_name = _('city')
-        verbose_name_plural = _('cities'),
+        verbose_name_plural = _('cities')
         unique_together = (('name', 'country'),)
 
 

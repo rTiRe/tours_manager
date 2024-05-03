@@ -10,9 +10,9 @@ class TourCityInline(admin.TabularInline):
 @admin.register(Agency)
 class AgencyAdmin(admin.ModelAdmin):
     model = Agency
-    list_display = ['name', 'phone_number', 'rating']
+    list_display = ['name', 'phone_number']
     search_fields = ['name', 'phone_number']
-    list_filter = ('name', 'phone_number', 'rating')
+    list_filter = ('name', 'phone_number')
 
 
 @admin.register(Tour)
