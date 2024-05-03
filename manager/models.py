@@ -81,6 +81,11 @@ class Tour(UUIDMixin, NameMixin, models.Model):
         verbose_name=_('agency'),
         on_delete=models.CASCADE
     )
+    cities = models.ManyToManyField(
+        'City',
+        verbose_name=_('cities'),
+        through='TourCity'
+    )
 
     def __str__(self) -> None:
         return f'{self.name}, {self.agency}'
@@ -99,6 +104,11 @@ class City(UUIDMixin, NameMixin, models.Model):
         max_length=COUNTRY_MAX_LEN,
         validators=[country_validator]
     )
+    tours = models.ManyToManyField(
+        'Tour',
+        verbose_name=_('tours'),
+        through='TourCity'
+    )
 
     def __str__(self) -> None:
         return f'{self.name}, {self.country}'
@@ -108,3 +118,14 @@ class City(UUIDMixin, NameMixin, models.Model):
         verbose_name = _('city')
         verbose_name_plural = _('cities'),
         unique_together = (('name', 'country'),)
+
+
+class TourCity(UUIDMixin, models.Model):
+    tour = models.ForeignKey(Tour, verbose_name=_('tour'), on_delete=models.CASCADE)
+    city = models.ForeignKey(City, verbose_name=_('city'), on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = '"tours_data"."tour_city"'
+        unique_together = (('tour', 'city'),)
+        verbose_name = _('relationship tour city')
+        verbose_name_plural = _('relationships tour city')
