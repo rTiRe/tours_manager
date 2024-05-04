@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Agency, Tour, City, TourCity, Address, Country, Review
+from .models import Agency, Tour, City, TourCity, Address, Country, Review, Account
 from .forms import AddressForm, ReviewForm
 
 
@@ -79,3 +79,10 @@ class ReviewAdmin(admin.ModelAdmin):
         'account',
     ]
     form = ReviewForm
+
+
+@admin.register(Account)
+class AccountAdmin(admin.ModelAdmin):
+    model = Account
+    list_display = ['account']
+    search_fields = ['account']
