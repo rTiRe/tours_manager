@@ -2,6 +2,7 @@ from django.db import models
 from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 from django.conf.global_settings import AUTH_USER_MODEL
+from django.contrib.gis.db import models as gismodels
 
 from .validators import phone_number_validator, \
     street_name_validator, house_number_validator
@@ -109,6 +110,10 @@ class City(UUIDMixin, NameMixin, models.Model):
         'Tour',
         verbose_name=_('tours'),
         through='TourCity'
+    )
+    point = gismodels.PointField(
+        _('city geopoint'),
+        srid=4326,
     )
 
     def __str__(self) -> None:
