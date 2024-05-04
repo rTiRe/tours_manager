@@ -168,6 +168,10 @@ class Address(UUIDMixin, models.Model):
         null = True,
         blank = True,
     )
+    point = gismodels.PointField(
+        _('address geopoint'),
+        srid=4326,
+    )
 
     def __str__(self) -> str:
         not_null_part = ' '.join([self.city.name, self.street, self.house_number])
