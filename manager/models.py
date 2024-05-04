@@ -198,7 +198,6 @@ class Review(UUIDMixin, models.Model):
     )
     rating = models.FloatField(
         _('rating'),
-        validators=[]
     )
     text = models.TextField(
         _('text'),
