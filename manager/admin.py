@@ -14,7 +14,8 @@ class AgencyAdmin(admin.ModelAdmin):
     model = Agency
     list_display = ['name', 'phone_number']
     search_fields = ['name', 'phone_number']
-    list_filter = ('name', 'phone_number')
+    list_filter = ['name', 'phone_number']
+    autocomplete_fields = ['address']
 
 
 @admin.register(Tour)
@@ -22,7 +23,8 @@ class TourAdmin(admin.ModelAdmin):
     model = Tour
     list_display = ['name', 'description']
     search_fields = ['name', 'description']
-    list_filter = ('name',)
+    list_filter = ['name']
+    autocomplete_fields = ['agency']
     inlines = (TourCityInline,)
 
 
@@ -52,6 +54,7 @@ class AddressAdmin(admin.ModelAdmin):
         'flat_number'
     ]
     search_fields = ['city', 'street', 'house_number']
+    autocomplete_fields = ['city']
     form = AddressForm
 
 
