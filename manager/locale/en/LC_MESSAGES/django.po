@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-04 00:42+0000\n"
+"POT-Creation-Date: 2024-05-04 11:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,112 +17,121 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: manager/models.py:31
+
+#: manager/models.py:32
 msgid "name"
 msgstr ""
 
-#: manager/models.py:41
+#: manager/models.py:42
 msgid "phone number"
 msgstr ""
 
-#: manager/models.py:47 manager/models.py:174
+#: manager/models.py:48 manager/models.py:183
 msgid "address"
 msgstr ""
 
-#: manager/models.py:58 manager/models.py:67 manager/models.py:191
+#: manager/models.py:59 manager/models.py:68 manager/models.py:200
 msgid "agency"
 msgstr ""
 
-#: manager/models.py:59
+#: manager/models.py:60
 msgid "agencies"
 msgstr ""
 
-#: manager/models.py:64
+#: manager/models.py:65
 msgid "description"
 msgstr ""
 
-#: manager/models.py:72 manager/models.py:120
+#: manager/models.py:73 manager/models.py:125
 msgid "cities"
 msgstr ""
 
-#: manager/models.py:82 manager/models.py:125
+#: manager/models.py:83 manager/models.py:130
 msgid "tour"
 msgstr ""
 
-#: manager/models.py:83 manager/models.py:110
+#: manager/models.py:84 manager/models.py:111
 msgid "tours"
 msgstr ""
 
-#: manager/models.py:89 manager/models.py:98 manager/models.py:105
+#: manager/models.py:90 manager/models.py:99 manager/models.py:106
 msgid "country"
 msgstr ""
 
-#: manager/models.py:99
+#: manager/models.py:100
 msgid "countries"
 msgstr ""
 
-#: manager/models.py:119 manager/models.py:126 manager/models.py:138
+#: manager/models.py:115
+msgid "city geopoint"
+msgstr ""
+
+#: manager/models.py:124 manager/models.py:131 manager/models.py:143
 msgid "city"
 msgstr ""
 
-#: manager/models.py:131
+#: manager/models.py:136
 msgid "relationship tour city"
 msgstr ""
 
-#: manager/models.py:132
+#: manager/models.py:137
 msgid "relationships tour city"
 msgstr ""
 
-#: manager/models.py:142
+#: manager/models.py:147
 msgid "street name"
 msgstr ""
 
-#: manager/models.py:147
+#: manager/models.py:152
 msgid "house number"
 msgstr ""
 
-#: manager/models.py:152
+#: manager/models.py:157
 msgid "entrance number"
 msgstr ""
 
-#: manager/models.py:157
+#: manager/models.py:162
 msgid "floor number"
 msgstr ""
 
-#: manager/models.py:162
+#: manager/models.py:167
 msgid "flat number"
 msgstr ""
 
-#: manager/models.py:175
+#: manager/models.py:172
+msgid "address geopoint"
+msgstr ""
+
+#: manager/models.py:184
 msgid "addresses"
 msgstr ""
 
-#: manager/models.py:196 manager/models.py:229
+#: manager/models.py:205 manager/models.py:238
 msgid "account"
 msgstr ""
 
-#: manager/models.py:200
+#: manager/models.py:209
 msgid "rating"
 msgstr ""
 
-#: manager/models.py:203
+#: manager/models.py:212
 msgid "text"
 msgstr ""
 
-#: manager/models.py:210
+#: manager/models.py:219
 #, python-brace-format
 msgid "{self.rating} ({self.account.username}) for {self.agency}"
 msgstr ""
 
-#: manager/models.py:214
+#: manager/models.py:223
 msgid "review"
 msgstr ""
 
-#: manager/models.py:215
+#: manager/models.py:224
 msgid "reviews"
 msgstr ""
 
-#: manager/models.py:230
+#: manager/models.py:239
 msgid "accounts"
 msgstr ""
 
