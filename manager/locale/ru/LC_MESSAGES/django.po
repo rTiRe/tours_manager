@@ -1,0 +1,147 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-04 00:42+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+#: manager/models.py:31
+msgid "name"
+msgstr "имя"
+
+#: manager/models.py:41
+msgid "phone number"
+msgstr "номер телефона"
+
+#: manager/models.py:47 manager/models.py:174
+msgid "address"
+msgstr "адрес"
+
+#: manager/models.py:58 manager/models.py:67 manager/models.py:191
+msgid "agency"
+msgstr "агенство"
+
+#: manager/models.py:59
+msgid "agencies"
+msgstr "агенства"
+
+#: manager/models.py:64
+msgid "description"
+msgstr "описание"
+
+#: manager/models.py:72 manager/models.py:120
+msgid "cities"
+msgstr "города"
+
+#: manager/models.py:82 manager/models.py:125
+msgid "tour"
+msgstr "тур"
+
+#: manager/models.py:83 manager/models.py:110
+msgid "tours"
+msgstr "туры"
+
+#: manager/models.py:89 manager/models.py:98 manager/models.py:105
+msgid "country"
+msgstr "страна"
+
+#: manager/models.py:99
+msgid "countries"
+msgstr "страны"
+
+#: manager/models.py:119 manager/models.py:126 manager/models.py:138
+msgid "city"
+msgstr "город"
+
+#: manager/models.py:131
+msgid "relationship tour city"
+msgstr "отношение тур город"
+
+#: manager/models.py:132
+msgid "relationships tour city"
+msgstr "отношения тур город"
+
+#: manager/models.py:142
+msgid "street name"
+msgstr "улица"
+
+#: manager/models.py:147
+msgid "house number"
+msgstr "номер дома"
+
+#: manager/models.py:152
+msgid "entrance number"
+msgstr "подъезд"
+
+#: manager/models.py:157
+msgid "floor number"
+msgstr "этаж"
+
+#: manager/models.py:162
+msgid "flat number"
+msgstr "квартира"
+
+#: manager/models.py:175
+msgid "addresses"
+msgstr "адреса"
+
+#: manager/models.py:196 manager/models.py:229
+msgid "account"
+msgstr "аккаунт"
+
+#: manager/models.py:200
+msgid "rating"
+msgstr "рейтинг"
+
+#: manager/models.py:203
+msgid "text"
+msgstr "текст"
+
+#: manager/models.py:210
+#, python-brace-format
+msgid "{self.rating} ({self.account.username}) for {self.agency}"
+msgstr "{self.rating} ({self.account.username}) для {self.agency}"
+
+#: manager/models.py:214
+msgid "review"
+msgstr "обзор"
+
+#: manager/models.py:215
+msgid "reviews"
+msgstr "обзоры"
+
+#: manager/models.py:230
+msgid "accounts"
+msgstr "аккаунты"
+
+#: manager/validators.py:11
+msgid "Street name contains incorrect symbols."
+msgstr "Имя улицы содержит некорректные символы"
+
+#: manager/validators.py:20
+msgid ""
+"Incorrect house number format. Use one of this:\n"
+"12, 12а, 12А,12 А, 12 а, 12 б, 12 я, 121 б, 56/58, 56/58а, 56-58, 56 - 58, "
+"56-58а"
+msgstr ""
+"Некорректный формат номера дома. Попробуйте один из этих:\n"
+"12, 12а, 12А,12 А, 12 а, 12 б, 12 я, 121 б, 56/58, 56/58а, 56-58, 56 - 58, "
+"56-58а"
+
+#: manager/validators.py:30
+msgid "Number must be in format +79999999999"
+msgstr "Номер должен быть в формате +79999999999"
