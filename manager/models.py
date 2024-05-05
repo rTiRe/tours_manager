@@ -114,6 +114,7 @@ class City(UUIDMixin, NameMixin, models.Model):
     point = gismodels.PointField(
         _('city geopoint'),
         srid=4326,
+        unique=True
     )
 
     def __str__(self) -> None:
@@ -123,7 +124,12 @@ class City(UUIDMixin, NameMixin, models.Model):
         db_table = '"tours_data"."city"'  
         verbose_name = _('city')
         verbose_name_plural = _('cities')
-        unique_together = (('name', 'country'),)
+        unique_together = (
+            (
+                'name',
+                'country',
+            ),
+        )
 
 
 class TourCity(UUIDMixin, models.Model):
@@ -189,7 +195,8 @@ class Address(UUIDMixin, models.Model):
                 'house_number', 
                 'entrance_number',
                 'floor',
-                'flat_number'
+                'flat_number',
+                'point',
             ),
         )
 
