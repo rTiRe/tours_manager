@@ -239,6 +239,9 @@ class Account(UUIDMixin, models.Model):
         verbose_name=_('user'),
         on_delete=models.CASCADE
     )
+    is_agency = models.BooleanField(
+        _('agency account'),
+    )
 
     class Meta:
         db_table = '"tours_data"."account"'
