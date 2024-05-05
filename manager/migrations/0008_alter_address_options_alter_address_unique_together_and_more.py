@@ -14,8 +14,8 @@ class Migration(migrations.Migration):
             name='address',
             options={'verbose_name': 'address', 'verbose_name_plural': 'addresses'},
         ),
-        migrations.AlterUniqueTogether(
-            name='address',
-            unique_together={('city', 'street', 'house_number', 'entrance_number', 'floor', 'flat_number')},
-        ),
+        # migrations.AlterUniqueTogether(
+        #     name='address',
+        #     unique_together={('city', 'street', 'house_number', 'entrance_number', 'floor', 'flat_number')},
+        # ),
     ]
