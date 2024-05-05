@@ -5,7 +5,7 @@ import re
 COUNTRIES = []
 
 def street_name_validator(name: str) -> None:
-    rule = re.compile(r'^[^\W\d_]+\.?(?:[-\s\'’][^\W\d_]+\.?)*$')
+    rule = re.compile(r'^[а-яА-ЯёЁa-zA-Z0-9]+$')
     if not rule.search(name):
         raise ValidationError(
             _('Street name contains incorrect symbols.'),
@@ -14,7 +14,7 @@ def street_name_validator(name: str) -> None:
 
 
 def house_number_validator(number: str) -> None:
-    rule = re.compile(r'^[1-9]\d*(?: ?(?:([а-я]|[a-z])|[/-] ?\d+([а-я]|[a-z])?))?$')
+    rule = re.compile(r'^[1-9]\d*(?: ?(?:([а-я]|[a-z])|[\/-] ?[1-9]+\d*([а-я]|[a-z])?))?$')
     if not rule.search(number):
         raise ValidationError(
             _("""Incorrect house number format. Use one of this:
