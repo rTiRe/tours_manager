@@ -229,7 +229,7 @@ class Account(UUIDMixin, models.Model):
     account = models.OneToOneField(
         AUTH_USER_MODEL,
         unique=True,
-        verbose_name=True,
+        verbose_name=_('user'),
         on_delete=models.CASCADE
     )
 
