@@ -181,8 +181,14 @@ class Address(UUIDMixin, models.Model):
 
     def __str__(self) -> str:
         not_null_part = ' '.join([self.city.name, self.street, self.house_number])
-        can_be_null_parts = ' '.join([self.entrance_number, self.floor, self.flat_number])
-        return f'{not_null_part}{can_be_null_parts}'.strip()
+        can_be_null_parts = ' '.join(
+            [
+                str(self.entrance_number),
+                str(self.floor),
+                str(self.flat_number)
+            ]
+        )
+        return f'{not_null_part} {can_be_null_parts}'.strip()
 
     class Meta:
         db_table = '"tours_data"."address"'

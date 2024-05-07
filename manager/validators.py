@@ -5,7 +5,7 @@ import re
 COUNTRIES = []
 
 def street_name_validator(name: str) -> None:
-    rule = re.compile(r'^[а-яА-ЯёЁa-zA-Z0-9]+$')
+    rule = re.compile(r'^[а-яА-ЯёЁa-zA-Z0-9 ]+$')
     if not rule.search(name):
         raise ValidationError(
             _('Street name contains incorrect symbols.'),
