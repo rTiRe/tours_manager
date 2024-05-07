@@ -40,3 +40,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'agency', 'account', 'rating', 'text']
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source = "account.first_name")
+    last_name = serializers.CharField(source = "account.last_name")
+    username = serializers.CharField(source = "account.username")
+
+    class Meta:
+        model = Account
+        fields = ['first_name', 'last_name', 'username', 'is_agency']

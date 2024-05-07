@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework import viewsets, permissions, authentication
-from .models import Agency, Tour, City, Country, Review, Address
-from .serializers import AgencySerializer, TourSerializer, CitySerializer, CountrySerializer, ReviewSerializer, AddressSerializer
+from .models import Agency, Tour, City, Country, Review, Address, Account
+from .serializers import AgencySerializer, TourSerializer, CitySerializer, \
+    CountrySerializer, ReviewSerializer, AddressSerializer, AccountSerializer
 
 def index(request):
     return render(
@@ -38,4 +39,5 @@ CountryViewSet = create_viewset(Country, CountrySerializer)
 CityViewSet = create_viewset(City, CitySerializer)
 AddressViewSet = create_viewset(Address, AddressSerializer)
 ReviewViewSet = create_viewset(Review, ReviewSerializer)
+AccountViewSet = create_viewset(Account, AccountSerializer)
 
