@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.contrib.auth import models
+from django.contrib.auth import models, password_validation
 import re
 
 contains_illegal_characters = _(f'field contains illegal characters.')
@@ -41,6 +41,19 @@ def check_empty(field: str) -> None:
 def check_str(field: str) -> None:
     if not isinstance(field, str):
         raise TypeError(_(f'field must be string, not {type(field).__name__}'))
+
+
+def password_validator(password: str, password2: str) -> None:
+        check_empty(password)
+        check_str(password)
+        password = str(password)
+        password_validation.validate_password(password)
+        password2 = str(password2)
+        if password != password2:
+            raise ValidationError(
+                _('password and password2 must be the same!'),
+                params={'password': password}
+            )
 
 
 def username_validator(username: str) -> None:
