@@ -30,3 +30,8 @@ def phone_number_validator(number: str) -> None:
             _('Number must be in format +79999999999'),
             params={'phone_number': number}
         )
+
+
+def check_empty(field: str) -> None:
+    if not field:
+        raise ValueError(_(f'field can\'t be empty!'))
