@@ -1,6 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.contrib.auth import models, password_validation
+from django.http import QueryDict
+from rest_framework.request import Empty
+from typing import Any
 import re
 
 contains_illegal_characters = _(f'field contains illegal characters.')
@@ -54,6 +57,16 @@ def password_validator(password: str, password2: str) -> None:
                 _('password and password2 must be the same!'),
                 params={'password': password}
             )
+
+
+def user_fields_validator(data: Empty | dict | QueryDict | Any) -> None:
+    user_fields = 'username', 'first_name', 'last_name', 'email', 'password', 'password2'
+    set_user_keys = set(user_fields)
+    data_fields = data.keys()
+    if not set_user_keys.issubset(data_fields):
+        keys = list(set_user_keys - set(data_fields))
+        response_dict = {key: _('field must be present') for key in keys}
+        raise ValidationError(str(response_dict))
 
 
 def username_validator(username: str) -> None:
