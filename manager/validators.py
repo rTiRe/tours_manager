@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.auth import models
 import re
 
 contains_illegal_characters = _(f'field contains illegal characters.')
@@ -40,6 +41,22 @@ def check_empty(field: str) -> None:
 def check_str(field: str) -> None:
     if not isinstance(field, str):
         raise TypeError(_(f'field must be string, not {type(field).__name__}'))
+
+
+def username_validator(username: str) -> None:
+        check_empty(username)
+        check_str(username)
+        rule = re.compile(r'^[a-z][a-z_0-9]*[^_]$')
+        if not rule.search(username):
+            raise ValidationError(
+                contains_illegal_characters,
+                params={'username': username}
+            )
+        if models.User.objects.filter(username=username).exists():
+            raise ValidationError(
+                _(f'{username} already exists!'),
+                params={'username': username}
+            )
 
 
 def name_validator(name: str, type: str = None) -> None:
