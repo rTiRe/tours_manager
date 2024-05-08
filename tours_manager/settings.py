@@ -106,9 +106,9 @@ DATABASES = {
         'HOST': getenv('PG_HOST'),
         'PORT': getenv('PG_PORT'),
         'OPTIONS': {'options': '-c search_path=public,tours_data'},
-        # 'TEST': {
-        #     'NAME': 'test_db',
-        # },
+        'TEST': {
+            'NAME': 'test_db',
+        },
     }
 }
 
@@ -155,3 +155,5 @@ LOACLE_PATH = 'manager/locale'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TEST_RUNNER = 'tests.runner.PostgresSchemaRunner'
