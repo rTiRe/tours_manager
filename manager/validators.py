@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 import re
 
-COUNTRIES = []
+contains_illegal_characters = _(f'field contains illegal characters.')
 
 def street_name_validator(name: str) -> None:
     rule = re.compile(r'^[а-яА-ЯёЁa-zA-Z0-9 ]+$')
@@ -40,3 +40,15 @@ def check_empty(field: str) -> None:
 def check_str(field: str) -> None:
     if not isinstance(field, str):
         raise TypeError(_(f'field must be string, not {type(field).__name__}'))
+
+
+def name_validator(name: str, type: str = None) -> None:
+    check_empty(name)
+    check_str(name)
+    rule = re.compile(r'^[а-яА-ЯёЁa-zA-Z-]+$')
+    if not rule.search(name):
+        type = f'{type}_' if type else ''
+        raise ValidationError(
+            contains_illegal_characters,
+            params={f'{type}name': name}
+        )
