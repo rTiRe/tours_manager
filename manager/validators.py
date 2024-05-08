@@ -14,7 +14,7 @@ def street_name_validator(name: str) -> None:
 
 
 def house_number_validator(number: str) -> None:
-    rule = re.compile(r'^[1-9]\d*(?: ?(?:([а-я]|[a-z])|[\/-] ?[1-9]+\d*([а-я]|[a-z])?))?$')
+    rule = re.compile(r'^[1-9]\d*(?: ?(?:([а-яА-Яa-zA-Z])|[\/-] ?[1-9]+\d*([а-яА-Яa-zA-Z])?))?$')
     if not rule.search(number):
         raise ValidationError(
             _("""Incorrect house number format. Use one of this:
