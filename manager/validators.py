@@ -35,3 +35,8 @@ def phone_number_validator(number: str) -> None:
 def check_empty(field: str) -> None:
     if not field:
         raise ValueError(_(f'field can\'t be empty!'))
+
+
+def check_str(field: str) -> None:
+    if not isinstance(field, str):
+        raise TypeError(_(f'field must be string, not {type(field).__name__}'))
