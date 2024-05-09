@@ -71,17 +71,25 @@ class AccountViewSet(viewsets.ModelViewSet):
     ) -> str:
         return re.sub(rule, replacement, replaceable, 0, re.MULTILINE)
 
-    def __name_validator(self, data: Empty | dict | QueryDict | Any) -> None | Response:
-        for name in ('first', 'last'):
+    def __name_validator(self, data: Empty | dict | QueryDict | Any, names: list = ['first', 'last']) -> None | Response:
+        for name in names:
             try:
                 name_validator(data[f'{name}_name'], name)
             except (exceptions.ValidationError, ValueError, TypeError) as e:
-                replaced = json.loads(self.replace_single_quote(str(e)))[0]
+                replaced = self.replace_single_quote(str(e))
+                if type(e) == exceptions.ValidationError:
+                    replaced = json.loads(replaced)[0]
                 return Response({f'{name}_name': replaced}, status=status.HTTP_400_BAD_REQUEST)
 
     def __password_validator(self, data: Empty | dict | QueryDict | Any) -> None | Response:
-        password = data['password']
-        password2 = data.pop('password2')
+        password = data.get('password', None)
+        try:
+            password2 = data.pop('password2')
+        except KeyError:
+            if password:
+                return Response({'passwor2': 'field must be present'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                password2 = None
         try:
             password_validator(password, password2)
         except (exceptions.ValidationError, TypeError, ValueError) as e:
@@ -103,7 +111,9 @@ class AccountViewSet(viewsets.ModelViewSet):
         try:
             username_validator(username, ignore_existing_username)
         except (exceptions.ValidationError, ValueError, TypeError) as e:
-            replaced = json.loads(self.replace_single_quote(str(e)))[0]
+            replaced = self.replace_single_quote(str(e))
+            if type(e) == exceptions.ValidationError:
+                    replaced = json.loads(replaced)[0]
             return Response({'username': replaced}, status=status.HTTP_400_BAD_REQUEST)
 
     def __email_validator(self, data: Empty | dict | QueryDict | Any) -> None | Response:
@@ -111,9 +121,9 @@ class AccountViewSet(viewsets.ModelViewSet):
             response_json = {'email': _('Incorrect email address.')}
             return Response(response_json, status=status.HTTP_400_BAD_REQUEST)
 
-    def __fields_validator(self, data: Empty | dict | QueryDict | Any) -> None | Response:
+    def __fields_validator(self, data: Empty | dict | QueryDict | Any, check_required: bool = True) -> None | Response:
         try:
-            user_fields_validator(data)
+            user_fields_validator(data, check_required)
         except exceptions.ValidationError as e:
             replaced = self.replace_single_quote(
                 json.loads(str(e))[0],
@@ -122,28 +132,51 @@ class AccountViewSet(viewsets.ModelViewSet):
             )
             return Response(json.loads(replaced), status=status.HTTP_400_BAD_REQUEST)
 
-    def __get_is_agency(self, data: Empty | dict | QueryDict | Any) -> bool:
+    def __get_is_agency(self, data: Empty | dict | QueryDict | Any) -> None | bool:
         try:
-            if data.pop('is_agency'):
-                return True
+            is_agency = data.pop('is_agency')
         except KeyError:
-            return False
+            return None
+        return is_agency
 
     def __user_validator(
         self,
         data: Empty | dict | QueryDict | Any,
-        ignore_existing_username: bool = False
+        ignore_existing_username: bool = False,
+        check_required: bool = True,
+        partial: bool = False
     ) -> Response:
-        validators = [
-            self.__fields_validator,
-            self.__email_validator,
-            self.__username_validator,
-            self.__password_validator,
-            self.__name_validator,
-        ]
-        for validator in validators:
-            if validator == self.__username_validator:
+        validators = {
+            self.__fields_validator: '',
+            self.__email_validator: 'email',
+            self.__username_validator: 'username',
+            self.__password_validator: 'password',
+            self.__name_validator: ['first', 'last'],
+        }
+        for validator in validators.keys():
+            if partial:
+                continue_validators = [
+                    self.__email_validator,
+                    self.__username_validator,
+                    self.__password_validator
+                ]
+                if validator in continue_validators and not data.get(validators[validator]):
+                    if validator == self.__password_validator and data.get('password2'):
+                        return Response({'password': 'field must be present'}, status=status.HTTP_400_BAD_REQUEST)  
+
+                    continue
+                elif validator == self.__name_validator:
+                    names = validators[validator]
+                    if not data.get('first_name', None):
+                        names.remove('first')
+                    if not data.get('last_name', None):
+                        names.remove('last')
+            if validator == self.__fields_validator:
+                validation_result = validator(data, check_required)
+            elif validator == self.__username_validator:
                 validation_result = validator(data, ignore_existing_username)
+            elif validator == self.__name_validator:
+                validation_result = validator(data, validators[validator])
             else:
                 validation_result = validator(data)
             if validation_result:
@@ -159,35 +192,54 @@ class AccountViewSet(viewsets.ModelViewSet):
         self,
         user: User,
         data: Empty | dict | QueryDict | Any,
-        ignore_existing_username: bool = False
+        ignore_existing_username: bool = False,
+        check_required: bool = True,
+        partial: bool = False
     ) -> User | Response:
-        user_validation_result = self.__user_validator(data, ignore_existing_username)
+        user_validation_result = self.__user_validator(
+            data,
+            ignore_existing_username,
+            check_required=check_required,
+            partial=partial
+        )
         if user_validation_result:
             if user_validation_result.data == {'username': f'{user.username} already exists!'}:
-                return self.__update_user(user, data, True)
+                return self.__update_user(user, data, True, check_required=check_required, partial=partial)
             return user_validation_result
         try:
             password = data.pop('password')
         except KeyError:
             password = None
-        if password and user.check_password(password):
+        if password and not user.check_password(password):
             user.set_password(password)
             user.save()
+        if data.get('password2'):
+            del data['password2']
         User.objects.filter(username=user.username).update(**data)
-        return User.objects.get(username=data['username'])
+        if data.get('username'):
+            username = data['username']
+        else:
+            username = user.username
+        return User.objects.get(username=username)
 
-    def update(self, request, *args, **kwargs):
-        data = request.data
+    def update(self, request, check_required: bool = True, partial: bool = False, *args, **kwargs):
+        data: dict = request.data
         is_agency = self.__get_is_agency(data)
         instance = self.get_object()
-        user = self.__update_user(instance.account, data)
+        user = self.__update_user(instance.account, data, check_required=check_required, partial=partial)
         if isinstance(user, Response):
             return user
-        del data['email']
-        data['is_agency'] = is_agency
-        Account.objects.filter(account=user).update(account=user, is_agency=is_agency)
+        if data.get('email'):
+            del data['email']
+        update_data = {'account': user}
+        if is_agency != None:
+            data['is_agency'] = is_agency
+            update_data['is_agency'] = is_agency
+        Account.objects.filter(account=user).update(**update_data)
+        return Response()
 
-        return Response(data)
+    def partial_update(self, request, *args, **kwargs) -> Response:
+        return self.update(request, check_required=False, partial=True, *args, **kwargs)
 
     def create(self, request: Request) -> Response:
         data = request.data
@@ -203,4 +255,3 @@ class AccountViewSet(viewsets.ModelViewSet):
     def destroy(self, request: Request, *args, **kwargs) -> Response:
         self.get_object().account.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
