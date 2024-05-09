@@ -43,10 +43,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(source = "account.first_name")
-    last_name = serializers.CharField(source = "account.last_name")
-    username = serializers.CharField(source = "account.username")
-    password = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(source = 'account.first_name')
+    last_name = serializers.CharField(source = 'account.last_name')
+    username = serializers.CharField(source = 'account.username')
+    password = serializers.CharField(source = 'account.password', write_only=True)
 
     class Meta:
         model = Account

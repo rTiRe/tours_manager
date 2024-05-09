@@ -69,7 +69,7 @@ def user_fields_validator(data: Empty | dict | QueryDict | Any) -> None:
         raise ValidationError(str(response_dict))
 
 
-def username_validator(username: str) -> None:
+def username_validator(username: str, ignore_existing_username: bool = False) -> None:
     check_empty(username)
     check_str(username)
     rule = re.compile(r'^[a-z][a-z_0-9]*[^_]$')
@@ -78,7 +78,7 @@ def username_validator(username: str) -> None:
             contains_illegal_characters,
             params={'username': username}
         )
-    if models.User.objects.filter(username=username).exists():
+    if models.User.objects.filter(username=username).exists() and not ignore_existing_username:
         raise ValidationError(
             _(f'{username} already exists!'),
             params={'username': username}

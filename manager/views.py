@@ -94,10 +94,14 @@ class AccountViewSet(viewsets.ModelViewSet):
                 e = json.loads(f'"{replaced}"')
             return Response({'password': e}, status=status.HTTP_400_BAD_REQUEST)
 
-    def __username_validator(self, data: Empty | dict | QueryDict | Any) -> None | Response:
+    def __username_validator(
+        self,
+        data: Empty | dict | QueryDict | Any,
+        ignore_existing_username: bool = False
+    ) -> None | Response:
         username = data['username']
         try:
-            username_validator(username)
+            username_validator(username, ignore_existing_username)
         except (exceptions.ValidationError, ValueError, TypeError) as e:
             replaced = json.loads(self.replace_single_quote(str(e)))[0]
             return Response({'username': replaced}, status=status.HTTP_400_BAD_REQUEST)
@@ -118,7 +122,18 @@ class AccountViewSet(viewsets.ModelViewSet):
             )
             return Response(json.loads(replaced), status=status.HTTP_400_BAD_REQUEST)
 
-    def __create_user(self, data: Empty | dict | QueryDict | Any) -> User | Response:
+    def __get_is_agency(self, data: Empty | dict | QueryDict | Any) -> bool:
+        try:
+            if data.pop('is_agency'):
+                return True
+        except KeyError:
+            return False
+
+    def __user_validator(
+        self,
+        data: Empty | dict | QueryDict | Any,
+        ignore_existing_username: bool = False
+    ) -> Response:
         validators = [
             self.__fields_validator,
             self.__email_validator,
@@ -127,17 +142,52 @@ class AccountViewSet(viewsets.ModelViewSet):
             self.__name_validator,
         ]
         for validator in validators:
-            validation_result = validator(data)
+            if validator == self.__username_validator:
+                validation_result = validator(data, ignore_existing_username)
+            else:
+                validation_result = validator(data)
             if validation_result:
                 return validation_result
+
+    def __create_user(self, data: Empty | dict | QueryDict | Any) -> User | Response:
+        user_validation_result = self.__user_validator(data)
+        if user_validation_result:
+            return user_validation_result
         return User.objects.create_user(**data)
+
+    def __update_user(
+        self,
+        user: User,
+        data: Empty | dict | QueryDict | Any,
+        ignore_existing_username: bool = False
+    ) -> User | Response:
+        user_validation_result = self.__user_validator(data, ignore_existing_username)
+        if user_validation_result:
+            if user_validation_result.data == {'username': f'{user.username} already exists!'}:
+                return self.__update_user(user, data, True)
+            return user_validation_result
+        password = data.pop('password')
+        User.objects.filter(username=user.username).update(**data)
+        user.set_password(password)
+        user.save()
+        return User.objects.get(username=data['username'])
+
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        is_agency = self.__get_is_agency(data)
+        instance = self.get_object()
+        user = self.__update_user(instance.account, data)
+        if isinstance(user, Response):
+            return user
+        del data['email']
+        data['is_agency'] = is_agency
+        Account.objects.filter(account=user).update(account=user, is_agency=is_agency)
+
+        return Response(data)
 
     def create(self, request: Request) -> Response:
         data = request.data
-        try:
-            is_agency = data.pop('is_agency')
-        except KeyError:
-            is_agency = False
+        is_agency = self.__get_is_agency(data)
         user = self.__create_user(data)
         if isinstance(user, Response):
             return user
