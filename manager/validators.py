@@ -47,16 +47,16 @@ def check_str(field: str) -> None:
 
 
 def password_validator(password: str, password2: str) -> None:
-        check_empty(password)
-        check_str(password)
-        password = str(password)
-        password_validation.validate_password(password)
-        password2 = str(password2)
-        if password != password2:
-            raise ValidationError(
-                _('password and password2 must be the same!'),
-                params={'password': password}
-            )
+    check_empty(password)
+    check_str(password)
+    password = str(password)
+    password_validation.validate_password(password)
+    password2 = str(password2)
+    if password != password2:
+        raise ValidationError(
+            _('password and password2 must be the same!'),
+            params={'password': password}
+        )
 
 
 def user_fields_validator(data: Empty | dict | QueryDict | Any) -> None:
@@ -70,19 +70,19 @@ def user_fields_validator(data: Empty | dict | QueryDict | Any) -> None:
 
 
 def username_validator(username: str) -> None:
-        check_empty(username)
-        check_str(username)
-        rule = re.compile(r'^[a-z][a-z_0-9]*[^_]$')
-        if not rule.search(username):
-            raise ValidationError(
-                contains_illegal_characters,
-                params={'username': username}
-            )
-        if models.User.objects.filter(username=username).exists():
-            raise ValidationError(
-                _(f'{username} already exists!'),
-                params={'username': username}
-            )
+    check_empty(username)
+    check_str(username)
+    rule = re.compile(r'^[a-z][a-z_0-9]*[^_]$')
+    if not rule.search(username):
+        raise ValidationError(
+            contains_illegal_characters,
+            params={'username': username}
+        )
+    if models.User.objects.filter(username=username).exists():
+        raise ValidationError(
+            _(f'{username} already exists!'),
+            params={'username': username}
+        )
 
 
 def name_validator(name: str, type: str = None) -> None:
