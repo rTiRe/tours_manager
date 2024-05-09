@@ -63,14 +63,31 @@ class AccountViewSet(viewsets.ModelViewSet):
     permission_classes = [CustomViewSetPermission]
     authentication_classes = [authentication.TokenAuthentication]
 
+    def replace_single_quote(
+            self,
+            replaceable: str,
+            replacement: str = '"\\g<1>"',
+            rule: str = r'\'([\s\S]*?)\''
+    ) -> str:
+        return re.sub(rule, replacement, replaceable, 0, re.MULTILINE)
+
+    def __name_validator(self, data: request.Empty | dict | QueryDict | Any) -> None | Response:
+        for name in ('first', 'last'):
+            try:
+                name_validator(data[f'{name}_name'], name)
+            except (exceptions.ValidationError, ValueError, TypeError) as e:
+                replaced = json.loads(self.replace_single_quote(str(e)))[0]
+                return Response({f'{name}_name': replaced}, status=status.HTTP_400_BAD_REQUEST)
+
     def __create_user(self, data: request.Empty | dict | QueryDict | Any) -> User | Response:
         try:
             user_fields_validator(data)
         except exceptions.ValidationError as e:
-            rule = r'\'(\w+)\': \'([\w\s]*)\''
-            replaceable = json.loads(str(e))[0]
-            replacement = '"\\g<1>": "\\g<2>"'
-            replaced = re.sub(rule, replacement, replaceable, 0, re.MULTILINE)
+            replaced = self.replace_single_quote(
+                json.loads(str(e))[0],
+                '"\\g<1>": "\\g<2>"',
+                r'\'(\w+)\': \'([\w\s]*)\''
+            )
             return Response(json.loads(replaced), status=status.HTTP_400_BAD_REQUEST)
         if not validate(data['email'], check_blacklist=False, check_dns=False, check_smtp=False):
             response_json = {'email': _('Incorrect email address.')}
@@ -78,25 +95,25 @@ class AccountViewSet(viewsets.ModelViewSet):
         username = data['username']
         try:
             username_validator(username)
-        except (exceptions.ValidationError, ValueError) as e:
-            return Response({'username': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except (exceptions.ValidationError, ValueError, TypeError) as e:
+            replaced = json.loads(self.replace_single_quote(str(e)))[0]
+            return Response({'username': replaced}, status=status.HTTP_400_BAD_REQUEST)
         password = data['password']
-        password2 = data['password2']
+        password2 = data.pop('password2')
         try:
             password_validator(password, password2)
         except (exceptions.ValidationError, TypeError, ValueError) as e:
-            rule = r'\'([\s\S]*?)\''
-            replaceable = str(e)
-            replacement = '"\\g<1>"'
-            replaced = re.sub(rule, replacement, replaceable, 0, re.MULTILINE)
-            print(replaced)
+            replaced = self.replace_single_quote(str(e))
             try:
                 e = json.loads(replaced)
+                if len(e) == 1:
+                    e = e[0]
             except json.decoder.JSONDecodeError:
                 e = json.loads(f'"{replaced}"')
             return Response({'password': e}, status=status.HTTP_400_BAD_REQUEST)
-        name_validator(data['first_name'], 'first')
-        name_validator(data['last_name'], 'last')
+        name_validation_result = self.__name_validator(data)
+        if name_validation_result:
+            return name_validation_result
         return User.objects.create_user(**data)
 
     def create(self, request: request.Request) -> Response:
@@ -111,10 +128,9 @@ class AccountViewSet(viewsets.ModelViewSet):
         Account.objects.create(account=user, is_agency=is_agency)
         del data['password']
         data['is_agency'] = is_agency
-        print(data)
         return Response(data, status=status.HTTP_201_CREATED)
 
-    def destroy(self, request: request.Request, *args, **kwargs):
+    def destroy(self, request: request.Request, *args, **kwargs) -> Response:
         self.get_object().account.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
