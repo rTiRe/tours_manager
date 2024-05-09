@@ -61,12 +61,18 @@ def password_validator(password: str, password2: str) -> None:
 
 def user_fields_validator(data: Empty | dict | QueryDict | Any) -> None:
     user_fields = 'username', 'first_name', 'last_name', 'email', 'password', 'password2'
-    set_user_keys = set(user_fields)
+    set_user_fields = set(user_fields)
     data_fields = data.keys()
-    if not set_user_keys.issubset(data_fields):
-        keys = list(set_user_keys - set(data_fields))
+    if not set_user_fields.issubset(data_fields):
+        keys = list(set_user_fields - set(data_fields))
         response_dict = {key: _('field must be present') for key in keys}
         raise ValidationError(str(response_dict))
+    unknown_keys = {}
+    for key in data.keys():
+        if key not in user_fields:
+            unknown_keys[key] = 'unknown key'
+    if unknown_keys:
+        raise ValidationError(str(unknown_keys))
 
 
 def username_validator(username: str, ignore_existing_username: bool = False) -> None:
