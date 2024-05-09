@@ -166,10 +166,14 @@ class AccountViewSet(viewsets.ModelViewSet):
             if user_validation_result.data == {'username': f'{user.username} already exists!'}:
                 return self.__update_user(user, data, True)
             return user_validation_result
-        password = data.pop('password')
+        try:
+            password = data.pop('password')
+        except KeyError:
+            password = None
+        if password and user.check_password(password):
+            user.set_password(password)
+            user.save()
         User.objects.filter(username=user.username).update(**data)
-        user.set_password(password)
-        user.save()
         return User.objects.get(username=data['username'])
 
     def update(self, request, *args, **kwargs):
