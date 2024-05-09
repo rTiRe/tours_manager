@@ -1,19 +1,23 @@
-from django.shortcuts import render
-from django.http import QueryDict
-from django.core import exceptions
-from rest_framework import viewsets, permissions, authentication, request, status
-from rest_framework.response import Response
-from django.contrib.auth.models import User
-from .models import Agency, Tour, City, Country, Review, Address, Account
-from .serializers import AgencySerializer, TourSerializer, CitySerializer, \
-    CountrySerializer, ReviewSerializer, AddressSerializer, AccountSerializer
-from django.utils.translation import gettext_lazy as _
-from typing import Any
 import json
-from .validators import password_validator, username_validator, \
-    user_fields_validator, name_validator
 import re
+from typing import Any
+
+from django.contrib.auth.models import User
+from django.core import exceptions
+from django.http import QueryDict
+from django.shortcuts import render
+from django.utils.translation import gettext_lazy as _
 from email_validate import validate
+from rest_framework import (authentication, permissions, request, status,
+                            viewsets)
+from rest_framework.response import Response
+
+from .models import Account, Address, Agency, City, Country, Review, Tour
+from .serializers import (AccountSerializer, AddressSerializer,
+                          AgencySerializer, CitySerializer, CountrySerializer,
+                          ReviewSerializer, TourSerializer)
+from .validators import (name_validator, password_validator,
+                         user_fields_validator, username_validator)
 
 
 def index(request):
