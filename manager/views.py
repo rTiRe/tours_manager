@@ -110,3 +110,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         print(data)
         return Response(data, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request: request.Request, *args, **kwargs):
+        self.get_object().account.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
