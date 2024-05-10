@@ -157,3 +157,4 @@ LOACLE_PATH = 'manager/locale'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TEST_RUNNER = 'tests.runner.PostgresSchemaRunner'
+APPEND_SLASH=False
