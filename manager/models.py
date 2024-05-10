@@ -89,6 +89,7 @@ class Country(UUIDMixin, models.Model):
     name = models.CharField(
         _('country'),
         max_length=COUNTRY_MAX_LEN,
+        unique=True,
     )
 
     def __str__(self) -> str:
