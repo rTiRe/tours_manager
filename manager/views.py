@@ -136,7 +136,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         try:
             is_agency = data.pop('is_agency')
         except KeyError:
-            return None
+            return False
         return is_agency
 
     def __user_validator(
