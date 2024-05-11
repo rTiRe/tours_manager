@@ -49,8 +49,9 @@ class AccountSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(source = 'account.last_name')
     username = serializers.CharField(source = 'account.username')
     password = serializers.CharField(source = 'account.password', write_only=True)
+    email = serializers.EmailField(source = 'account.email')
 
     class Meta:
         model = Account
-        fields = ['first_name', 'last_name', 'username', 'is_agency', 'password']
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'is_agency', 'password']
         extra_kwargs = {'password': {'write_only': True}}
