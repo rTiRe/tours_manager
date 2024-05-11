@@ -225,7 +225,14 @@ class AccountViewSet(viewsets.ModelViewSet):
         )
         if user_validation_result:
             if user_validation_result.data == {'username': f'{user.username} already exists!'}:
-                return self.__update_user(user, data, True, check_required=check_required, partial=partial)
+                return self.__update_user(
+                    user,
+                    data,
+                    ignore_existing_username=True,
+                    check_required=check_required,
+                    partial=partial,
+                    ignore_emails=ignore_emails
+                )
             return user_validation_result
         try:
             password = data.pop('password')
