@@ -40,6 +40,14 @@ class CustomViewSetPermission(permissions.BasePermission):
         return False
 
 
+class AccountViewSetPermission(permissions.BasePermission):
+    def has_permission(self, request, _):
+        user = request.user
+        if user and user.is_superuser:
+            return True
+        return False
+
+
 def create_viewset(model_class, serializer):
     class CustomViewSet(viewsets.ModelViewSet):
         serializer_class = serializer
@@ -60,7 +68,7 @@ ReviewViewSet = create_viewset(Review, ReviewSerializer)
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
     queryset = Account.objects.all()
-    permission_classes = [CustomViewSetPermission]
+    permission_classes = [AccountViewSetPermission]
     authentication_classes = [authentication.TokenAuthentication]
 
     def replace_single_quote(
