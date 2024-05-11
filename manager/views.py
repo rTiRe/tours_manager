@@ -124,11 +124,16 @@ class AccountViewSet(viewsets.ModelViewSet):
                     replaced = json.loads(replaced)[0]
             return Response({'username': replaced}, status=status.HTTP_400_BAD_REQUEST)
 
-    def __email_validator(self, data: Empty | dict | QueryDict | Any) -> None | Response:
+    def __email_validator(
+            self,
+            data: Empty | dict | QueryDict | Any,
+            ignore_emails: list | tuple = []
+        ) -> None | Response:
         if not validate(data['email'], check_blacklist=False, check_dns=False, check_smtp=False):
             response_json = {'email': _('Incorrect email address.')}
             return Response(response_json, status=status.HTTP_400_BAD_REQUEST)
-        if User.objects.filter(email=data['email']).exists():
+        email = data['email']
+        if User.objects.filter(email=email).exists() and email not in ignore_emails:
             response_json = {'email': _('a user with this email already exists')}
             return Response(response_json, status=status.HTTP_400_BAD_REQUEST)
 
@@ -154,6 +159,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         self,
         data: Empty | dict | QueryDict | Any,
         ignore_existing_username: bool = False,
+        ignore_emails: list | tuple = [],
         check_required: bool = True,
         partial: bool = False
     ) -> Response:
@@ -188,6 +194,8 @@ class AccountViewSet(viewsets.ModelViewSet):
                 validation_result = validator(data, ignore_existing_username)
             elif validator == self.__name_validator:
                 validation_result = validator(data, validators[validator])
+            elif validator == self.__email_validator:
+                validation_result = validator(data, ignore_emails=ignore_emails)
             else:
                 validation_result = validator(data)
             if validation_result:
@@ -204,6 +212,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         user: User,
         data: Empty | dict | QueryDict | Any,
         ignore_existing_username: bool = False,
+        ignore_emails: tuple | list = [],
         check_required: bool = True,
         partial: bool = False
     ) -> User | Response:
@@ -211,6 +220,7 @@ class AccountViewSet(viewsets.ModelViewSet):
             data,
             ignore_existing_username,
             check_required=check_required,
+            ignore_emails=ignore_emails,
             partial=partial
         )
         if user_validation_result:
@@ -237,11 +247,16 @@ class AccountViewSet(viewsets.ModelViewSet):
         data: dict = request.data
         is_agency = self.__get_is_agency(data)
         instance = self.get_object()
-        user = self.__update_user(instance.account, data, check_required=check_required, partial=partial)
+        user: User = instance.account
+        user = self.__update_user(
+            user,
+            data,
+            check_required=check_required,
+            partial=partial,
+            ignore_emails=[user.email]
+        )
         if isinstance(user, Response):
             return user
-        if data.get('email'):
-            del data['email']
         update_data = {'account': user}
         if is_agency != None:
             data['is_agency'] = is_agency
@@ -258,9 +273,10 @@ class AccountViewSet(viewsets.ModelViewSet):
         user = self.__create_user(data)
         if isinstance(user, Response):
             return user
-        Account.objects.create(account=user, is_agency=is_agency)
+        account = Account.objects.create(account=user, is_agency=is_agency)
         del data['password']
         data['is_agency'] = is_agency
+        data['id'] = account.id
         return Response(data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request: Request, *args, **kwargs) -> Response:
