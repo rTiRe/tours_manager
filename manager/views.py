@@ -120,6 +120,9 @@ class AccountViewSet(viewsets.ModelViewSet):
         if not validate(data['email'], check_blacklist=False, check_dns=False, check_smtp=False):
             response_json = {'email': _('Incorrect email address.')}
             return Response(response_json, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(email=data['email']).exists():
+            response_json = {'email': _('a user with this email already exists')}
+            return Response(response_json, status=status.HTTP_400_BAD_REQUEST)
 
     def __fields_validator(self, data: Empty | dict | QueryDict | Any, check_required: bool = True) -> None | Response:
         try:
