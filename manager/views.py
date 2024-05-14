@@ -1,23 +1,10 @@
-import json
-import re
-from typing import Any
-
-from django.contrib.auth.models import User
-from django.core import exceptions
-from django.http import QueryDict
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
-from email_validate import validate
-from rest_framework import authentication, permissions, status, viewsets
-from rest_framework.response import Response
-from rest_framework.request import Request, Empty
+from rest_framework import authentication, permissions, viewsets
 
-from .models import Account, Address, Agency, City, Country, Review, Tour
-from .serializers import (AccountSerializer, AddressSerializer,
-                          AgencySerializer, CitySerializer, CountrySerializer,
+from .models import Address, Agency, Review, Tour
+from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .validators import (name_validator, password_validator,
-                         user_fields_validator, username_validator)
 
 
 def index(request):
@@ -51,7 +38,5 @@ def create_viewset(model_class, serializer):
 
 AgencyViewSet = create_viewset(Agency, AgencySerializer)
 TourViewSet = create_viewset(Tour, TourSerializer)
-CountryViewSet = create_viewset(Country, CountrySerializer)
-CityViewSet = create_viewset(City, CitySerializer)
 AddressViewSet = create_viewset(Address, AddressSerializer)
 ReviewViewSet = create_viewset(Review, ReviewSerializer)
