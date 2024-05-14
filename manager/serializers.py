@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Agency, Tour, Country, City, Address, Review, Account
+from .models import Agency, Tour, City, Address, Review
 
 class AgencySerializer(serializers.ModelSerializer):
     class Meta:
