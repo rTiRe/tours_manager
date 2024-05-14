@@ -45,16 +45,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'agency', 'account', 'rating', 'text']
-
-
-class AccountSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(source = 'account.first_name')
-    last_name = serializers.CharField(source = 'account.last_name')
-    username = serializers.CharField(source = 'account.username')
-    password = serializers.CharField(source = 'account.password', write_only=True)
-    email = serializers.EmailField(source = 'account.email')
-
-    class Meta:
-        model = Account
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'is_agency', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
