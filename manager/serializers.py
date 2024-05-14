@@ -15,12 +15,6 @@ class TourSerializer(serializers.ModelSerializer):
         optional_fields = ['description']
 
 
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Country
-        fields = ['id', 'name']
-
-
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
