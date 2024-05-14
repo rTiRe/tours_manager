@@ -7,13 +7,6 @@ class AgencySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'phone_number', 'address']
 
 
-class CitySerializer(serializers.ModelSerializer):
-    tours = serializers.PrimaryKeyRelatedField(queryset=Tour.objects.all(), many=True)
-    class Meta:
-        model = City
-        fields = ['id', 'name', 'country', 'tours', 'point']
-
-
 class TourSerializer(serializers.ModelSerializer):
     cities = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), many=True)
     class Meta:
