@@ -29,6 +29,8 @@ jobs:
         pip install GDAL==3.6.4
         python -m pip install --upgrade pip
         pip install -r tests/requirements.txt
+        sudo apt-get install libpq-dev
+        sudo apt install postgresql@16
         sudo apt install postgis
         sudo ln -s /opt/homebrew/Cellar/postgresql@16/16.0/bin/postgres /usr/local/bin/postgres
         wget https://download.osgeo.org/postgis/source/postgis-3.4.0.tar.gz
