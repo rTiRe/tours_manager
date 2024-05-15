@@ -15,6 +15,11 @@ STREET_MAX_LEN = 255
 HOUSE_NUMBER_MAX_LEN = 8
 REVIEW_TEXT_MAX_LEN = 8192
 
+name_field = 'name'
+agency_field = 'agency'
+country_field = 'country'
+city_field = 'city'
+
 
 class UUIDMixin(models.Model):
     id = models.UUIDField(
@@ -29,7 +34,7 @@ class UUIDMixin(models.Model):
 
 class NameMixin(models.Model):
     name = models.CharField(
-        verbose_name=_('name'),
+        verbose_name=_(name_field),
         max_length=NAME_MAX_LEN,
     )
 
@@ -55,17 +60,17 @@ class Agency(UUIDMixin, NameMixin, models.Model):
 
     class Meta:
         db_table = '"tours_data"."agency"'
-        ordering = ['name']
-        verbose_name = _('agency')
+        ordering = [name_field]
+        verbose_name = _(agency_field)
         verbose_name_plural = _('agencies')
-        unique_together = (('name',),)
+        unique_together = ((name_field,),)
 
 
 class Tour(UUIDMixin, NameMixin, models.Model):
     description = models.TextField(_('description'))
     agency = models.ForeignKey(
         Agency,
-        verbose_name=_('agency'),
+        verbose_name=_(agency_field),
         on_delete=models.CASCADE,
     )
     cities = models.ManyToManyField(
@@ -79,15 +84,15 @@ class Tour(UUIDMixin, NameMixin, models.Model):
 
     class Meta:
         db_table = '"tours_data"."tour"'
-        ordering = ['name']
+        ordering = [name_field]
         verbose_name = _('tour')
         verbose_name_plural = _('tours')
-        unique_together = (('name', 'description', 'agency'),)
+        unique_together = ((name_field, 'description', agency_field),)
 
 
 class Country(UUIDMixin, models.Model):
     name = models.CharField(
-        _('country'),
+        _(country_field),
         max_length=COUNTRY_MAX_LEN,
         unique=True,
     )
@@ -104,7 +109,7 @@ class Country(UUIDMixin, models.Model):
 class City(UUIDMixin, NameMixin, models.Model):
     country = models.ForeignKey(
         Country,
-        verbose_name=_('country'),
+        verbose_name=_(country_field),
         on_delete=models.CASCADE,
     )
     tours = models.ManyToManyField(
@@ -123,23 +128,23 @@ class City(UUIDMixin, NameMixin, models.Model):
 
     class Meta:
         db_table = '"tours_data"."city"'
-        verbose_name = _('city')
+        verbose_name = _(city_field)
         verbose_name_plural = _('cities')
         unique_together = (
             (
-                'name',
-                'country',
+                name_field,
+                country_field,
             ),
         )
 
 
 class TourCity(UUIDMixin, models.Model):
     tour = models.ForeignKey(Tour, verbose_name=_('tour'), on_delete=models.CASCADE)
-    city = models.ForeignKey(City, verbose_name=_('city'), on_delete=models.CASCADE)
+    city = models.ForeignKey(City, verbose_name=_(city_field), on_delete=models.CASCADE)
 
     class Meta:
         db_table = '"tours_data"."tour_city"'
-        unique_together = (('tour', 'city'),)
+        unique_together = (('tour', city_field),)
         verbose_name = _('relationship tour city')
         verbose_name_plural = _('relationships tour city')
 
@@ -147,7 +152,7 @@ class TourCity(UUIDMixin, models.Model):
 class Address(UUIDMixin, models.Model):
     city = models.ForeignKey(
         City,
-        verbose_name=_('city'),
+        verbose_name=_(city_field),
         on_delete=models.CASCADE,
     )
     street = models.CharField(
@@ -211,7 +216,7 @@ class Address(UUIDMixin, models.Model):
 class Review(UUIDMixin, models.Model):
     agency = models.ForeignKey(
         Agency,
-        verbose_name=_('agency'),
+        verbose_name=_(agency_field),
         on_delete=models.CASCADE,
     )
     account = models.ForeignKey(
@@ -239,7 +244,7 @@ class Review(UUIDMixin, models.Model):
         db_table = '"tours_data"."review"'
         verbose_name = _('review')
         verbose_name_plural = _('reviews')
-        unique_together = (('agency', 'account'),)
+        unique_together = ((agency_field, 'account'),)
 
 
 class Account(UUIDMixin, models.Model):
