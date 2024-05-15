@@ -1,15 +1,15 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import AgencyViewSet, TourViewSet, \
-    ReviewViewSet, AddressViewSet
+"""Module with site urls."""
 
-router = DefaultRouter()
-router.register(r'agencies', AgencyViewSet)
-router.register(r'tours', TourViewSet)
-router.register(r'reviews', ReviewViewSet)
-router.register(r'addresses', AddressViewSet)
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 from . import views
+
+router = DefaultRouter()
+router.register('agencies', views.AgencyViewSet)
+router.register('tours', views.TourViewSet)
+router.register('reviews', views.ReviewViewSet)
+router.register('addresses', views.AddressViewSet)
 
 urlpatterns = [
     path('', views.index, name='index'),
