@@ -14,6 +14,7 @@ COUNTRY_MAX_LEN = 255
 STREET_MAX_LEN = 255
 HOUSE_NUMBER_MAX_LEN = 8
 REVIEW_TEXT_MAX_LEN = 8192
+srid = 4326
 
 name_field = 'name'
 agency_field = 'agency'
@@ -39,7 +40,7 @@ class NameMixin(models.Model):
     )
 
     class Meta:
-        abstract=True
+        abstract = True
 
 
 class Agency(UUIDMixin, NameMixin, models.Model):
@@ -119,7 +120,7 @@ class City(UUIDMixin, NameMixin, models.Model):
     )
     point = gismodels.PointField(
         _('city geopoint'),
-        srid=4326,
+        srid=srid,
         unique=True,
     )
 
@@ -182,7 +183,7 @@ class Address(UUIDMixin, models.Model):
     )
     point = gismodels.PointField(
         _('address geopoint'),
-        srid=4326,
+        srid=srid,
     )
 
     def __str__(self) -> str:
