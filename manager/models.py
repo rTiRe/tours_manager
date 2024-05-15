@@ -20,7 +20,7 @@ class UUIDMixin(models.Model):
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
-        editable=False
+        editable=False,
     )
 
     class Meta:
@@ -30,7 +30,7 @@ class UUIDMixin(models.Model):
 class NameMixin(models.Model):
     name = models.CharField(
         verbose_name = _('name'),
-        max_length = NAME_MAX_LEN
+        max_length = NAME_MAX_LEN,
     )
 
     class Meta:
@@ -41,13 +41,13 @@ class Agency(UUIDMixin, NameMixin, models.Model):
     phone_number = models.CharField(
         _('phone number'),
         max_length=PHONE_NUMBER_MAX_LEN,
-        validators=[phone_number_validator]
+        validators=[phone_number_validator],
     )
     address = models.OneToOneField(
         'Address',
         verbose_name=_('address'),
         unique=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     def __str__(self) -> str:
@@ -66,12 +66,12 @@ class Tour(UUIDMixin, NameMixin, models.Model):
     agency = models.ForeignKey(
         Agency,
         verbose_name=_('agency'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     cities = models.ManyToManyField(
         'City',
         verbose_name=_('cities'),
-        through='TourCity'
+        through='TourCity',
     )
 
     def __str__(self) -> str:
@@ -103,26 +103,26 @@ class Country(UUIDMixin, models.Model):
 
 class City(UUIDMixin, NameMixin, models.Model):
     country = models.ForeignKey(
-        Country, 
+        Country,
         verbose_name=_('country'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     tours = models.ManyToManyField(
         'Tour',
         verbose_name=_('tours'),
-        through='TourCity'
+        through='TourCity',
     )
     point = gismodels.PointField(
         _('city geopoint'),
         srid=4326,
-        unique=True
+        unique=True,
     )
 
     def __str__(self) -> None:
         return f'{self.name}, {self.country}'
 
     class Meta:
-        db_table = '"tours_data"."city"'  
+        db_table = '"tours_data"."city"'
         verbose_name = _('city')
         verbose_name_plural = _('cities')
         unique_together = (
@@ -148,17 +148,17 @@ class Address(UUIDMixin, models.Model):
     city = models.ForeignKey(
         City,
         verbose_name=_('city'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     street = models.CharField(
         _('street name'),
         max_length=STREET_MAX_LEN,
-        validators=[street_name_validator]
+        validators=[street_name_validator],
     )
     house_number = models.CharField(
         _('house number'),
         max_length=HOUSE_NUMBER_MAX_LEN,
-        validators=[house_number_validator]
+        validators=[house_number_validator],
     )
     entrance_number = models.SmallIntegerField(
         _('entrance number'),
@@ -186,8 +186,8 @@ class Address(UUIDMixin, models.Model):
             [
                 str(self.entrance_number),
                 str(self.floor),
-                str(self.flat_number)
-            ]
+                str(self.flat_number),
+            ],
         )
         return f'{not_null_part} {can_be_null_parts}'.strip()
 
@@ -199,7 +199,7 @@ class Address(UUIDMixin, models.Model):
             (
                 'city',
                 'street',
-                'house_number', 
+                'house_number',
                 'entrance_number',
                 'floor',
                 'flat_number',
@@ -212,12 +212,12 @@ class Review(UUIDMixin, models.Model):
     agency = models.ForeignKey(
         Agency,
         verbose_name=_('agency'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     account = models.ForeignKey(
         'Account',
         verbose_name=_('account'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     rating = models.FloatField(
         _('rating'),
@@ -226,7 +226,7 @@ class Review(UUIDMixin, models.Model):
         _('text'),
         max_length=REVIEW_TEXT_MAX_LEN,
         null=True,
-        blank=True
+        blank=True,
     )
 
     def __str__(self) -> str:
@@ -244,7 +244,7 @@ class Account(UUIDMixin, models.Model):
         AUTH_USER_MODEL,
         unique=True,
         verbose_name=_('user'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     is_agency = models.BooleanField(
         _('agency account'),
