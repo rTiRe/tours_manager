@@ -230,7 +230,10 @@ class Review(UUIDMixin, models.Model):
     )
 
     def __str__(self) -> str:
-        return _(f'{self.rating} ({self.account.username}) for {self.agency}')
+        rating = self.rating
+        username = self.account.username
+        agency = self.agency
+        return _(f'{rating} ({username}) for {agency}')
 
     class Meta:
         db_table = '"tours_data"."review"'
@@ -256,7 +259,10 @@ class Account(UUIDMixin, models.Model):
         verbose_name_plural = _('accounts')
 
     def __str__(self) -> str:
-        return f'{self.account.username} ({self.account.first_name} {self.account.last_name})'
+        username = self.account.username
+        first_name = self.account.first_name
+        last_name = self.account.last_name
+        return f'{username} ({first_name} {last_name})'
 
     @property
     def username(self) -> str:
