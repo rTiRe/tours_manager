@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres
+        image: postgis/postgis
         env:
           POSTGRES_PASSWORD: test
           POSTGRES_DBNAME: postgres
@@ -23,9 +23,10 @@ jobs:
         python-version: "3.10.12"
     - name: Установка модулей и зависимостей
       run: |
-        sudo apt-get install libgdal-dev
-        export CPLUS_INCLUDE_PATH=/usr/include/gdal
-        export C_INCLUDE_PATH=/usr/include/gdal
+        sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
+        sudo apt-get update
+        sudo apt-get install gdal-bin libgdal-dev
+        pip install GDAL==3.6.4
         python -m pip install --upgrade pip
         pip install -r tests/requirements.txt
     - name: Тесты api
