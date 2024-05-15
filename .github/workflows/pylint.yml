@@ -23,6 +23,9 @@ jobs:
         python-version: "3.10.12"
     - name: Установка модулей и зависимостей
       run: |
+        sudo apt-get install libgdal-dev
+        export CPLUS_INCLUDE_PATH=/usr/include/gdal
+        export C_INCLUDE_PATH=/usr/include/gdal
         python -m pip install --upgrade pip
         pip install -r tests/requirements.txt
     - name: Тесты api
