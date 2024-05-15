@@ -105,3 +105,55 @@ def create_api_test(model: Model, url: str, creation_attrs: dict):
 
 
 url = '/api/'
+
+country_data = {
+    'name': 'test_country',
+}
+
+city_data = {
+    'name': 'Тверь',
+    'country': [Country, country_data],
+    'point': 'SRID=4326;POINT (55.555555555555555 55.5555555555555)',
+}
+
+address_data = {
+    'city': [City, city_data],
+    'street': 'Пермская',
+    'house_number': 47,
+    'point': 'SRID=4326;POINT (55.555555555555555 55.5555555555555)',
+}
+AddressApiTest = create_api_test(Address, f'{url}addresses/', address_data)
+
+agency_data = {
+    'name': 'test_agency',
+    'phone_number': '+77777777777',
+    'address': [Address, address_data],
+}
+AgencyApiTest = create_api_test(Agency, f'{url}agencies/', agency_data)
+
+tour_data = {
+    'name': 'test_tour',
+    'agency': [Agency, agency_data],
+    'cities': [City, [city_data]],
+}
+TourApiTest = create_api_test(Tour, f'{url}tours/', tour_data)
+
+user_data = {
+    "username": "test",
+    "email": "test@test.ru",
+    "password":"1234509876qwerty",
+}
+
+account_data = {
+    "account": [User, user_data],
+    "is_agency": False,
+}
+
+review_data = {
+    'agency': [Agency, agency_data],
+    'account': [Account, account_data],
+    'rating': 1.2,
+    'text': 'test_review',
+}
+
+ReviewApiTest = create_api_test(Review, f'{url}reviews/', review_data)
