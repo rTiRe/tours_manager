@@ -28,6 +28,7 @@ jobs:
         export C_INCLUDE_PATH=/usr/include/gdal
         python -m pip install --upgrade pip
         pip install -r tests/requirements.txt
+        python3 -m pip install ../input/gdalwheel/GDAL-3.1.4-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.whl
     - name: Тесты api
       run: |
         chmod +x tests/test.sh
