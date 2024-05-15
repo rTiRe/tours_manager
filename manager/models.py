@@ -29,12 +29,12 @@ class UUIDMixin(models.Model):
 
 class NameMixin(models.Model):
     name = models.CharField(
-        verbose_name = _('name'),
-        max_length = NAME_MAX_LEN,
+        verbose_name=_('name'),
+        max_length=NAME_MAX_LEN,
     )
 
     class Meta:
-        abstract = True
+        abstract=True
 
 
 class Agency(UUIDMixin, NameMixin, models.Model):
@@ -162,18 +162,18 @@ class Address(UUIDMixin, models.Model):
     )
     entrance_number = models.SmallIntegerField(
         _('entrance number'),
-        null = True,
-        blank = True,
+        null=True,
+        blank=True,
     )
     floor = models.SmallIntegerField(
         _('floor number'),
-        null = True,
-        blank = True,
+        null=True,
+        blank=True,
     )
     flat_number = models.SmallIntegerField(
         _('flat number'),
-        null = True,
-        blank = True,
+        null=True,
+        blank=True,
     )
     point = gismodels.PointField(
         _('address geopoint'),
