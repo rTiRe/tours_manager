@@ -29,7 +29,7 @@ jobs:
         pip install GDAL==3.6.4
         python -m pip install --upgrade pip
         pip install -r tests/requirements.txt
-        apt install postgis
+        sudo apt install postgis
     - name: Тесты api
       run: |
         chmod +x tests/test.sh
