@@ -1,12 +1,12 @@
-from django.db import models
 from uuid import uuid4
-from django.utils.translation import gettext_lazy as _
+
 from django.conf.global_settings import AUTH_USER_MODEL
 from django.contrib.gis.db import models as gismodels
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .validators import phone_number_validator, \
-    street_name_validator, house_number_validator
-
+from .validators import (house_number_validator, phone_number_validator,
+                         street_name_validator)
 
 NAME_MAX_LEN = 255
 PHONE_NUMBER_MAX_LEN = 12
