@@ -27,8 +27,6 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    account = serializers.UUIDField(write_only=True)
-
     class Meta:
         model = Review
         fields = ['id', 'agency', 'account', 'rating', 'text']
