@@ -23,6 +23,8 @@ jobs:
         python-version: "3.10.12"
     - name: Установка модулей и зависимостей
       run: |
+        sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
+        sudo apt-get update
         sudo apt-get install gdal-bin libgdal-dev
         pip install GDAL==3.6.4
         python -m pip install --upgrade pip
