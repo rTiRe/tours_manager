@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block header %}{% include 'header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="search">
+            <div class="background"></div>
+            <form action="/tours">
+                <div class="selectors">
+                    <div class="left">
+                        <label for="city">Город</label>
+                        <input type="text" id="city" name="city" required pattern="\S+">
+                    </div>
+                    <div class="right">
+                        <label for="country">Страна</label>
+                        <input type="text" id="country" name="country" required pattern="\S+">
+                    </div>
+                </div>
+                <button type="submit">Найти туры</button>
+            </form>
+        </div>
+    </section>
+    <script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
