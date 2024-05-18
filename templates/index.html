@@ -9,11 +9,11 @@
                 <div class="selectors">
                     <div class="left">
                         <label for="city">Город</label>
-                        <input type="text" id="city" name="city" required pattern="\S+">
+                        {{ form.city }}
                     </div>
                     <div class="right">
                         <label for="country">Страна</label>
-                        <input type="text" id="country" name="country" required pattern="\S+">
+                        {{ form.country }}
                     </div>
                 </div>
                 <button type="submit">Найти туры</button>
