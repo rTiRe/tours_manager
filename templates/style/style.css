@@ -213,7 +213,7 @@ ul.nav-links > li {
     flex-direction: column;
 }
 
-.search .left input {
+.search .left select {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: 1px solid lightgrey;
