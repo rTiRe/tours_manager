@@ -1,5 +1,5 @@
 #!/bin/bash
-export DJANGO_SECRET_KEY = "django-insecure-pt4!7*d%-dn)&lx6@598y(1!!rljgaieunnwk!n)-#r^ew(dcb"
+export DJANGO_SECRET_KEY="django-insecure-pt4!7*d%-dn)&lx6@598y(1!!rljgaieunnwk!n)-#r^ew(dcb"
 export PG_HOST=127.0.0.1
 export PG_PORT=5432
 export PG_USER=test
