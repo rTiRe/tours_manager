@@ -38,9 +38,14 @@ class ReviewForm(forms.ModelForm):
 
 
 class FindToursForm(forms.Form):
-    country_choice_list, city_choice_list = [('', '')], [('', '')]
-    city_objects = City.objects.all()
-    country_choice_list += [(city.country.id, city.country.name) for city in city_objects]
-    city_choice_list += [(city.id, city.name) for city in city_objects]
-    country = forms.ChoiceField(choices=country_choice_list, required=True)
-    city = forms.ChoiceField(choices=city_choice_list, required=True)
+    country = forms.ChoiceField(required=True)
+    city = forms.ChoiceField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(FindToursForm, self).__init__(*args, **kwargs)
+        country_choice_list, city_choice_list = [('', '')], [('', '')]
+        city_objects = City.objects.all()
+        country_choice_list += [(city.country.id, city.country.name) for city in city_objects]
+        city_choice_list += [(city.id, city.name) for city in city_objects]
+        self.fields['country'].choices = country_choice_list
+        self.fields['city'].choices = city_choice_list
