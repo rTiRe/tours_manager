@@ -141,6 +141,7 @@ ul.nav-links > li {
 }
 
 .search > form button {
+    width: auto;
     background-color: #ff157e;
     border: none;
     border-radius: 5px;
@@ -161,13 +162,14 @@ ul.nav-links > li {
     transform: scale(0.95)
 }
 
-.search > form  input {
+.search > form select {
     padding: 10px;
     height: 25px;
     box-sizing: content-box;
     border-radius: 5px;
     border-color: transparent;
     font: 400 16px "Roboto", sans-serif;
+    background-color: #fff;
 }
 
 .search > form label {
@@ -178,18 +180,18 @@ ul.nav-links > li {
     cursor: text;
 }
 
-.search > form input:focus {
+.search > form select:focus {
     outline: none;
 }
 
-.search > form label:has(+ input:focus) {
+.search > form label:has(+ select:active) {
     color: white;
     transform: translate(10px, -110%);
     cursor: default;
     font-weight: 600;
 }
 
-.search > form label:has(+ input:valid) {
+.search > form label:has(+ select:valid) {
     color: white;
     transform: translate(10px, -110%);
     cursor: default;
@@ -204,13 +206,17 @@ ul.nav-links > li {
 }
 
 .search .selectors {
-    position: flex;
+    position: relative;
     display: flex;
 }
 
 .search .left, .right {
+    width: 100%;
+    min-width: 150px;
+    max-width: 350px;
     display: inline-flex;
     flex-direction: column;
+    position: relative;
 }
 
 .search .left select {
@@ -249,14 +255,14 @@ ul.nav-links > li {
         height: 40px;
     }
     .search {
-        width: 50%;
+        width: 100%;
         padding: 30px;
     }
     .search > form {
         width: 100%;
         font: 400 14px "Roboto", sans-serif;
     }
-    .search > form  input {
+    .search > form  select {
         padding: 8px;
         height: 25px;
         font: 400 14px "Roboto", sans-serif;
@@ -270,11 +276,16 @@ ul.nav-links > li {
     .search > form label {
         transform: translate(10px, 15px);
     }
-    .search .left input {
+    .search .left, .right {
+        width: 100%;
+        min-width: none;
+        max-width: none;
+    }
+    .search .left select {
         border-radius: 5px;
         border: 1px solid lightgrey;
     }
-    .search .right input {
+    .search .right select {
         border-radius: 5px;
         border: 1px solid lightgrey;
     }
