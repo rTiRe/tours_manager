@@ -11,4 +11,4 @@ export MINIO_STORAGE_BUCKET_NAME=static
 export MINIO_API=http://localhost:9000
 export MINIO_CONSISTENCY_CHECK_ON_START=False
 
-python3 manage.py test $1
+python3 manage.py test --verbosity=3 $1
