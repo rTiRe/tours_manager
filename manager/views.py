@@ -11,6 +11,7 @@ from rest_framework.serializers import ModelSerializer
 from .models import Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
+from .forms import FindToursForm
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -22,9 +23,20 @@ def index(request: HttpRequest) -> HttpResponse:
     Returns:
         HttpResponse: response from server.
     """
+    form = FindToursForm
     return render(
         request,
         'index.html',
+        {'form': form},
+    )
+
+
+def tours(request: HttpRequest) -> HttpResponse:
+    form = FindToursForm
+    return render(
+        request,
+        'tours.html',
+        {'form': form},
     )
 
 
