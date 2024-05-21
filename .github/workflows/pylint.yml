@@ -15,6 +15,15 @@ jobs:
           POSTGRES_HOST: 127.0.0.1
         ports:
         - 5432:5432
+      minio:
+        image: minio/minio
+        env:
+          MINIO_ROOT_USER: user
+          MINIO_ROOT_PASSWORD: password
+        ports:
+        - 9000:9000
+        - 9001:9001
+        options: server /data --console-address ":9001"
     steps:
     - uses: actions/checkout@v2
     - name: Установка Python
