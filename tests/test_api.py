@@ -1,102 +1,216 @@
-from django.test import TestCase
-from rest_framework.test import APIClient
+"""Module with API tests."""
+
+from os import getenv
+from uuid import UUID
+
 from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework.authtoken.models import Token
 from django.db.models import Model
 from django.db.models.base import ModelBase
+from django.test import TestCase
+from dotenv import load_dotenv
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 
-from manager.models import Agency, Tour, Country, City, Address, Account, Review
+from manager.models import (Account, Address, Agency, City, Country, Review,
+                            Tour)
 
 ACCOUNT_NAME = 'disenfranchised_user'
+NAME_LITERAL = 'name'
+
+load_dotenv()
+USER_NAME = getenv('DJANGO_TESTS_USER_NAME')
+USER_PASSWORD = getenv('DJANGO_TESTS_USER_PASSWORD')
+SUPERUSER_NAME = getenv('DJANGO_TESTS_SUPERUSER_NAME')
+SUPERUSER_PASSWORD = getenv('DJANGO_TESTS_SUPERUSER_PASSWORD')
+
 
 def create_object(
-        obj_model: Model,
-        json: dict,
-        return_json: bool = True,
-) -> Model:
+    obj_model: Model,
+    json: dict,
+    return_json: bool = True,
+) -> Model | dict:
+    """Create object using json.
+
+    Args:
+        obj_model: Model - object model.
+        json: dict - data for create object.
+        return_json: bool, optional - return object as Model or as dict. Defaults to True.
+
+    Returns:
+        Model: model of created object.
+        dict: json for created object.
+    """
     json_copy = json.copy()
-    for key, value in json_copy.items():
-        if isinstance(value, list) and isinstance(value[0], ModelBase):
-            sub_model: Model = value[0]
-            sub_jsons = value[1]
-            if isinstance(sub_jsons, list):
-                object = [create_object(sub_model, sub_json, False) for sub_json in sub_jsons]
+    for key, body in json_copy.items():
+        if isinstance(body, list) and isinstance(body[0], ModelBase):
+            model: Model = body[0]
+            jsons = body[1]
+            if isinstance(jsons, list):
+                json_ob = [create_object(model, sub_json, return_json=False) for sub_json in jsons]
             else:
-                object = create_object(sub_model, sub_jsons, False)
-            json_copy[key] = object
+                json_ob = create_object(model, jsons, return_json=False)
+            json_copy[key] = json_ob
     if not return_json:
         if obj_model.objects.filter(**json_copy).exists():
             return obj_model.objects.get(**json_copy)
-        else:
-            return obj_model.objects.create(**json_copy)
+        return obj_model.objects.create(**json_copy)
     return json_copy
 
-def create_api_test(model: Model, url: str, creation_attrs: dict):
+
+def create_object_json_with_ids(object_with_model: dict) -> dict:
+    """Create object with ids of child objects.
+
+    Args:
+        object_with_model: dict - object dict with models of child objects.
+
+    Returns:
+        dict: json for created object.
+    """
+    attrs_with_id = object_with_model.copy()
+    for field, attrs in attrs_with_id.items():
+        if isinstance(attrs, Model):
+            attrs_with_id[field] = attrs.id
+        if isinstance(attrs, list):
+            attrs_with_id[field] = [attr.id for attr in attrs]
+    return attrs_with_id
+
+
+def get_object_as_superuser(
+    model: Model,
+    attrs_with_id: dict,
+) -> UUID:
+    """Get created object id as superuser.
+
+    Args:
+        model: Model - object model.
+        attrs_with_id: dict - json data with child objects ids. Data for transform.
+
+    Returns:
+        UUID: finded object id.
+    """
+    if attrs_with_id.get('cities'):
+        attrs_with_id.pop('cities')
+    return model.objects.get(**attrs_with_id).id
+
+
+def get_object_as_user(
+    model: Model,
+    attrs_with_model: dict,
+) -> UUID:
+    """Get created object id as user or create and return object id if not exists.
+
+    Args:
+        model: Model - object model.
+        attrs_with_model: dict - json data with child objects models. Data for transform.
+
+    Returns:
+        UUID: finded object id.
+    """
+    try:
+        created_id = model.objects.create(**attrs_with_model).id
+    except TypeError:
+        many_to_many = {}
+        for field, attr in attrs_with_model.items():
+            if isinstance(attr, list):
+                many_to_many[field] = attrs_with_model[field]
+        for field_to_pop in many_to_many.keys():
+            attrs_with_model.pop(field_to_pop)
+        created: Tour = model.objects.create(**attrs_with_model)
+        for field_name, attrs in many_to_many.items():
+            getattr(created, field_name).set(attrs)
+        created_id = created.id
+    return created_id
+
+
+def get_object(
+    model: Model,
+    user: User,
+    attrs_with_id: dict,
+    attrs_with_model: dict,
+) -> UUID:
+    """Get created object id as user/superuser or create and return object id if not exists.
+
+    Args:
+        model: Model - object model.
+        user: User - who want to get object.
+        attrs_with_id: dict - json data with child objects ids. Data for transform.
+        attrs_with_model: dict - json data with child objects models. Data for transform.
+
+    Returns:
+        UUID: finded object id.
+    """
+    if user.is_superuser:
+        return get_object_as_superuser(model, attrs_with_id)
+    return get_object_as_user(model, attrs_with_model)
+
+
+def create_api_test(model: Model, url: str, creation_attrs: dict) -> TestCase:
+    """Class decorator for create tests.
+
+    Args:
+        model: Model - object model.
+        url: str - path to api.
+        creation_attrs: dict - json data for create object for tests.
+
+    Returns:
+        TestCase: class with tests.
+    """
     class ApiTest(TestCase):
+        """API test class."""
+
         def setUp(self) -> None:
+            """Pre-setup tests."""
             self.client = APIClient()
-            self.user = User.objects.create_user(username='abc', password='abc')
-            self.superuser = User.objects.create_superuser(username='admin', password='admin')
-            self.user_token = Token(user=self.user)
-            self.superuser_token = Token(user=self.superuser)
+            self.user = User.objects.create_user(username=USER_NAME, password=USER_PASSWORD)
+            self.superuser = User.objects.create_superuser(
+                username=SUPERUSER_NAME,
+                password=SUPERUSER_PASSWORD,
+            )
 
         def manage(
-            self, user: User, token: Token,
+            self,
+            user: User,
             post_expected: int,
             put_expected: int,
             delete_expected: int,
-        ):
-            self.client.force_authenticate(user=user, token=token)
+        ) -> None:
+            """Manage and run tests.
 
+            Args:
+                user: User - who run tests.
+                post_expected: int - expected http code for post method.
+                put_expected: int - expected http code for put method.
+                delete_expected: int - expected http code for delete method.
+            """
+            token = Token(user=user)
+            self.client.force_authenticate(user=user, token=token)
             self.assertEqual(self.client.get(url).status_code, status.HTTP_200_OK)
             self.assertEqual(self.client.head(url).status_code, status.HTTP_200_OK)
             self.assertEqual(self.client.options(url).status_code, status.HTTP_200_OK)
             attrs_with_model = create_object(model, creation_attrs)
-            attrs_with_id = attrs_with_model.copy()
-            for field, attrs in attrs_with_id.items():
-                if isinstance(attrs, Model):
-                    attrs_with_id[field] = attrs.id
-                if isinstance(attrs, list):
-                    attrs_with_id[field] = [attr.id for attr in attrs]
+            attrs_with_id = create_object_json_with_ids(attrs_with_model)
             post_created = self.client.post(url, attrs_with_id)
             self.assertEqual(post_created.status_code, post_expected)
-            if user.is_superuser:
-                if attrs_with_id.get('cities'):
-                    attrs_with_id.pop('cities')
-                created_id = model.objects.get(**attrs_with_id).id
-            else:
-                try:
-                    created_id = model.objects.create(**attrs_with_model).id
-                except TypeError:
-                    many_to_many = {}
-                    for field, attr in attrs_with_model.items():
-                        if isinstance(attr, list):
-                            many_to_many[field] = attrs_with_model[field]
-                    for field in many_to_many.keys():
-                        attrs_with_model.pop(field)
-                    created: Tour = model.objects.create(**attrs_with_model)
-                    for field, attrs in many_to_many.items():
-                        getattr(created, field).set(attrs)
-                    created_id = created.id
-            instance_url = f'{url}{created_id}/'
-            put_response = self.client.put(instance_url, attrs_with_id)
+            created_id = get_object(model, user, attrs_with_id, attrs_with_model)
+            put_response = self.client.put(f'{url}{created_id}/', attrs_with_id)
             self.assertEqual(put_response.status_code, put_expected)
-
-            delete_response = self.client.delete(instance_url, creation_attrs)
+            delete_response = self.client.delete(f'{url}{created_id}/', creation_attrs)
             self.assertEqual(delete_response.status_code, delete_expected)
 
-        def test_superuser(self):
+        def test_superuser(self) -> None:
+            """Run tests for superuser."""
             self.manage(
-                self.superuser, self.superuser_token,
+                self.superuser,
                 post_expected=status.HTTP_201_CREATED,
                 put_expected=status.HTTP_200_OK,
                 delete_expected=status.HTTP_204_NO_CONTENT,
             )
 
-        def test_user(self):
+        def test_user(self) -> None:
+            """Run tests for user."""
             self.manage(
-                self.user, self.user_token,
+                self.user,
                 post_expected=status.HTTP_403_FORBIDDEN,
                 put_expected=status.HTTP_403_FORBIDDEN,
                 delete_expected=status.HTTP_403_FORBIDDEN,
@@ -107,11 +221,11 @@ def create_api_test(model: Model, url: str, creation_attrs: dict):
 url = '/api/'
 
 country_data = {
-    'name': 'test_country',
+    NAME_LITERAL: 'test_country',
 }
 
 city_data = {
-    'name': 'Тверь',
+    NAME_LITERAL: 'Тверь',
     'country': [Country, country_data],
     'point': 'SRID=4326;POINT (55.555555555555555 55.5555555555555)',
 }
@@ -125,28 +239,28 @@ address_data = {
 AddressApiTest = create_api_test(Address, f'{url}addresses/', address_data)
 
 agency_data = {
-    'name': 'test_agency',
+    NAME_LITERAL: 'test_agency',
     'phone_number': '+77777777777',
     'address': [Address, address_data],
 }
 AgencyApiTest = create_api_test(Agency, f'{url}agencies/', agency_data)
 
 tour_data = {
-    'name': 'test_tour',
+    NAME_LITERAL: 'test_tour',
     'agency': [Agency, agency_data],
     'cities': [City, [city_data]],
 }
 TourApiTest = create_api_test(Tour, f'{url}tours/', tour_data)
 
 user_data = {
-    "username": "test",
-    "email": "test@test.ru",
-    "password":"1234509876qwerty",
+    'username': 'test',
+    'email': 'test@test.ru',
+    'password': '1234509876qwerty',
 }
 
 account_data = {
-    "account": [User, user_data],
-    "is_agency": False,
+    'account': [User, user_data],
+    'is_agency': False,
 }
 
 review_data = {
