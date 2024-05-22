@@ -2,7 +2,8 @@
 
 from django import forms
 
-from .models import Address, Review, City, Country
+from .models import Address, Review, City
+from django.http import HttpRequest
 
 name_min = 'min'
 name_max = 'max'
@@ -41,7 +42,7 @@ class FindToursForm(forms.Form):
     country = forms.ChoiceField(required=True)
     city = forms.ChoiceField(required=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request: HttpRequest = None, *args, **kwargs):
         super(FindToursForm, self).__init__(*args, **kwargs)
         country_choice_list, city_choice_list = [('', '')], [('', '')]
         city_objects = City.objects.all()
@@ -49,3 +50,6 @@ class FindToursForm(forms.Form):
         city_choice_list += [(city.id, city.name) for city in city_objects]
         self.fields['country'].choices = country_choice_list
         self.fields['city'].choices = city_choice_list
+        if request and request.method == 'GET':
+            self.fields['country'].initial = request.GET.get('country')
+            self.fields['city'].initial = request.GET.get('city')
