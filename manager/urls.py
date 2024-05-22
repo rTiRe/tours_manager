@@ -14,6 +14,7 @@ router.register('addresses', views.AddressViewSet)
 urlpatterns = [
     path('', views.index, name='index'),
     path('tours/', views.tours, name='tours'),
+    path('tours', views.tours, name='tours'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),
