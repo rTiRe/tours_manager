@@ -10,5 +10,9 @@ export MINIO_SECRET_ACCESS_KEY=dGKHOvOO9166VEMOO0tSRdUVVUcm5odgYgB2Yfjs
 export MINIO_STORAGE_BUCKET_NAME=static
 export MINIO_API=http://localhost:9000
 export MINIO_CHECK_ON_START=False
+export DJANGO_TESTS_USER_NAME=user
+export DJANGO_TESTS_USER_PASSWORD=user
+export DJANGO_TESTS_SUPERUSER_NAME=admin
+export DJANGO_TESTS_SUPERUSER_PASSWORD=admin
 
 python3 manage.py test --verbosity=3 $1
