@@ -31,7 +31,7 @@ class PostgresSchemaRunner(DiscoverRunner):
         Returns:
             list[tuple[BaseDatabaseWrapper, str, bool]]: setupped database.
         """
-        for conn_name in connections:
+        for conn_name in connections.databases:
             connection = connections[conn_name]
             connection.prepare_database = MethodType(prepare_db, connection)
         return super().setup_databases(**kwargs)
