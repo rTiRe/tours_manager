@@ -4,14 +4,17 @@ from typing import Any
 
 from django.db.models import Model
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .models import Address, Agency, Review, Tour
+from .models import Address, Agency, Review, Tour, Account
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .forms import FindToursForm
+from .forms import FindToursForm, SignupForm
+
+from django.contrib.auth import decorators
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -62,6 +65,37 @@ def tours(request: HttpRequest) -> HttpResponse:
             'form': form,
             'tours_data': tours_data,
             'tours_ratings': reviews_data,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/tours.css',
+                'css/search_tours.css',
+            ],
+        },
+    )
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('profile')
+    else:
+        if request.user.is_authenticated:
+            return redirect('profile')
+        form = SignupForm()
+    return render(request, 'signup/signup.html', {'signup_form': form})
+
+
+def profile(request: HttpRequest) -> HttpResponse:
+    client = Account.objects.get(account=request.user)
+    return render(
+        request,
+        'pages/profile.html',
+        {
+            'user': client,
             'style_files': [
                 'css/header.css',
                 'css/body.css',

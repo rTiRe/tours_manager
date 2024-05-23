@@ -3,6 +3,7 @@
 from django import forms
 
 from .models import Address, Review, Tour
+from django.contrib.auth import forms as auth_forms, models
 from django.http import HttpRequest
 
 name_min = 'min'
@@ -62,3 +63,13 @@ class FindToursForm(forms.Form):
         if request and request.method == 'GET':
             self.fields['country'].initial = request.GET.get('country')
             self.fields['starting_city'].initial = request.GET.get('starting_city')
+
+
+class SignupForm(auth_forms.UserCreationForm):
+    email = forms.EmailField(required=True)
+    password1 = forms.PasswordInput()
+    password2 = forms.PasswordInput()
+
+    class Meta:
+        model = models.User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']

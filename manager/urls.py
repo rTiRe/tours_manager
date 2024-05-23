@@ -15,6 +15,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('tours/', views.tours, name='tours'),
     path('tours', views.tours, name='tours'),
+    path('profile/', views.profile, name='profile'),
+    path('signup/', views.signup, name='signup'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')),

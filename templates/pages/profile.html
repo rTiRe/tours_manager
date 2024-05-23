@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load template_filters %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="container">
+            {% if user.account.is_authenticated %}
+                {{ user.first_name }}
+            {% endif %}
+        </div>
+    </section>
+    <main>
+
+    </main>
+{% endblock %}
