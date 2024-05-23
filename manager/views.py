@@ -27,7 +27,15 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         'index.html',
-        {'form': form},
+        {
+            'form': form,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/index.css',
+                'css/search_tours.css',
+            ],
+        },
     )
 
 

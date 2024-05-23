@@ -1,0 +1,16 @@
+<div class="search">
+    <div class="background"></div>
+    <form action="/tours">
+        <div class="selectors">
+            <div class="left">
+                <label for="city">Город вылета</label>
+                {{ form.starting_city }}
+            </div>
+            <div class="right">
+                <label for="country">Страна</label>
+                {{ form.country }}
+            </div>
+        </div>
+        <button type="submit">Найти туры</button>
+    </form>
+</div>

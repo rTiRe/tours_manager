@@ -1,24 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block header %}{% include 'header.html' %}{% endblock %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
 {% block content %}
     <section class="home">
-        <div class="search">
-            <div class="background"></div>
-            <form action="/tours">
-                <div class="selectors">
-                    <div class="left">
-                        <label for="country">Страна</label>
-                        {{ form.country }}
-                    </div>
-                    <div class="right">
-                        <label for="city">Город</label>
-                        {{ form.city }}
-                    </div>
-                </div>
-                <button type="submit">Найти туры</button>
-            </form>
-        </div>
+        {% include 'parts/search.html' %}
     </section>
     <script src="{% static 'js/script.js' %}"></script>
 {% endblock %}
