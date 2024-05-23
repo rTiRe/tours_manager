@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from .forms import AddressForm, ReviewForm
 from .models import (Account, Address, Agency, City, Country, Review, Tour,
-                     TourCountry)
+                     TourAddress)
 
 name = 'name'
 agency = 'agency'
@@ -14,7 +14,7 @@ account = 'account'
 class TourCityInline(admin.TabularInline):
     """Inline for Country and Tour link."""
 
-    model = TourCountry
+    model = TourAddress
     extra = 0
     min_num = 1
 
@@ -79,11 +79,11 @@ class AddressAdmin(admin.ModelAdmin):
     form = AddressForm
 
 
-@admin.register(TourCountry)
-class TourCityAdmin(admin.ModelAdmin):
+@admin.register(TourAddress)
+class TourAddressAdmin(admin.ModelAdmin):
     """Field tour and city link for admin panel."""
 
-    model = TourCountry
+    model = TourAddress
 
 
 @admin.register(Review)

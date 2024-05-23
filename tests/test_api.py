@@ -123,8 +123,8 @@ def get_object_as_superuser(
     Returns:
         UUID: finded object id.
     """
-    if attrs_with_id.get('countries'):
-        attrs_with_id.pop('countries')
+    if attrs_with_id.get('addresses'):
+        attrs_with_id.pop('addresses')
     return model.objects.get(**attrs_with_id).id
 
 
@@ -276,7 +276,7 @@ AgencyApiTest = create_api_test(Agency, f'{url}agencies/', agency_data)
 tour_data = {
     NAME_LITERAL: 'test_tour',
     'agency': [Agency, agency_data],
-    'countries': [Country, [country_data]],
+    'addresses': [Address, [address_data]],
     'starting_city': [City, city_data],
     'price': 4,
 }

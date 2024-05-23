@@ -23,7 +23,7 @@ def index(request: HttpRequest) -> HttpResponse:
     Returns:
         HttpResponse: response from server.
     """
-    form = FindToursForm
+    form = FindToursForm()
     return render(
         request,
         'index.html',
@@ -42,7 +42,7 @@ def index(request: HttpRequest) -> HttpResponse:
 def tours(request: HttpRequest) -> HttpResponse:
     tours_data = Tour.objects.filter(
         starting_city=request.GET.get('starting_city'),
-        country=request.GET.get('country'),
+        address__city__country=request.GET.get('country'),
     )
     if not request.GET:
         tours_data = Tour.objects.all()

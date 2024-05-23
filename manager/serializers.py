@@ -20,13 +20,13 @@ class AgencySerializer(serializers.ModelSerializer):
 class TourSerializer(serializers.ModelSerializer):
     """Tour table serializer."""
 
-    countries = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), many=True)
+    addresses = serializers.PrimaryKeyRelatedField(queryset=Address.objects.all(), many=True)
 
     class Meta:
         """Class with Tour settings."""
 
         model = Tour
-        fields = [id_field, 'name', 'agency', 'countries', 'starting_city', 'price']
+        fields = [id_field, 'name', 'agency', 'addresses', 'starting_city', 'price']
         optional_fields = ['description']
 
 

@@ -19,8 +19,8 @@
                 <div class="top">
                     <div class="title">{{ tour_data.name }}</div>
                     <div class="countries">
-                        {% for country in tour_data.countries.all %}
-                            {{ country.name }}{% if not forloop.last %},{% endif %}
+                        {% for address in tour_data.addresses.all %}
+                            {{ address.city.country.name }}{% if not forloop.last %},{% endif %}
                         {% endfor %}
                     </div>
                 </div>

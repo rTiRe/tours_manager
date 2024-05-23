@@ -47,12 +47,12 @@ class FindToursForm(forms.Form):
         starting_city_choice_list, country_choice_list = [('', '')], [('', '')]
         tours_objects = Tour.objects.all()
         tours_starting_city = [tour.starting_city for tour in tours_objects]
-        tours_countries = [tour.countries.all() for tour in tours_objects]
+        tours_addresses = [tour.addresses.all() for tour in tours_objects]
         tours_countries_objects = set()
-        for tour_countries in tours_countries:
-            for country_object in tour_countries.all():
-                if country_object:
-                    tours_countries_objects.add(country_object)
+        for address_objects in tours_addresses:
+            for address_object in address_objects:
+                country_object = address_object.city.country
+                tours_countries_objects.add(country_object)
         tours_starting_city = sorted(list(set(tours_starting_city)), key=lambda x: x.name)
         tours_countries_objects = sorted(list(set(tours_countries_objects)), key=lambda x: x.name)
         starting_city_choice_list += [(city.id, city.name) for city in tours_starting_city]

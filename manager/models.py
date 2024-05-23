@@ -53,82 +53,6 @@ class NameMixin(models.Model):
         abstract = True
 
 
-class Agency(UUIDMixin, NameMixin, models.Model):
-    """Agency model."""
-
-    phone_number = models.CharField(
-        _('phone number'),
-        max_length=PHONE_NUMBER_MAX_LEN,
-        validators=[phone_number_validator],
-    )
-    address = models.OneToOneField(
-        'Address',
-        verbose_name=_('address'),
-        unique=True,
-        on_delete=models.CASCADE,
-    )
-
-    def __str__(self) -> str:
-        """Stringify class.
-
-        Returns:
-            str: stringified class. Name, phone_number.
-        """
-        return f'{self.name}, {self.phone_number}'
-
-    class Meta:
-        """Meta class with Agency settings."""
-
-        db_table = '"tours_data"."agency"'
-        ordering = [name_field]
-        verbose_name = _(agency_field)
-        verbose_name_plural = _('agencies')
-        unique_together = ((name_field,),)
-
-
-class Tour(UUIDMixin, NameMixin, models.Model):
-    """Tour table model."""
-
-    description = models.TextField(_('description'))
-    agency = models.ForeignKey(
-        Agency,
-        verbose_name=_(agency_field),
-        on_delete=models.CASCADE,
-    )
-    countries = models.ManyToManyField(
-        'Country',
-        verbose_name=_('country'),
-        through='TourCountry',
-    )
-    starting_city = models.ForeignKey(
-        'City',
-        verbose_name=_('starting city'),
-        on_delete=models.CASCADE,
-    )
-    price = models.DecimalField(
-        _('price'),
-        max_digits = 9,
-        decimal_places = 2,
-    )
-
-    def __str__(self) -> str:
-        """Stringify class.
-
-        Returns:
-            str: stringified class. Name, agency.
-        """
-        return f'{self.name}, {self.agency}'
-
-    class Meta:
-        """Meta class with Tour settings."""
-
-        db_table = '"tours_data"."tour"'
-        ordering = [name_field]
-        verbose_name = _('tour')
-        verbose_name_plural = _('tours')
-        unique_together = ((name_field, 'description', agency_field),)
-
-
 class Country(UUIDMixin, models.Model):
     """Country table model."""
 
@@ -136,11 +60,6 @@ class Country(UUIDMixin, models.Model):
         _(country_field),
         max_length=COUNTRY_MAX_LEN,
         unique=True,
-    )
-    tours = models.ManyToManyField(
-        'Tour',
-        verbose_name=_('tours'),
-        through='TourCountry',
     )
 
     def __str__(self) -> str:
@@ -195,21 +114,6 @@ class City(UUIDMixin, NameMixin, models.Model):
         )
 
 
-class TourCountry(UUIDMixin, models.Model):
-    """Model for Tour and City tables link."""
-
-    tour = models.ForeignKey(Tour, verbose_name=_('tour'), on_delete=models.CASCADE)
-    country = models.ForeignKey(Country, verbose_name=_('country'), on_delete=models.CASCADE)
-
-    class Meta:
-        """Meta class with Tour settings."""
-
-        db_table = '"tours_data"."tour_country"'
-        unique_together = (('tour', 'country'),)
-        verbose_name = _('relationship tour country')
-        verbose_name_plural = _('relationships tour country')
-
-
 class Address(UUIDMixin, models.Model):
     """Address table model."""
 
@@ -247,6 +151,11 @@ class Address(UUIDMixin, models.Model):
         _('address geopoint'),
         srid=srid,
     )
+    tours = models.ManyToManyField(
+        'Tour',
+        verbose_name=_('tours'),
+        through='TourAddress',
+    )
 
     def __str__(self) -> str:
         """Stringify class.
@@ -281,6 +190,97 @@ class Address(UUIDMixin, models.Model):
                 'point',
             ),
         )
+
+
+class Agency(UUIDMixin, NameMixin, models.Model):
+    """Agency model."""
+
+    phone_number = models.CharField(
+        _('phone number'),
+        max_length=PHONE_NUMBER_MAX_LEN,
+        validators=[phone_number_validator],
+    )
+    address = models.OneToOneField(
+        'Address',
+        verbose_name=_('address'),
+        unique=True,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self) -> str:
+        """Stringify class.
+
+        Returns:
+            str: stringified class. Name, phone_number.
+        """
+        return f'{self.name}, {self.phone_number}'
+
+    class Meta:
+        """Meta class with Agency settings."""
+
+        db_table = '"tours_data"."agency"'
+        ordering = [name_field]
+        verbose_name = _(agency_field)
+        verbose_name_plural = _('agencies')
+        unique_together = ((name_field,),)
+
+
+class Tour(UUIDMixin, NameMixin, models.Model):
+    """Tour table model."""
+
+    description = models.TextField(_('description'))
+    agency = models.ForeignKey(
+        Agency,
+        verbose_name=_(agency_field),
+        on_delete=models.CASCADE,
+    )
+    addresses = models.ManyToManyField(
+        'Address',
+        verbose_name=_('address'),
+        through='TourAddress',
+    )
+    starting_city = models.ForeignKey(
+        'City',
+        verbose_name=_('starting city'),
+        on_delete=models.CASCADE,
+    )
+    price = models.DecimalField(
+        _('price'),
+        max_digits = 9,
+        decimal_places = 2,
+    )
+
+    def __str__(self) -> str:
+        """Stringify class.
+
+        Returns:
+            str: stringified class. Name, agency.
+        """
+        return f'{self.name}, {self.agency}'
+
+    class Meta:
+        """Meta class with Tour settings."""
+
+        db_table = '"tours_data"."tour"'
+        ordering = [name_field]
+        verbose_name = _('tour')
+        verbose_name_plural = _('tours')
+        unique_together = ((name_field, 'description', agency_field),)
+
+
+class TourAddress(UUIDMixin, models.Model):
+    """Model for Tour and City tables link."""
+
+    tour = models.ForeignKey(Tour, verbose_name=_('tour'), on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, verbose_name=_('address'), on_delete=models.CASCADE)
+
+    class Meta:
+        """Meta class with Tour settings."""
+
+        db_table = '"tours_data"."tour_address"'
+        unique_together = (('tour', 'address'),)
+        verbose_name = _('relationship tour address')
+        verbose_name_plural = _('relationships tour address')
 
 
 class Review(UUIDMixin, models.Model):
