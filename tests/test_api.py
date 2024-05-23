@@ -12,6 +12,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
+from django.core.exceptions import ValidationError
+
 from manager.models import (Account, Address, Agency, City, Country, Review,
                             Tour)
 
@@ -23,6 +25,33 @@ USER_NAME = getenv('DJANGO_TESTS_USER_NAME')
 USER_PASSWORD = getenv('DJANGO_TESTS_USER_PASSWORD')
 SUPERUSER_NAME = getenv('DJANGO_TESTS_SUPERUSER_NAME')
 SUPERUSER_PASSWORD = getenv('DJANGO_TESTS_SUPERUSER_PASSWORD')
+
+
+def create_many_to_many(model: Model, attrs_with_model: dict) -> Model:
+    many_to_many = {}
+    for field, attr in attrs_with_model.items():
+        if isinstance(attr, list):
+            many_to_many[field] = attrs_with_model[field]
+    for field_to_pop in many_to_many.keys():
+        attrs_with_model.pop(field_to_pop)
+    created: Tour = model.objects.create(**attrs_with_model)
+    for field_name, attrs in many_to_many.items():
+        getattr(created, field_name).set(attrs)
+    return created
+
+
+def filter_many_to_many(json: dict) -> dict:
+    json_copy = json.copy()
+    fields_to_change = {}
+    for field_key, field_data in json_copy.items():
+        if isinstance(field_data, list):
+            fields_to_change[field_key] = field_data
+    for field_key, field_data in fields_to_change.items():
+        json_copy.pop(field_key)
+        json_copy[f'{field_key}__in'] = [field.id for field in field_data]
+    return json_copy
+        
+
 
 
 def create_object(
@@ -52,9 +81,14 @@ def create_object(
                 json_ob = create_object(model, jsons, return_json=False)
             json_copy[key] = json_ob
     if not return_json:
-        if obj_model.objects.filter(**json_copy).exists():
+        try:
+            objects = obj_model.objects.filter(**json_copy)
+        except ValidationError:
+            json_for_filter = filter_many_to_many(json_copy)
+            objects = obj_model.objects.filter(**json_for_filter)
+        if objects.exists():
             return obj_model.objects.get(**json_copy)
-        return obj_model.objects.create(**json_copy)
+        return create_many_to_many(obj_model, json_copy)
     return json_copy
 
 
@@ -89,8 +123,8 @@ def get_object_as_superuser(
     Returns:
         UUID: finded object id.
     """
-    if attrs_with_id.get('cities'):
-        attrs_with_id.pop('cities')
+    if attrs_with_id.get('countries'):
+        attrs_with_id.pop('countries')
     return model.objects.get(**attrs_with_id).id
 
 
@@ -110,15 +144,7 @@ def get_object_as_user(
     try:
         created_id = model.objects.create(**attrs_with_model).id
     except TypeError:
-        many_to_many = {}
-        for field, attr in attrs_with_model.items():
-            if isinstance(attr, list):
-                many_to_many[field] = attrs_with_model[field]
-        for field_to_pop in many_to_many.keys():
-            attrs_with_model.pop(field_to_pop)
-        created: Tour = model.objects.create(**attrs_with_model)
-        for field_name, attrs in many_to_many.items():
-            getattr(created, field_name).set(attrs)
+        created = create_many_to_many(model, attrs_with_model)
         created_id = created.id
     return created_id
 
@@ -188,6 +214,8 @@ def create_api_test(model: Model, url: str, creation_attrs: dict) -> TestCase:
             self.assertEqual(self.client.get(url).status_code, status.HTTP_200_OK)
             self.assertEqual(self.client.head(url).status_code, status.HTTP_200_OK)
             self.assertEqual(self.client.options(url).status_code, status.HTTP_200_OK)
+            # if url == '/api/reviews/':
+            #     print(creation_attrs)
             attrs_with_model = create_object(model, creation_attrs)
             attrs_with_id = create_object_json_with_ids(attrs_with_model)
             post_created = self.client.post(url, attrs_with_id)
@@ -233,7 +261,7 @@ city_data = {
 address_data = {
     'city': [City, city_data],
     'street': 'Пермская',
-    'house_number': 47,
+    'house_number': '47',
     'point': 'SRID=4326;POINT (55.555555555555555 55.5555555555555)',
 }
 AddressApiTest = create_api_test(Address, f'{url}addresses/', address_data)
@@ -248,8 +276,11 @@ AgencyApiTest = create_api_test(Agency, f'{url}agencies/', agency_data)
 tour_data = {
     NAME_LITERAL: 'test_tour',
     'agency': [Agency, agency_data],
-    'cities': [City, [city_data]],
+    'countries': [Country, [country_data]],
+    'starting_city': [City, city_data],
+    'price': 4,
 }
+# print(tour_data)
 TourApiTest = create_api_test(Tour, f'{url}tours/', tour_data)
 
 user_data = {
@@ -264,7 +295,7 @@ account_data = {
 }
 
 review_data = {
-    'agency': [Agency, agency_data],
+    'tour': [Tour, tour_data],
     'account': [Account, account_data],
     'rating': 1.2,
     'text': 'test_review',

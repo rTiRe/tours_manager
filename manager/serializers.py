@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from .models import Address, Agency, City, Review, Tour
+from .models import Address, Agency, Country, Review, Tour
 
 id_field = 'id'
 
@@ -20,13 +20,13 @@ class AgencySerializer(serializers.ModelSerializer):
 class TourSerializer(serializers.ModelSerializer):
     """Tour table serializer."""
 
-    cities = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), many=True)
+    countries = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), many=True)
 
     class Meta:
         """Class with Tour settings."""
 
         model = Tour
-        fields = [id_field, 'name', 'agency', 'cities']
+        fields = [id_field, 'name', 'agency', 'countries', 'starting_city', 'price']
         optional_fields = ['description']
 
 
@@ -52,4 +52,4 @@ class ReviewSerializer(serializers.ModelSerializer):
         """Class with Review setting."""
 
         model = Review
-        fields = ['id', 'agency', 'account', 'rating', 'text']
+        fields = ['id', 'tour', 'account', 'rating', 'text']
