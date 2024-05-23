@@ -14,8 +14,8 @@ class Migration(migrations.Migration):
             name='review',
             options={'verbose_name': 'review', 'verbose_name_plural': 'reviews'},
         ),
-        migrations.AlterUniqueTogether(
-            name='review',
-            unique_together={('agency', 'account')},
-        ),
+        # migrations.AlterUniqueTogether(
+        #     name='review',
+        #     unique_together={('agency', 'account')},
+        # ),
     ]

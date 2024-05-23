@@ -95,10 +95,20 @@ class Tour(UUIDMixin, NameMixin, models.Model):
         verbose_name=_(agency_field),
         on_delete=models.CASCADE,
     )
-    cities = models.ManyToManyField(
+    countries = models.ManyToManyField(
+        'Country',
+        verbose_name=_('country'),
+        through='TourCountry',
+    )
+    starting_city = models.ForeignKey(
         'City',
-        verbose_name=_('cities'),
-        through='TourCity',
+        verbose_name=_('starting city'),
+        on_delete=models.CASCADE,
+    )
+    price = models.DecimalField(
+        _('price'),
+        max_digits = 9,
+        decimal_places = 2,
     )
 
     def __str__(self) -> str:
@@ -127,6 +137,11 @@ class Country(UUIDMixin, models.Model):
         max_length=COUNTRY_MAX_LEN,
         unique=True,
     )
+    tours = models.ManyToManyField(
+        'Tour',
+        verbose_name=_('tours'),
+        through='TourCountry',
+    )
 
     def __str__(self) -> str:
         """Stringify class.
@@ -151,11 +166,6 @@ class City(UUIDMixin, NameMixin, models.Model):
         Country,
         verbose_name=_(country_field),
         on_delete=models.CASCADE,
-    )
-    tours = models.ManyToManyField(
-        'Tour',
-        verbose_name=_('tours'),
-        through='TourCity',
     )
     point = gismodels.PointField(
         _('city geopoint'),
@@ -185,19 +195,19 @@ class City(UUIDMixin, NameMixin, models.Model):
         )
 
 
-class TourCity(UUIDMixin, models.Model):
+class TourCountry(UUIDMixin, models.Model):
     """Model for Tour and City tables link."""
 
     tour = models.ForeignKey(Tour, verbose_name=_('tour'), on_delete=models.CASCADE)
-    city = models.ForeignKey(City, verbose_name=_(city_field), on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, verbose_name=_('country'), on_delete=models.CASCADE)
 
     class Meta:
         """Meta class with Tour settings."""
 
-        db_table = '"tours_data"."tour_city"'
-        unique_together = (('tour', city_field),)
-        verbose_name = _('relationship tour city')
-        verbose_name_plural = _('relationships tour city')
+        db_table = '"tours_data"."tour_country"'
+        unique_together = (('tour', 'country'),)
+        verbose_name = _('relationship tour country')
+        verbose_name_plural = _('relationships tour country')
 
 
 class Address(UUIDMixin, models.Model):
@@ -276,9 +286,9 @@ class Address(UUIDMixin, models.Model):
 class Review(UUIDMixin, models.Model):
     """Review table model."""
 
-    agency = models.ForeignKey(
-        Agency,
-        verbose_name=_(agency_field),
+    tour = models.ForeignKey(
+        Tour,
+        verbose_name=_('tour'),
         on_delete=models.CASCADE,
     )
     account = models.ForeignKey(
@@ -304,8 +314,8 @@ class Review(UUIDMixin, models.Model):
         """
         rating = self.rating
         username = self.account.username
-        agency = self.agency
-        return _(f'{rating} ({username}) for {agency}')
+        tour = self.tour
+        return f'{rating} ({username}) for {tour}'  
 
     class Meta:
         """Meta class with Review settings."""
@@ -313,7 +323,7 @@ class Review(UUIDMixin, models.Model):
         db_table = '"tours_data"."review"'
         verbose_name = _('review')
         verbose_name_plural = _('reviews')
-        unique_together = ((agency_field, 'account'),)
+        unique_together = (('tour', 'account'),)
 
 
 class Account(UUIDMixin, models.Model):
