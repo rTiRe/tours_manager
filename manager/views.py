@@ -40,11 +40,35 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 def tours(request: HttpRequest) -> HttpResponse:
-    form = FindToursForm
+    tours_data = Tour.objects.filter(
+        starting_city=request.GET.get('starting_city'),
+        country=request.GET.get('country'),
+    )
+    if not request.GET:
+        tours_data = Tour.objects.all()
+    reviews_data = {tour_data: Review.objects.filter(tour=tour_data) for tour_data in tours_data}
+    for tour_data, tour_reviews in reviews_data.items():
+        tour_ratings = [review.rating for review in tour_reviews]
+        if tour_ratings:
+            reviews_data[tour_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
+        else:
+            reviews_data[tour_data] = 0
+
+    form = FindToursForm(request)
     return render(
         request,
         'tours.html',
-        {'form': form},
+        {
+            'form': form,
+            'tours_data': tours_data,
+            'tours_ratings': reviews_data,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/tours.css',
+                'css/search_tours.css',
+            ],
+        },
     )
 
 
