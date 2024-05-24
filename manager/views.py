@@ -97,7 +97,7 @@ def signup(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Account.objects.create(account=user, is_agency=False)
+            Account.objects.create(account=user)
             login(request, user)
             return redirect('signin')
         else:

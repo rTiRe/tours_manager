@@ -335,8 +335,14 @@ class Account(UUIDMixin, models.Model):
         verbose_name=_('user'),
         on_delete=models.CASCADE,
     )
-    is_agency = models.BooleanField(
-        _('agency account'),
+    agency = models.OneToOneField(
+        Agency,
+        verbose_name=_('agency account'),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+        unique=True,
     )
 
     class Meta:

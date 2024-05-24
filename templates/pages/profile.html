@@ -7,6 +7,11 @@
         <div class="container">
             {% if user.account.is_authenticated %}
                 {{ user.first_name }}
+                {{ user.last_name }}
+                {{ user.username }}
+                {% if user.agency %}
+                    {{ user.agency.name }}
+                {% endif %}
             {% endif %}
         </div>
     </section>
