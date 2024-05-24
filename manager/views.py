@@ -183,8 +183,8 @@ def profile(request: HttpRequest, pk: UUID = None) -> HttpResponse:
     )
 
 
-# def csrf_failure(request, reason=""):
-#     return redirect('index')
+def csrf_failure(request, reason=""):
+    return redirect('index')
 
 
 class CustomViewSetPermission(permissions.BasePermission):

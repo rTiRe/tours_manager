@@ -179,4 +179,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TEST_RUNNER = 'tests.runner.PostgresSchemaRunner'
 APPEND_SLASH = False
-# CSRF_FAILURE_VIEW = 'manager.views.csrf_failure'
+CSRF_FAILURE_VIEW = 'manager.views.csrf_failure'
