@@ -1,5 +1,55 @@
-<form method="post">
-    {% csrf_token %}
-    {{ signup_form.as_p }}
-    <button type="submit">Sign up</button>
-</form>
+{% extends 'base.html' %}
+{% load static %}
+{% load template_filters %}
+{% load errors_writer %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="container">
+            <div class="account_form">
+                <p class="title"><i class="fa-solid fa-hand-peace"></i> Давайте знакомиться!</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input_group username">
+                        <label for="username">Имя пользователя</label>
+                        {{ form.username }}
+                        {{ errors|get_errors_html:form.username.name }}
+                    </div>
+                    <div class="person_group">
+                        <div class="input_group firstname">
+                            <label for="first_name">Имя</label>
+                            {{ form.first_name }}
+                            {{ errors|get_errors_html:form.first_name.name }}
+                        </div>
+                        <div class="input_group lastname">
+                            <label for="last_name">Фамилия</label>
+                            {{ form.last_name }}
+                            {{ errors|get_errors_html:form.last_name.name }}
+                        </div>
+                    </div>
+                    <div class="input_group email">
+                        <label for="email">Email</label>
+                        {{ form.email }}
+                        {{ errors|get_errors_html:form.email.name }}
+                    </div>
+                    <div class="password_with_hint">
+                        <div class="password_group">
+                            <div class="input_group password">
+                                <label for="password1">Пароль</label>
+                                {{ form.password1 }}
+                            </div>
+                            <div class="input_group password2">
+                                <label for="password2">Пароль еще раз</label>
+                                {{ form.password2 }}
+                            </div>
+                        </div>
+                        {{ errors|get_errors_html:form.password1.name }}
+                        {{ errors|get_errors_html:form.password2.name }}
+                    </div>
+                    <button type="submit">Зарегистрироваться</button>
+                </form>
+                <p class="form_redirect">Уже есть аккаунт? <a href="{% url 'signin' %}">Войдите</a></p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

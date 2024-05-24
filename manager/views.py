@@ -18,6 +18,8 @@ from uuid import UUID
 
 from django.contrib.auth import decorators
 
+from django.utils.translation import gettext_lazy as _
+
 
 def index(request: HttpRequest) -> HttpResponse:
     """Index page view.
@@ -37,7 +39,6 @@ def index(request: HttpRequest) -> HttpResponse:
             'style_files': [
                 'css/header.css',
                 'css/body.css',
-                'css/index.css',
                 'css/search_tours.css',
             ],
         },
@@ -77,22 +78,52 @@ def tours(request: HttpRequest) -> HttpResponse:
     )
 
 
+def convert_errors(errors: dict) -> dict:
+    readable_dict = {}
+    for field_name, field_errors in errors.items():
+        for error in field_errors:
+            error = str(error)
+            if error.startswith('[\'') and error.endswith('\']'):
+                error = error[2:-2]
+                readable_dict[field_name] = error
+    return readable_dict
+
+
 def signup(request):
+    errors = {}
     if request.user.is_authenticated:
-        return redirect('profile')
+        return redirect('my_profile')
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Account.objects.create(account=user)
+            Account.objects.create(account=user, is_agency=False)
             login(request, user)
-            return redirect('profile')
+            return redirect('signin')
+        else:
+            errors = form.errors.as_data()
+            errors = convert_errors(errors)
     else:
         form = SignupForm()
-    return render(request, 'signup/signup.html', {'signup_form': form})
+    return render(
+        request,
+        'signup/signup.html',
+        {
+            'form': form,
+            'errors': errors,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+            ],
+        }
+    )
 
 
 def signin(request):
+    errors = {}
+    if request.user.is_authenticated:
+        return redirect('my_profile')
     if request.method == 'POST':
         form = SigninForm(request.POST)
         if form.is_valid():
@@ -101,10 +132,28 @@ def signin(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user) 
-                return redirect('/profile/')
+                return redirect('my_profile')
+            else:
+                errors['username'] = _('The username or password seems to be incorrect.')
+        else:
+            errors = form.errors.as_data()
+            errors = convert_errors(errors)
     else:
         form = SigninForm()
-    return render(request, 'signup/signin.html', {'signin_form': form})
+    print(errors)
+    return render(
+        request,
+        'signup/signin.html',
+        {
+            'form': form,
+            'errors': errors,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+            ],
+        }
+    )
 
 
 def signout(request):
@@ -132,6 +181,10 @@ def profile(request: HttpRequest, pk: UUID = None) -> HttpResponse:
             ],
         },
     )
+
+
+# def csrf_failure(request, reason=""):
+#     return redirect('index')
 
 
 class CustomViewSetPermission(permissions.BasePermission):

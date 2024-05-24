@@ -3,43 +3,43 @@
 {% load template_filters %}
 {% block header %}{% include 'parts/header.html' %}{% endblock %}
 {% block content %}
-<section class="home">
-    <div class="container">
-        {% include 'parts/tours_search.html' %}
-    </div>
-</section>
-<main>
-    <div class="container">
-        {% for tour_data in tours_data %}
-        <div class="card">
-            <div class="left">
-                <img src="img/search-banner.png" alt="img"/>
-            </div>
-            <div class="right">
-                <div class="top">
-                    <div class="title">{{ tour_data.name }}</div>
-                    <div class="countries">
-                        {% for address in tour_data.addresses.all %}
-                            {{ address.city.country.name }}{% if not forloop.last %},{% endif %}
-                        {% endfor %}
+    <section class="home">
+        <div class="container">
+            {% include 'parts/tours_search.html' %}
+        </div>
+    </section>
+    <main>
+        <div class="container">
+            {% for tour_data in tours_data %}
+            <div class="card">
+                <div class="left">
+                    <img src="img/search-banner.png" alt="img"/>
+                </div>
+                <div class="right">
+                    <div class="top">
+                        <div class="title">{{ tour_data.name }}</div>
+                        <div class="countries">
+                            {% for address in tour_data.addresses.all %}
+                                {{ address.city.country.name }}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="rating">
+                        {% with tour_rating=tours_ratings|get_item:tour_data %}
+                            {% for num in '01234'|make_list %}
+                                <span class="fa fa-star{% if num|to_int < tour_rating|to_int %} checked{% endif %}"></span>
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                    <div class="description">
+                        {{ tour_data.description }}
+                    </div>
+                    <div class="price">
+                        {{ tour_data.price }}<span>₽</span>
                     </div>
                 </div>
-                <div class="rating">
-                    {% with tour_rating=tours_ratings|get_item:tour_data %}
-                        {% for num in '01234'|make_list %}
-                            <span class="fa fa-star{% if num|to_int < tour_rating|to_int %} checked{% endif %}"></span>
-                        {% endfor %}
-                    {% endwith %}
-                </div>
-                <div class="description">
-                    {{ tour_data.description }}
-                </div>
-                <div class="price">
-                    {{ tour_data.price }}<span>₽</span>
-                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-</main>
+    </main>
 {% endblock %}

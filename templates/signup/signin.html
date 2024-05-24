@@ -1,5 +1,28 @@
-<form method="post">
-    {% csrf_token %}
-    {{ signin_form.as_p }}
-    <button type="submit">Sign in</button>
-</form>
+{% extends 'base.html' %}
+{% load static %}
+{% load template_filters %}
+{% load errors_writer %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="container">
+            <div class="account_form">
+                <p class="title"><i class="fa-solid fa-hand-peace"></i> Рады встрече!</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input_group username">
+                        <label for="username">Имя пользователя</label>
+                        {{ form.username }}
+                        {{ errors|get_errors_html:form.username.name }}
+                    </div>
+                    <div class="input_group password">
+                        <label for="password">Пароль</label>
+                        {{ form.password }}
+                        {{ errors|get_errors_html:form.password.name }}
+                    </div>
+                    <button type="submit">Войти</button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
