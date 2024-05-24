@@ -73,3 +73,8 @@ class SignupForm(auth_forms.UserCreationForm):
     class Meta:
         model = models.User
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+
+
+class SigninForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)

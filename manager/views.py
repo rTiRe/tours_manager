@@ -5,14 +5,16 @@ from typing import Any
 from django.db.models import Model
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib.auth import login, logout, authenticate
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
 from .models import Address, Agency, Review, Tour, Account
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .forms import FindToursForm, SignupForm
+from .forms import FindToursForm, SignupForm, SigninForm
+
+from uuid import UUID
 
 from django.contrib.auth import decorators
 
@@ -76,21 +78,47 @@ def tours(request: HttpRequest) -> HttpResponse:
 
 
 def signup(request):
+    if request.user.is_authenticated:
+        return redirect('profile')
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
+            Account.objects.create(account=user)
             login(request, user)
             return redirect('profile')
     else:
-        if request.user.is_authenticated:
-            return redirect('profile')
         form = SignupForm()
     return render(request, 'signup/signup.html', {'signup_form': form})
 
 
-def profile(request: HttpRequest) -> HttpResponse:
-    client = Account.objects.get(account=request.user)
+def signin(request):
+    if request.method == 'POST':
+        form = SigninForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user) 
+                return redirect('/profile/')
+    else:
+        form = SigninForm()
+    return render(request, 'signup/signin.html', {'signin_form': form})
+
+
+def signout(request):
+    logout(request)
+    return redirect('signin')
+
+
+def profile(request: HttpRequest, pk: UUID = None) -> HttpResponse:
+    if not request.user.is_authenticated:
+        return redirect('signin')
+    if pk:
+        client = Account.objects.get(id=pk)
+    else:
+        client = Account.objects.get(account=request.user)
     return render(
         request,
         'pages/profile.html',
