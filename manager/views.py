@@ -168,7 +168,6 @@ def signin(request):
             errors = convert_errors(errors)
     else:
         form = SigninForm()
-    print(errors)
     return render(
         request,
         'signup/signin.html',
