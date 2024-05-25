@@ -11,7 +11,12 @@
         <ul class="nav-links">
             <li><a href="{% url 'tours' %}">Туры</a></li>
             <li><a href="{% url 'agencies' %}">Турагенства</a></li>
-            <li><a href="{% url 'my_profile' %}">Аккаунт</a></li>
+            {% if request_user.is_authenticated and request_user == user.account %}
+                <li><a href="{% url 'manager-logout' %}"><i class="fa fa-cog" aria-hidden="true"></i> Настройки</a></li>
+                <li><a href="{% url 'manager-logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i> Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'my_profile' %}"><i class="fa-solid fa-user" aria-hidden="true"></i> Аккаунт</a></li>
+            {% endif %}
         </ul>
     </div>
     <script src="{% static 'js/menu_opener.js' %}"></script>

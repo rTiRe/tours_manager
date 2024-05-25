@@ -33,7 +33,7 @@ def check_isinstance(
 @register.filter
 def get_item(
     dictionary: dict,
-    key: str | int | float | tuple | frozenset,
+    key: str | int | float | tuple | frozenset | object
 ) -> Any | None:
     """Get item from dictionary by key.
 
@@ -45,9 +45,9 @@ def get_item(
         Any: dictionary data if key exists.
         None: dictionary data if key not exists.
     """
-    expected_types = (dict)
+    expected_types = (dict,)
     check_isinstance(expected_types, dictionary, 'dictionary')
-    expected_types = (str, int, float, tuple, frozenset)
+    expected_types = (str, int, float, tuple, frozenset | object)
     check_isinstance(expected_types, key, 'key')
     return dictionary.get(key)
 

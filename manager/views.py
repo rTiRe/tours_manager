@@ -2,7 +2,8 @@
 
 from typing import Any
 
-from django.contrib.auth import authenticate, decorators, login, logout, models
+from django.contrib import auth
+from django.contrib.auth import decorators
 from django.db.models import Model
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -117,7 +118,7 @@ def convert_errors(errors: dict) -> dict:
     return readable_dict
 
 
-def signup(request):
+def registration(request):
     errors = {}
     if request.user.is_authenticated:
         return redirect('my_profile')
@@ -126,8 +127,7 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             Account.objects.create(account=user)
-            login(request, user)
-            return redirect('signin')
+            return redirect('manager-login')
         else:
             errors = form.errors.as_data()
             errors = convert_errors(errors)
@@ -135,7 +135,7 @@ def signup(request):
         form = SignupForm()
     return render(
         request,
-        'signup/signup.html',
+        'registration/registration.html',
         {
             'form': form,
             'errors': errors,
@@ -148,7 +148,7 @@ def signup(request):
     )
 
 
-def signin(request):
+def login(request):
     errors = {}
     if request.user.is_authenticated:
         return redirect('my_profile')
@@ -157,9 +157,9 @@ def signin(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
+            user = auth.authenticate(request, username=username, password=password)
             if user:
-                login(request, user) 
+                auth.login(request, user)
                 return redirect('my_profile')
             else:
                 errors['username'] = _('The username or password seems to be incorrect.')
@@ -170,7 +170,7 @@ def signin(request):
         form = SigninForm()
     return render(
         request,
-        'signup/signin.html',
+        'registration/login.html',
         {
             'form': form,
             'errors': errors,
@@ -183,20 +183,20 @@ def signin(request):
     )
 
 
-def signout(request):
-    logout(request)
-    return redirect('signin')
+def logout(request):
+    auth.logout(request)
+    return redirect('manager-login')
 
 
 def profile(request: HttpRequest, username: str = None) -> HttpResponse:
     tours_data = {}
     reviews_data = {}
     if username:
-        user_id = models.User.objects.get(username=username).id
+        user_id = auth.models.User.objects.get(username=username).id
         profile = Account.objects.get(account=user_id)
     else:
         if not request.user.is_authenticated:
-                return redirect('signin')
+                return redirect('manager-login')
         profile = Account.objects.get(account=request.user)
     if profile.agency:
         tours_data = Tour.objects.filter(agency=profile.agency.id)
@@ -223,6 +223,11 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
             ],
         },
     )
+
+
+@decorators.login_required
+def my_profile(request: HttpRequest) -> HttpResponse:
+    return profile(request)
 
 
 def csrf_failure(request, reason=""):
