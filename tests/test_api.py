@@ -291,7 +291,6 @@ user_data = {
 
 account_data = {
     'account': [User, user_data],
-    'is_agency': False,
 }
 
 review_data = {
