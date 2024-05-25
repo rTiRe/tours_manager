@@ -8,12 +8,8 @@
             <div class="search">
                 <div class="background"></div>
                 <form action="/agencies">
-                    <div class="selectors">
-                        <div class="left">
-                            <label for="city">Город</label>
-                            {{ form.city }}
-                        </div>
-                    </div>
+                    <label for="city">Город</label>
+                    {{ form.city }}
                     <button type="submit">Найти туры</button>
                 </form>
             </div>
@@ -22,28 +18,28 @@
     <main>
         <div class="container">
             {% for agency_data in agencies_data %}
-                <div class="card">
-                    <div class="left">
-                        <img src="{% static 'img/search-banner.png' %}" alt="img"/>
-                    </div>
-                    <div class="right">
-                        <div class="top">
-                            <div class="title">{{ agency_data.name }}</div>
-                            <div class="countries">
-                                {% for address in agency_data.addresses.all %}
-                                    {{ address }}
-                                {% endfor %}
+                <a href="/profile/{{ agency_data.account.username }}">
+                    <div class="card">
+                        <div class="left">
+                            <img src="{% static 'img/search-banner.png' %}" alt="img"/>
+                        </div>
+                        <div class="right">
+                            <div class="top">
+                                <div class="title">{{ agency_data.name }}</div>
+                                <div class="places">
+                                    {{ agency_data.address.city.name }}
+                                </div>
+                            </div>
+                            <div class="rating">
+                                {% with agency_rating=reviews_data|get_item:agency_data %}
+                                    {% for num in '01234'|make_list %}
+                                        <span class="fa fa-star{% if num|to_int < agency_rating|to_int %} checked{% endif %}"></span>
+                                    {% endfor %}
+                                {% endwith %}
                             </div>
                         </div>
-                        <div class="rating">
-                            {% with agency_rating=reviews_data|get_item:agency_data %}
-                                {% for num in '01234'|make_list %}
-                                    <span class="fa fa-star{% if num|to_int < agency_rating|to_int %} checked{% endif %}"></span>
-                                {% endfor %}
-                            {% endwith %}
-                        </div>
                     </div>
-                </div>
+                </a>
             {% endfor %}
         </div>
     </main>

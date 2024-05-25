@@ -78,9 +78,13 @@ def tours(request: HttpRequest) -> HttpResponse:
 
 
 def agencies(request: HttpRequest) -> HttpResponse:
-    agencies_data = Agency.objects.filter(address__city=request.GET.get('city'))
-    if not request.GET:
+    GET_city = request.GET.get('city')
+    if not GET_city:
         agencies_data = Agency.objects.all()
+    elif not request.GET:
+        agencies_data = Agency.objects.all()
+    else:
+        agencies_data = Agency.objects.filter(address__city=GET_city)
     reviews_data = {agency_data: Review.objects.filter(tour__agency=agency_data) for agency_data in agencies_data}
     for agency_data, agency_reviews in reviews_data.items():
         tour_ratings = [review.rating for review in agency_reviews]
@@ -99,8 +103,8 @@ def agencies(request: HttpRequest) -> HttpResponse:
             'style_files': [
                 'css/header.css',
                 'css/body.css',
-                'css/tours.css',
-                'css/search_tours.css',
+                'css/agencies.css',
+                'css/search_agencies.css',
             ],
         },
     )

@@ -343,6 +343,7 @@ class Account(UUIDMixin, models.Model):
         blank=True,
         default=None,
         unique=True,
+        related_name='account',
     )
 
     class Meta:

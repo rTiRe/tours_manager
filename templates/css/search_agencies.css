@@ -41,6 +41,7 @@
 }
 
 .search form select {
+    position: relative;
     padding: 10px;
     height: 25px;
     box-sizing: content-box;
@@ -48,6 +49,7 @@
     border-color: transparent;
     font: 400 16px "Roboto", sans-serif;
     background-color: #fff;
+    min-width: 150px;
 }
 
 .search form label {
@@ -83,32 +85,6 @@
     font-weight: 600;
 }
 
-.search .selectors {
-    position: relative;
-    display: flex;
-}
-
-.search .left, .search .right {
-    width: 100%;
-    min-width: 150px;
-    max-width: 350px;
-    display: inline-flex;
-    flex-direction: column;
-    position: relative;
-}
-
-.search .left select {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right: 1px solid lightgrey;
-}
-
-.search .right select {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: 1px solid lightgrey;
-}
-
 @media (max-width: 768px) {
     .search {
         width: 100%;
@@ -116,11 +92,6 @@
     }
     .search > form {
         width: 100%;
-        font: 400 14px "Roboto", sans-serif;
-    }
-    .search > form  select {
-        padding: 8px;
-        height: 25px;
         font: 400 14px "Roboto", sans-serif;
     }
     .search > form button {
@@ -132,24 +103,14 @@
     .search > form label {
         transform: translate(10px, 15px);
     }
-    .search .left, .search .right {
-        width: 100%;
-        min-width: none;
-        max-width: none;
-    }
-    .search .left select {
+    .search select {
         border-radius: 5px;
         border: 1px solid lightgrey;
-    }
-    .search .right select {
-        border-radius: 5px;
-        border: 1px solid lightgrey;
+        padding: 8px;
+        height: 25px;
+        font: 400 14px "Roboto", sans-serif;
     }
     .search > form {
-        flex-direction: column;
-        gap: 20px;
-    }
-    .search > form .selectors {
         flex-direction: column;
         gap: 20px;
     }
