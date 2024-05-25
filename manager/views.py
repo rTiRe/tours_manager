@@ -12,7 +12,7 @@ from rest_framework.serializers import ModelSerializer
 from .models import Address, Agency, Review, Tour, Account
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .forms import FindToursForm, SignupForm, SigninForm
+from .forms import FindToursForm, SignupForm, SigninForm, FindAgenciesForm
 
 from django.contrib.auth import decorators
 
@@ -67,6 +67,35 @@ def tours(request: HttpRequest) -> HttpResponse:
             'form': form,
             'tours_data': tours_data,
             'tours_ratings': reviews_data,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/tours.css',
+                'css/search_tours.css',
+            ],
+        },
+    )
+
+
+def agencies(request: HttpRequest) -> HttpResponse:
+    agencies_data = Agency.objects.filter(address__city=request.GET.get('city'))
+    if not request.GET:
+        agencies_data = Agency.objects.all()
+    reviews_data = {agency_data: Review.objects.filter(tour__agency=agency_data) for agency_data in agencies_data}
+    for agency_data, agency_reviews in reviews_data.items():
+        tour_ratings = [review.rating for review in agency_reviews]
+        if tour_ratings:
+            reviews_data[agency_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
+        else:
+            reviews_data[agency_data] = 0
+    form = FindAgenciesForm(request)
+    return render(
+        request,
+        'pages/agencies.html',
+        {
+            'form': form,
+            'agencies_data': agencies_data,
+            'reviews_data': reviews_data,
             'style_files': [
                 'css/header.css',
                 'css/body.css',

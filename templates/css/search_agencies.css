@@ -1,0 +1,166 @@
+.search {
+    overflow: hidden;
+    position: relative;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: rgb(0, 0, 0, 10%);
+    backdrop-filter: blur(7px);
+    display: inline-block;
+}
+
+.search form {
+    position: relative;
+    display: inline-flex;
+    gap: 10px;
+    font: 400 16px "Roboto", sans-serif;
+}
+
+.search form button {
+    width: auto;
+    background-color: #ff157e;
+    border: none;
+    border-radius: 5px;
+    padding: 0 20px;
+    font: 600 16px "Roboto", sans-serif;
+    color: white;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: .3s;
+}
+
+.search form button:hover {
+    transform: translate(0, -5px)
+}
+
+.search > form button:active {
+    transition: .1s;
+    transform: scale(0.95)
+}
+
+.search form select {
+    padding: 10px;
+    height: 25px;
+    box-sizing: content-box;
+    border-radius: 5px;
+    border-color: transparent;
+    font: 400 16px "Roboto", sans-serif;
+    background-color: #fff;
+}
+
+.search form label {
+    position: absolute;
+    transform: translate(10px, 14px);
+    color: gray;
+    transition: .3s;
+    cursor: text;
+}
+
+.search form select:focus {
+    outline: none;
+}
+
+.search form label:has(+ select:active) {
+    color: white;
+    transform: translate(10px, -110%);
+    cursor: default;
+    font-weight: 600;
+}
+
+.search form label:has(+ select:valid) {
+    color: white;
+    transform: translate(10px, -110%);
+    cursor: default;
+    font-weight: 600;
+}
+
+.search form label.active {
+    color: white;
+    transform: translate(10px, -110%);
+    cursor: default;
+    font-weight: 600;
+}
+
+.search .selectors {
+    position: relative;
+    display: flex;
+}
+
+.search .left, .search .right {
+    width: 100%;
+    min-width: 150px;
+    max-width: 350px;
+    display: inline-flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.search .left select {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid lightgrey;
+}
+
+.search .right select {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 1px solid lightgrey;
+}
+
+@media (max-width: 768px) {
+    .search {
+        width: 100%;
+        padding: 30px;
+    }
+    .search > form {
+        width: 100%;
+        font: 400 14px "Roboto", sans-serif;
+    }
+    .search > form  select {
+        padding: 8px;
+        height: 25px;
+        font: 400 14px "Roboto", sans-serif;
+    }
+    .search > form button {
+        font: 600 14px "Roboto", sans-serif;
+        height: 25px;
+        padding: 8px;
+        box-sizing: content-box;
+    }
+    .search > form label {
+        transform: translate(10px, 15px);
+    }
+    .search .left, .search .right {
+        width: 100%;
+        min-width: none;
+        max-width: none;
+    }
+    .search .left select {
+        border-radius: 5px;
+        border: 1px solid lightgrey;
+    }
+    .search .right select {
+        border-radius: 5px;
+        border: 1px solid lightgrey;
+    }
+    .search > form {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .search > form .selectors {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 510px) {
+    .search {
+        width: 100%;
+        padding: 25px 15px;
+    }
+    .search form {
+        width: 100%;
+    }
+}

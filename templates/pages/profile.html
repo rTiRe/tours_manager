@@ -31,9 +31,9 @@
                                 <i class="fa-solid fa-check-circle" aria-hidden="true"></i> Турагенство 
                                 <div class="rating">
                                     {% with agency_rating=reviews_data|get_avg %}
-                                    {% for num in '01234'|make_list %}
-                                        <span class="fa fa-star{% if num|to_int < agency_rating|to_int %} checked{% endif %}"></span>
-                                    {% endfor %}
+                                        {% for num in '01234'|make_list %}
+                                            <span class="fa fa-star{% if num|to_int < agency_rating|to_int %} checked{% endif %}"></span>
+                                        {% endfor %}
                                     {% endwith %}
                                 </div>
                             </h3>

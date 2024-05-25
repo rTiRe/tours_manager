@@ -2,7 +2,7 @@
 
 from django import forms
 
-from .models import Address, Review, Tour
+from .models import Address, Review, Tour, Agency
 from django.contrib.auth import forms as auth_forms, models
 from django.http import HttpRequest
 
@@ -63,6 +63,20 @@ class FindToursForm(forms.Form):
         if request and request.method == 'GET':
             self.fields['country'].initial = request.GET.get('country')
             self.fields['starting_city'].initial = request.GET.get('starting_city')
+
+
+class FindAgenciesForm(forms.Form):
+    city = forms.ChoiceField(required=True)
+
+    def __init__(self, request: HttpRequest = None, *args, **kwargs):
+        super(FindAgenciesForm, self).__init__(*args, **kwargs)
+        city_choice_list = [('', '')]
+        agencies_objects = Agency.objects.all()
+        agencies_cities = [agency.address.city for agency in agencies_objects.all()]
+        city_choice_list += [(city.id, city.name) for city in agencies_cities]
+        self.fields['city'].choices = city_choice_list
+        if request and request.method == 'GET':
+            self.fields['city'].initial = request.GET.get('city')
 
 
 class SignupForm(auth_forms.UserCreationForm):
