@@ -17,3 +17,10 @@ def make_str(item):
 @register.filter
 def to_int(value):
     return int(value)
+
+@register.filter
+def get_avg(int_list):
+    if isinstance(int_list, dict):
+        int_list = [dict_value for dict_value in int_list.values()]
+    int_list = list(filter(lambda number: number != 0, int_list))
+    return sum(int_list) / len(int_list)

@@ -1,21 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load template_filters %}
+{% load gravatar %}
 {% block header %}{% include 'parts/header.html' %}{% endblock %}
 {% block content %}
     <section class="home">
         <div class="container">
-            {% if user.account.is_authenticated %}
-                {{ user.first_name }}
-                {{ user.last_name }}
-                {{ user.username }}
-                {% if user.agency %}
-                    {{ user.agency.name }}
+            {% if user.account.is_active %}
+                <div class="left">
+                    <div class="profile">
+                        <div class="userinfo">
+                            <div class="avatar">
+                                <img src="{{ user.email|gravatar_url }}" alt="gravatar">
+                            </div>
+                            <section>
+                                <h2>
+                                    {% if user.agency %}
+                                        {{ user.agency.name }}
+                                    {% else %}
+                                        {{ user.first_name }} {{ user.last_name }}
+                                    {% endif %}
+                                </h2>
+                                <h5>@{{ user.username }}</h5>
+                            </section>
+                        </div>
+                    </div>
+                    {% if user.agency %}
+                        <div class="agency_info">
+                            <h3>
+                                <i class="fa-solid fa-check-circle" aria-hidden="true"></i> Турагенство 
+                                <div class="rating">
+                                    {% with agency_rating=reviews_data|get_avg %}
+                                    {% for num in '01234'|make_list %}
+                                        <span class="fa fa-star{% if num|to_int < agency_rating|to_int %} checked{% endif %}"></span>
+                                    {% endfor %}
+                                    {% endwith %}
+                                </div>
+                            </h3>
+                            <div class="contacts">
+                                <p><i class="fa-solid fa-user" aria-hidden="true"></i> Владелец: {{ user.first_name }} {{ user.last_name }}</p>
+                                <p><i class="fa fa-envelope" aria-hidden="true"></i> Email: <a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+                                <p><i class="fa-solid fa-phone" aria-hidden="true"></i> Телефон: <a href="tel:{{ user.agency.phone_number }}">{{ user.agency.phone_number }}</a></p>
+                            </div>
+                            <div class="documents">
+                                All docs
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if request_user.is_authenticated and request_user == user.account %}
+                    <div class="right">
+                        <button>Настройки</button>
+                    </div>
                 {% endif %}
             {% endif %}
         </div>
     </section>
     <main>
-
+        <div class="container">
+            {% for tour_data in tours_data %}
+            <div class="card">
+                <div class="left">
+                    <img src="{% static 'img/search-banner.png' %}" alt="img"/>
+                </div>
+                <div class="right">
+                    <div class="top">
+                        <div class="title">{{ tour_data.name }}</div>
+                        <div class="countries">
+                            {% for address in tour_data.addresses.all %}
+                                {{ address.city.country.name }}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="rating">
+                        {% with tour_rating=reviews_data|get_item:tour_data %}
+                            {% for num in '01234'|make_list %}
+                                <span class="fa fa-star{% if num|to_int < tour_rating|to_int %} checked{% endif %}"></span>
+                            {% endfor %}
+                        {% endwith %}
+                    </div>
+                    <div class="description">
+                        {{ tour_data.description }}
+                    </div>
+                    <div class="price">
+                        {{ tour_data.price }}<span>₽</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </main>
 {% endblock %}

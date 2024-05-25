@@ -389,3 +389,12 @@ class Account(UUIDMixin, models.Model):
             str: account last name.
         """
         return self.account.last_name
+
+    @property
+    def email(self) -> str:
+        """Get email.
+
+        Returns:
+            str: account email.
+        """
+        return self.account.email

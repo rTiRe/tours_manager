@@ -14,11 +14,10 @@ from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
 from .forms import FindToursForm, SignupForm, SigninForm
 
-from uuid import UUID
-
 from django.contrib.auth import decorators
 
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import models
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -161,23 +160,38 @@ def signout(request):
     return redirect('signin')
 
 
-def profile(request: HttpRequest, pk: UUID = None) -> HttpResponse:
-    if not request.user.is_authenticated:
-        return redirect('signin')
-    if pk:
-        client = Account.objects.get(id=pk)
+def profile(request: HttpRequest, username: str = None) -> HttpResponse:
+    tours_data = {}
+    reviews_data = {}
+    if username:
+        user_id = models.User.objects.get(username=username).id
+        profile = Account.objects.get(account=user_id)
     else:
-        client = Account.objects.get(account=request.user)
+        if not request.user.is_authenticated:
+                return redirect('signin')
+        profile = Account.objects.get(account=request.user)
+    if profile.agency:
+        tours_data = Tour.objects.filter(agency=profile.agency.id)
+        reviews_data = {tour_data: Review.objects.filter(tour=tour_data) for tour_data in tours_data}
+        for tour_data, tour_reviews in reviews_data.items():
+            tour_ratings = [review.rating for review in tour_reviews]
+            if tour_ratings:
+                reviews_data[tour_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
+            else:
+                reviews_data[tour_data] = 0
     return render(
         request,
         'pages/profile.html',
         {
-            'user': client,
+            'request_user': request.user,
+            'user': profile,
+            'tours_data': tours_data,
+            'reviews_data': reviews_data,
             'style_files': [
                 'css/header.css',
                 'css/body.css',
                 'css/tours.css',
-                'css/search_tours.css',
+                'css/profile.css',
             ],
         },
     )

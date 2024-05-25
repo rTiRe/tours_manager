@@ -1,0 +1,123 @@
+.home {
+    background-image: none;
+    min-height: 80px;
+    height: fit-content;
+    padding: 90px 80px 40px 80px;
+    box-sizing: border-box;
+    box-sizing: border-box;
+    background: hsla(324, 82%, 55%, 1);
+    background: radial-gradient(circle, hsla(324, 82%, 55%, 1) 0%, hsla(269, 93%, 59%, 1) 68%);
+    background: -moz-radial-gradient(circle, hsla(324, 82%, 55%, 1) 0%, hsla(269, 93%, 59%, 1) 68%);
+    background: -webkit-radial-gradient(circle, hsla(324, 82%, 55%, 1) 0%, hsla(269, 93%, 59%, 1) 68%);
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#EA30A0", endColorstr="#9234F8", GradientType=1 );
+}
+
+.home > .container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 50px;
+}
+
+.home > .container .left {
+    box-sizing: border-box;
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.home > .container .right {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.home > .container .right button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 25px;
+    min-width: 100px;
+    font: 600 16px "Roboto", sans-serif;
+    backdrop-filter: blur(7px);
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    color: white;
+}
+
+.home > .container .right button:hover {
+    outline: rgba(255, 255, 255, 0.4) solid 3px;
+}
+
+main {
+    padding: 15px;
+}
+
+.profile .userinfo {
+    display: flex;
+    gap: 10px;
+}
+
+.profile .avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.profile .avatar img {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.profile .userinfo h2 {
+    color: white;
+    font: 600 22px "Roboto", sans-serif;
+}
+
+.profile .userinfo h5 {
+    color: white;
+    font: 400 14px "Roboto", sans-serif;
+}
+
+.agency_info {
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
+    color: white;
+    font-family: "Roboto", sans-serif;
+}
+
+.agency_info .rating {
+    display: inline;
+}
+
+.agency_info .fa-star {
+    color: lightgrey;
+}
+
+.agency_info .checked {
+    color: orange;
+}
+
+.agency_info .contacts {
+    font-size: 16px;
+}
+
+.agency_info .contacts p {
+    margin-bottom: 3px;
+}
+
+.agency_info .contacts a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.agency_info .documents {
+    font-size: 16px;
+}
