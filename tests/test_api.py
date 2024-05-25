@@ -4,6 +4,7 @@ from os import getenv
 from uuid import UUID
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.models import Model
 from django.db.models.base import ModelBase
 from django.test import TestCase
@@ -11,8 +12,6 @@ from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
-
-from django.core.exceptions import ValidationError
 
 from manager.models import (Account, Address, Agency, City, Country, Review,
                             Tour)

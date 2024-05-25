@@ -1,5 +1,5 @@
 from django import template
-from django.utils.safestring import mark_safe, SafeText
+from django.utils.safestring import SafeText, mark_safe
 
 register = template.Library()
 

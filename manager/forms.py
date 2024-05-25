@@ -1,12 +1,12 @@
 """Classes with changed forms."""
 
 from django import forms
-
-from .models import Address, Review, Tour, Agency
-from django.contrib.auth import forms as auth_forms, models
+from django.contrib.auth import forms as auth_forms
+from django.contrib.auth import models
 from django.http import HttpRequest
-
 from django.utils.translation import gettext_lazy as _
+
+from .models import Address, Agency, Review, Tour
 
 name_min = 'min'
 name_max = 'max'

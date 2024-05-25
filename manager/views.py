@@ -2,22 +2,18 @@
 
 from typing import Any
 
+from django.contrib.auth import authenticate, decorators, login, logout, models
 from django.db.models import Model
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
+from django.shortcuts import redirect, render
+from django.utils.translation import gettext_lazy as _
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .models import Address, Agency, Review, Tour, Account
+from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm
+from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .forms import FindToursForm, SignupForm, SigninForm, FindAgenciesForm
-
-from django.contrib.auth import decorators
-
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import models
 
 
 def index(request: HttpRequest) -> HttpResponse:
