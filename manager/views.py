@@ -62,7 +62,7 @@ def tours(request: HttpRequest) -> HttpResponse:
     form = FindToursForm(request)
     return render(
         request,
-        'tours.html',
+        'pages/tours.html',
         {
             'form': form,
             'tours_data': tours_data,
