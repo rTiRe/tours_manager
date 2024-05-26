@@ -178,8 +178,16 @@ LOACLE_PATH = 'manager/locale'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TEST_RUNNER = 'tests.runner.PostgresSchemaRunner'
-APPEND_SLASH = False
+APPEND_SLASH = True
 CSRF_FAILURE_VIEW = 'manager.views.csrf_failure'
 LOGIN_REDIRECT_URL = 'my_profile'
 LOGIN_URL = 'manager-login'
 LOGOUT_URL = 'manager-logout'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'zientenin@mail.ru'  # Ваш email на Mail.ru
+EMAIL_HOST_PASSWORD = 'XMhzdGni8bkM9yjqCPtQ'  # Пароль от вашего email на Mail.ru
+DEFAULT_FROM_EMAIL = 'zientenin@mail.ru'

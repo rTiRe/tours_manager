@@ -48,11 +48,6 @@
                         </div>
                     {% endif %}
                 </div>
-                {% if request_user.is_authenticated and request_user == user.account %}
-                    <div class="right">
-                        <button>Настройки</button>
-                    </div>
-                {% endif %}
             {% endif %}
         </div>
     </section>

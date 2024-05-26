@@ -19,6 +19,7 @@
                         <label for="password">Пароль</label>
                         {{ form.password }}
                         {{ errors|get_errors_html:form.password.name }}
+                        <p class="form_redirect">Забыли пароль? <a href="{% url 'password_reset' %}">Восстановите</a></p>
                     </div>
                     <button type="submit">Войти</button>
                 </form>

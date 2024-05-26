@@ -2,15 +2,25 @@
 
 from django import forms
 from django.contrib.auth import forms as auth_forms
-from django.contrib.auth import models
+from django.contrib.auth import models as auth_models
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
-from .models import Address, Agency, Review, Tour
+from .models import Address, Agency, Review, Tour, Account
 
 name_min = 'min'
 name_max = 'max'
 name_step = 'step'
+
+ADDRESS_WIDGETS = {
+    'entrance_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
+    'floor': forms.NumberInput(attrs={name_min: -1, name_step: 1}),
+    'flat_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
+}
+REVIEW_WIDGETS = {
+    'rating': forms.NumberInput(attrs={name_min: 1, name_max: 5, name_step: 0.1}),
+}
 
 
 class AddressForm(forms.ModelForm):
@@ -21,11 +31,7 @@ class AddressForm(forms.ModelForm):
 
         model = Address
         fields = '__all__'
-        widgets = {
-            'entrance_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
-            'floor': forms.NumberInput(attrs={name_min: -1, name_step: 1}),
-            'flat_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
-        }
+        widgets = ADDRESS_WIDGETS
 
 
 class ReviewForm(forms.ModelForm):
@@ -36,9 +42,7 @@ class ReviewForm(forms.ModelForm):
 
         model = Review
         fields = '__all__'
-        widgets = {
-            'rating': forms.NumberInput(attrs={name_min: 1, name_max: 5, name_step: 0.1}),
-        }
+        widgets = REVIEW_WIDGETS
 
 
 class FindToursForm(forms.Form):
@@ -87,10 +91,83 @@ class SignupForm(auth_forms.UserCreationForm):
     password2 = forms.PasswordInput()
 
     class Meta:
-        model = models.User
+        model = auth_models.User
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
 
 
 class SigninForm(forms.Form):
     username = forms.CharField(required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+
+class SettingsUserForm(auth_forms.UserChangeForm):
+    email = forms.EmailField(required=True)
+
+    def __init__(self, request: HttpRequest = None, *args, **kwargs) -> None:
+        super(SettingsUserForm, self).__init__(*args, **kwargs)
+        self.request = request
+        del self.fields['password']
+        if self.request and isinstance(self.request, HttpRequest):
+            user = self.request.user
+            self.fields['username'].initial = user.username
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if auth_models.User.objects.filter(username=username).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError('Это имя пользователя уже занято.')
+        return username
+
+    class Meta:
+        model = auth_models.User
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+
+class SettingsAgencyForm(forms.ModelForm):
+    def __init__(self, request: HttpRequest = None, *args, **kwargs) -> None:
+        super(SettingsAgencyForm, self).__init__(*args, **kwargs)
+        if request and isinstance(request, HttpRequest):
+            user = Account.objects.get(account=request.user.id)
+            self.fields['name'].initial = user.agency.name
+            self.fields['phone_number'].initial = user.agency.phone_number
+
+    class Meta:
+        model = Agency
+        fields = ['name', 'phone_number']
+
+
+class SettingsAddressForm(forms.ModelForm):
+    def __init__(self, request: HttpRequest = None, *args, **kwargs) -> None:
+        super(SettingsAddressForm, self).__init__(*args, **kwargs)
+        if request and isinstance(request, HttpRequest):
+            user = Account.objects.get(account=request.user.id)
+            self.fields['city'].initial = user.agency.address.city
+            self.fields['street'].initial = user.agency.address.street
+            self.fields['house_number'].initial = user.agency.address.house_number
+            self.fields['entrance_number'].initial = user.agency.address.entrance_number
+            self.fields['floor'].initial = user.agency.address.floor
+            self.fields['flat_number'].initial = user.agency.address.flat_number
+            self.fields['point'].initial = user.agency.address.point
+            
+
+    class Meta:
+        model = Address
+        fields = ['city', 'street', 'house_number', 'entrance_number', 'floor', 'flat_number', 'point']
+        widgets = ADDRESS_WIDGETS
+
+
+class PasswordChangeRequestForm(forms.Form):
+    new_password = forms.CharField(widget=forms.PasswordInput, label="New Password")
+    new_password_confirm = forms.CharField(widget=forms.PasswordInput, label="Confirm New Password")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        new_password_confirm = cleaned_data.get("new_password_confirm")
+
+        if new_password != new_password_confirm:
+            raise forms.ValidationError("Passwords do not match.")
+        
+        return cleaned_data
