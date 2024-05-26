@@ -1,6 +1,7 @@
 """Classes with changed forms."""
 
 from django import forms
+from django.contrib.gis import forms as gis_forms
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import models as auth_models
 from django.http import HttpRequest
@@ -14,10 +15,11 @@ name_max = 'max'
 name_step = 'step'
 
 ADDRESS_WIDGETS = {
-    'entrance_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
-    'floor': forms.NumberInput(attrs={name_min: -1, name_step: 1}),
-    'flat_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
-}
+        'entrance_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
+        'floor': forms.NumberInput(attrs={name_min: -1, name_step: 1}),
+        'flat_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
+        'point': gis_forms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}),
+    }
 REVIEW_WIDGETS = {
     'rating': forms.NumberInput(attrs={name_min: 1, name_max: 5, name_step: 0.1}),
 }
@@ -132,6 +134,12 @@ class SettingsAgencyForm(forms.ModelForm):
             user = Account.objects.get(account=request.user.id)
             self.fields['name'].initial = user.agency.name
             self.fields['phone_number'].initial = user.agency.phone_number
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if Agency.objects.filter(name=name).exclude(id=self.instance.id).exists():
+            raise forms.ValidationError('Это имя уже занято другим агентством.')
+        return name
 
     class Meta:
         model = Agency

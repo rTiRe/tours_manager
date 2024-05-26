@@ -243,18 +243,34 @@ def settings(request: HttpRequest) -> HttpResponse:
     if not request_user.is_authenticated:
         return redirect('manager-login')
     user = Account.objects.get(account=request_user.id)
-    user_form = SettingsUserForm(request=request, instance=request_user)
+    user_form = SettingsUserForm(request)
     agency_form = SettingsAgencyForm(request)
     address_form = SettingsAddressForm(request)
     if request.method == 'POST':
         post_request = request.POST
         if 'agency_submit' in post_request:
-            agency_form = SettingsAgencyForm(data=post_request)
+            agency_form = SettingsAgencyForm(data=post_request, instance=user.agency)
             address_form = SettingsAddressForm(data=post_request)
+            if agency_form.is_valid() and address_form.is_valid():
+                cleaned_data = address_form.cleaned_data
+                cleaned_data = {
+                    'city': cleaned_data['city'],
+                    'street': cleaned_data['street'],
+                    'house_number': cleaned_data['house_number'],
+                    'entrance_number': cleaned_data['entrance_number'],
+                    'floor': cleaned_data['floor'],
+                    'flat_number': cleaned_data['flat_number'],
+                    'point': cleaned_data['point'],
+                }
+                existing_address = Address.objects.filter(**cleaned_data).first()
+                if existing_address:
+                    user.agency.address = existing_address
+                else:
+                    new_address = Address.objects.create(**cleaned_data)
+                    user.agency.address = new_address
+                agency_form.save()
         if 'user_submit' in post_request:
-            user_form = SettingsUserForm(request, data=post_request, instance=request_user)
-            agency_form = SettingsAgencyForm(request)
-            address_form = SettingsAddressForm(request)
+            user_form = SettingsUserForm(data=post_request, instance=request_user)
             if user_form.is_valid():
                 user_form.save()
             else:

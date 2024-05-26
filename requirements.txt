@@ -10,3 +10,5 @@ email-validate==1.1.2
 django-storages==1.14.3
 django-minio-backend==3.6.0
 boto3==1.34.101
+django-leaflet==0.30.0
+django-geojson==4.1.0

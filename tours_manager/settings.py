@@ -62,15 +62,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'rest_framework',
     'rest_framework.authtoken',
     'manager',
-    'django_extensions',
-    'django.contrib.gis',
-    'storages',
-    'django_minio_backend',
     'manager.templatetags.template_filters',
     'manager.templatetags.errors_writer',
+    'django_extensions',
+    'storages',
+    'django_minio_backend',
 ]
 
 REST_FRAMEWORK = {
