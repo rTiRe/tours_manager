@@ -191,3 +191,5 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'zientenin@mail.ru'  # Ваш email на Mail.ru
 EMAIL_HOST_PASSWORD = 'XMhzdGni8bkM9yjqCPtQ'  # Пароль от вашего email на Mail.ru
 DEFAULT_FROM_EMAIL = 'zientenin@mail.ru'
+
+PASSWORD_RESET_TIMEOUT = 900

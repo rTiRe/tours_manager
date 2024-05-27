@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
 from .models import Address, Agency, Review, Tour, Account
+from django.contrib.auth.password_validation import validate_password
 
 name_min = 'min'
 name_max = 'max'
@@ -167,15 +168,17 @@ class SettingsAddressForm(forms.ModelForm):
 
 
 class PasswordChangeRequestForm(forms.Form):
-    new_password = forms.CharField(widget=forms.PasswordInput, label="New Password")
-    new_password_confirm = forms.CharField(widget=forms.PasswordInput, label="Confirm New Password")
+    new_password = forms.CharField(widget=forms.PasswordInput)
+    new_password_confirm = forms.CharField(widget=forms.PasswordInput)
 
     def clean(self):
         cleaned_data = super().clean()
-        new_password = cleaned_data.get("new_password")
-        new_password_confirm = cleaned_data.get("new_password_confirm")
+        new_password = cleaned_data.get('new_password')
+        new_password_confirm = cleaned_data.get('new_password_confirm')
+
+        validate_password(new_password)
 
         if new_password != new_password_confirm:
-            raise forms.ValidationError("Passwords do not match.")
+            raise forms.ValidationError(_('Passwords do not match.'))
         
         return cleaned_data

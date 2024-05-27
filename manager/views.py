@@ -28,6 +28,12 @@ from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from .forms import PasswordChangeRequestForm
 from django.views.generic import TemplateView
+from django.utils.html import strip_tags
+
+from dotenv import load_dotenv
+from os import getenv
+
+from django.views.generic.base import View
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -296,6 +302,7 @@ def settings(request: HttpRequest) -> HttpResponse:
 
 @decorators.login_required
 def request_password_change(request):
+    errors = {}
     if request.method == 'POST':
         form = PasswordChangeRequestForm(request.POST)
         if form.is_valid():
@@ -305,18 +312,45 @@ def request_password_change(request):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             current_site = get_current_site(request)
             mail_subject = 'Confirm your password change'
-            message = render_to_string('registration/password_change_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': uid,
-                'token': token,
-            })
-            send_mail(mail_subject, message, 'zientenin@mail.ru', [user.email])
+            load_dotenv()
+            html_message = render_to_string(
+                'registration/password_change_email.html',
+                {
+                    'protocol': getenv('SITE_PROTOCOL'),
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': uid,
+                    'token': token,
+                },
+            )
+            plain_message = strip_tags(html_message)
+            send_mail(
+                mail_subject,
+                plain_message,
+                'zientenin@mail.ru',
+                [user.email],
+                html_message=html_message
+            )
             request.session['new_password'] = new_password
             return redirect('password_change_done')
+        else:
+            errors = form.errors.as_data()
+            errors = convert_errors(errors)
     else:
         form = PasswordChangeRequestForm()
-    return render(request, 'registration/password_change_form.html', {'form': form})
+    return render(
+        request,
+        'registration/password_change_form.html',
+        {
+            'form': form,
+            'errors': errors,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+            ],
+        }
+    )
 
 
 def confirm_password_change(request, uidb64, token):
@@ -325,23 +359,24 @@ def confirm_password_change(request, uidb64, token):
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
-
     if user is not None and default_token_generator.check_token(user, token):
-        # Получите новый пароль из сессии
         new_password = request.session.get('new_password')
         if new_password:
             user.set_password(new_password)
             user.save()
-            # Удалите новый пароль из сессии
             del request.session['new_password']
             return redirect('password_change_complete')
-        else:
-            return render(request, 'registration/password_change_invalid.html')
-    else:
-        return render(request, 'registration/password_change_invalid.html')
-
-class PasswordChangeCompleteView(TemplateView):
-    template_name = 'registration/password_change_complete.html'
+    return render(
+        request,
+        'registration/password_change_invalid.html',
+        {
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+            ],
+        }
+    )
 
 
 @decorators.login_required
@@ -353,16 +388,47 @@ def csrf_failure(request, reason=""):
     return redirect('index')
 
 
-class PasswordChangeCompleteView(TemplateView):
-    template_name = 'registration/password_change_complete.html'
+def create_stylized_auth_view(style_files: list | tuple) -> View:
+    def class_decorator(original_class: object) -> View:
+        class CustomView(original_class):
+            def get_context_data(self, **kwargs):
+                errors = {}
+                context = super().get_context_data(**kwargs)
+                form = context.get('form')
+                if form:
+                    errors = form.errors.as_data()
+                    errors = convert_errors(errors)
+                context['errors'] = errors
+                context['style_files'] = style_files
+                return context
+        return CustomView
+    return class_decorator
 
+account_form_styles = [
+    'css/header.css',
+    'css/body.css',
+    'css/account_form.css',
+]
 
+@create_stylized_auth_view(account_form_styles)
 class CustomPasswordResetView(auth_views.PasswordResetView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['my_variable'] = 'My custom value'
-        context['another_variable'] = 'Another value'
-        return context
+    html_email_template_name='registration/password_reset_email_html.html'
+
+@create_stylized_auth_view(account_form_styles)
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    pass
+
+@create_stylized_auth_view(account_form_styles)
+class CustomPasswordResetDoneView(auth_views.PasswordResetDoneView):
+    pass
+
+@create_stylized_auth_view(account_form_styles)
+class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    pass
+
+@create_stylized_auth_view(account_form_styles)
+class CustomPasswordChangeDoneView(auth_views.PasswordChangeDoneView):
+    template_name='registration/password_change_done.html'
 
 
 class CustomViewSetPermission(permissions.BasePermission):
