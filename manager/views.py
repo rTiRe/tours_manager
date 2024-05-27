@@ -5,7 +5,7 @@ from typing import Any
 from django.contrib import auth
 from django.contrib.auth import decorators
 from django.db.models import Model
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 from rest_framework import authentication, permissions, viewsets
@@ -34,6 +34,8 @@ from dotenv import load_dotenv
 from os import getenv
 
 from django.views.generic.base import View
+
+from uuid import UUID
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -388,6 +390,29 @@ def csrf_failure(request, reason=""):
     return redirect('index')
 
 
+def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
+    tour = Tour.objects.filter(id=uuid).first()
+    if not tour:
+        return HttpResponseNotFound()
+    tour_reviews = tour.reviews.all()
+    ratings = []
+    for review in tour_reviews:
+        ratings.append(review.rating)
+    return render(
+        request,
+        'pages/tour.html',
+        {
+            'ratings': ratings,
+            'tour': tour,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/tour.css',
+            ],
+        }
+    )
+
+
 def create_stylized_auth_view(style_files: list | tuple) -> View:
     def class_decorator(original_class: object) -> View:
         class CustomView(original_class):
@@ -403,6 +428,7 @@ def create_stylized_auth_view(style_files: list | tuple) -> View:
                 return context
         return CustomView
     return class_decorator
+
 
 account_form_styles = [
     'css/header.css',

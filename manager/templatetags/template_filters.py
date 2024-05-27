@@ -57,7 +57,7 @@ def to_int(any_object: str | float | bool) -> int:
     """Convert object to int.
 
     Args:
-        any_object: Any - object for convert to int.
+        any_object: str | float | bool- object for convert to int.
 
     Returns:
         int: converted object.
@@ -65,6 +65,21 @@ def to_int(any_object: str | float | bool) -> int:
     expected_types = (str, float, bool)
     check_isinstance(expected_types, any_object, 'any_object')
     return int(any_object)
+
+
+@register.filter
+def to_str(any_object: int | float | object) -> str:
+    """Convert object to str.
+
+    Args:
+        any_object: int | float | object - object for convert to str.
+
+    Returns:
+        str: converted object.
+    """
+    expected_types = (int, float, object)
+    check_isinstance(expected_types, any_object, 'any_object')
+    return str(any_object)
 
 
 @register.filter

@@ -164,14 +164,13 @@ class Address(UUIDMixin, models.Model):
             str: stringified class. Not_nul_part can_be_null_part.
         """
         not_null_part = ' '.join([self.city.name, self.street, self.house_number])
-        can_be_null_parts = ' '.join(
-            [
-                str(self.entrance_number),
-                str(self.floor),
-                str(self.flat_number),
-            ],
-        )
-        return f'{not_null_part} {can_be_null_parts}'.strip()
+        parts_for_check = [self.entrance_number, self.floor, self.flat_number]
+        nullable_parts = []
+        for part in parts_for_check:
+            if part:
+                nullable_parts.append(part)
+        nullable_parts = ' '.join(nullable_parts)
+        return f'{not_null_part} {nullable_parts}'.strip()
 
     class Meta:
         """Meta class with Address settings."""
@@ -290,6 +289,7 @@ class Review(UUIDMixin, models.Model):
         Tour,
         verbose_name=_('tour'),
         on_delete=models.CASCADE,
+        related_name='reviews',
     )
     account = models.ForeignKey(
         'Account',

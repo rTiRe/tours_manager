@@ -39,12 +39,12 @@ main .card {
     font-weight: 400;
 }
 
-main .card:last-child {
+main a:last-child .card {
     padding-bottom: 0;
     border-bottom: none;
 }
 
-main .card:first-child {
+main a:first-child .card {
     padding-top: 0;
     padding-bottom: 10px;
 }

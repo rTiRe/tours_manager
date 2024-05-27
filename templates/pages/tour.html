@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load template_filters %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="container">
+            <div class="left">
+                <div class="profile">
+                    <div class="tourheader">
+                        <div class="avatar">
+                            <img src="{% static 'img/search-banner.png' %}" alt="img">
+                        </div>
+                        <section>
+                            <h2>{{ tour.name }}</h2>
+                            <div class="rating">
+                                {% with rating=ratings|get_avg %}
+                                    {% for num in '01234'|make_list %}
+                                        <span class="fa fa-star{% if num|to_int < rating %} checked{% endif %}"></span>
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                            <h4>Предоставляет: <a href="/profile/{{ tour.agency.account.name }}">{{ tour.agency.name }}</a></h4>
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <div class="right">
+                <button>Edit</button>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div class="container">
+            <div class="tour_info">
+                <div class="addresses">
+                    <h3>Адреса:</h3>
+                    <ul>
+                        {% for address in tour.addresses.all %}
+                            <li><i class="fa fa-map-marker" aria-hidden="true"></i> {{address|to_str}}</li>
+                        {% endfor %}
+                        
+                    </ul>
+                </div>
+                <div class="description">
+                    <h3>Описание:</h3>
+                    <p>{{ tour.description }}</p>
+                </div>
+            </div>
+            <div class="reviews">
+                
+            </div>
+        </div>
+    </main>
+{% endblock %}
