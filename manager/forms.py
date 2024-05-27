@@ -93,6 +93,12 @@ class SignupForm(auth_forms.UserCreationForm):
     password1 = forms.PasswordInput()
     password2 = forms.PasswordInput()
 
+    def clean(self):
+        email = self.cleaned_data.get('email')
+        if auth_models.User.objects.filter(email=email).exists():
+            self.add_error('email', _('Email currently exists.'))
+        return self.cleaned_data
+
     class Meta:
         model = auth_models.User
         fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
