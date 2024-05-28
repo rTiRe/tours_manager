@@ -295,7 +295,7 @@ account_data = {
 review_data = {
     'tour': [Tour, tour_data],
     'account': [Account, account_data],
-    'rating': 1.2,
+    'rating': 1,
     'text': 'test_review',
 }
 
