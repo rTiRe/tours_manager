@@ -1,0 +1,58 @@
+
+{% load static %}
+{% load template_filters %}
+<div class="review">
+    {% if review %}
+        <a href="/profile/{{ review.account.account.username }}">
+            <div class="author">
+                <div class="avatar">
+                    <img src="img/avatar.png" alt="avatar">
+                </div>
+                <div class="right">
+                    <div class="full_name">
+                        {{ review.account.first_name }} {{ review.account.last_name }} <span>@{{ review.account.username }}</span>
+                    </div>
+                    <span class="created">
+                        От {{ review.created.day|stringformat:'.02d' }}.{{ review.created.month|stringformat:'.02d' }}.{{ review.created.year }}{% if review.edited %}, ред. {{ review.edited.day|stringformat:'.02d' }}.{{ review.edited.month|stringformat:'.02d' }}.{{ review.edited.year }}{% endif %}
+                    </span>
+                </div>
+            </div>
+        </a>
+        <div class="review_data">
+            {% if request.user.is_authenticated and request.user == review.account.account %}
+                <div class="edit"><i class="fa-solid fa-edit" aria-hidden="true"></i> Редактировать</div>
+            {% endif %}
+            <div class="rating">
+                <div class="title">Оценка: </div>
+                {% for num in '12345'|make_list %}
+                    <span class="fa fa-star{% if num|to_int <= review.rating %} checked{% endif %}"></span>
+                {% endfor %}
+            </div>
+            <div class="text">
+                <div class="title">Отзыв: </div>
+                {{ review.text }}
+            </div>
+        </div>
+    {% else %}
+        <a href="/profile/{{ review.account.account.username }}">
+            <div class="author">
+                <div class="avatar">
+                    <img src="img/avatar.png" alt="avatar">
+                </div>
+                <div class="right">
+                    <div class="full_name">
+                        {{ request.user.first_name }} {{ request.user.last_name }} <span>@{{ request.user.username }}</span>
+                    </div>
+                    <span class="created">
+                        Вы пока не отправляли отзыв. Давайте сделаем это!
+                    </span>
+                </div>
+            </div>
+        </a>
+    {% endif %}
+    {% if request.user.is_authenticated and request.user == review.account.account %}
+        {% include 'parts/review_form.html' with btn_icon='fa-save' btn_text='Сохранить' %}
+    {% elif request.user.is_authenticated and not review %}
+        {% include 'parts/review_form.html' with btn_icon='fa-plus' btn_text='Отправить' display=True %}
+    {% endif %}
+</div>

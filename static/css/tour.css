@@ -162,6 +162,10 @@ main .container {
     border-right: none;
 }
 
-.info_header ul li:hover {
+.info_header ul li a {
+    color: black;
+}
+
+.info_header ul li:hover a {
     color: #ea2e9f;
 }

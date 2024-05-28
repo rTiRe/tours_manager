@@ -5,51 +5,92 @@
 {% block content %}
     <section class="home">
         <div class="container">
-            <div class="left">
-                <div class="profile">
-                    <div class="tourheader">
-                        <div class="avatar">
-                            <img src="{% static 'img/search-banner.png' %}" alt="img">
-                        </div>
-                        <section>
-                            <h2>{{ tour.name }}</h2>
-                            <div class="rating">
-                                {% with rating=ratings|get_avg %}
-                                    {% for num in '01234'|make_list %}
-                                        <span class="fa fa-star{% if num|to_int < rating %} checked{% endif %}"></span>
-                                    {% endfor %}
-                                {% endwith %}
-                            </div>
-                            <h4>Предоставляет: <a href="/profile/{{ tour.agency.account.name }}">{{ tour.agency.name }}</a></h4>
-                        </section>
+            <div class="profile">
+                <div class="tourheader">
+                    <div class="avatar">
+                        <img src="{% static 'img/search-banner.png' %}" alt="img">
                     </div>
+                    <section>
+                        <h2>{{ tour.name }}</h2>
+                        <div class="rating">
+                            {% with rating=ratings|get_avg %}
+                                {% if rating %}
+                                    Оценка <span class="num_rating">{{ rating }}</span> <span class="fa fa-star checked"></span>
+                                {% else %}
+                                    Оценок пока нет
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        <h4>Предоставляет: <a href="/profile/{{ tour.agency.account.name }}">{{ tour.agency.name }}</a></h4>
+                    </section>
                 </div>
-            </div>
-            <div class="right">
-                <button>Edit</button>
             </div>
         </div>
     </section>
     <main>
         <div class="container">
-            <div class="tour_info">
-                <div class="addresses">
-                    <h3>Адреса:</h3>
-                    <ul>
-                        {% for address in tour.addresses.all %}
-                            <li><i class="fa fa-map-marker" aria-hidden="true"></i> {{address|to_str}}</li>
-                        {% endfor %}
-                        
+            <div class="info_header">
+                <nav>
+                    <ul class="info_menu">
+                        <li class="see_info"><a href="#info"><span>Информация</span></a></li>
+                        <li class="see_reviews"><a href="#reviews"><span>Отзывы</span></a></li>
                     </ul>
+                </nav>
+            </div>
+            <div class="tour_info">
+                <div class="part">
+                    <h3>Остановки:</h3>
+                    <p>
+                        <ul>
+                            {% for address in tour_addresses %}
+                                <li><i class="fa fa-map-marker" aria-hidden="true"></i> {{ address|to_str }}</li>
+                            {% endfor %}
+                        </ul>
+                    </p>
                 </div>
-                <div class="description">
+                <div class="part">
                     <h3>Описание:</h3>
                     <p>{{ tour.description }}</p>
                 </div>
             </div>
-            <div class="reviews">
-                
+            <div class="reviews" style="display: none">
+                <div class="title">
+                    <h3>Отзывы <span>{% if user_review %} {{ reviews|length|add:'1' }} {% else %} {{ reviews|length }} {% endif %}</span></h3>
+                </div>
+                <div class="reviews_wrapper">
+                    {% if user_review %}
+                        {% include 'parts/review.html' with form=review_form review=user_review request=request %}
+                    {% elif request.user.is_authenticated %}
+                        {% include 'parts/review.html' with form=review_form review=None request=request %}
+                    {% endif %}
+                    {% for review in reviews %}
+                        {% include 'parts/review.html' with form=review_form review=review request=request %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </main>
+    <script>
+        $(document).ready(function() {
+            if (window.location.hash == "reviews") {
+                $('.see_reviews a').click();
+            } else {
+                $('.see_info a').click();
+            }
+            $('.see_info').click(function() {
+                $('.tour_info').show();
+                $('.reviews').hide();
+            });
+            $('.see_reviews').click(function() {
+                console.log()
+                $('.reviews').show();
+                $('.tour_info').hide();
+            });
+            $('.edit').click(function() {
+                var reviewContainer = $(this).closest('.review');
+                reviewContainer.find('.review_data').hide();
+                reviewContainer.find('.edit_form').show();
+            });
+        });
+        </script>
 {% endblock %}

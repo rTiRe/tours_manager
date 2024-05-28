@@ -11,10 +11,11 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm
+from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm, UserReviewForm, PasswordChangeRequestForm
 from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
+from .validators import get_datetime
 
 from django.contrib.auth import views as auth_views
 
@@ -26,8 +27,6 @@ from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
-from .forms import PasswordChangeRequestForm
-from django.views.generic import TemplateView
 from django.utils.html import strip_tags
 
 from dotenv import load_dotenv
@@ -36,6 +35,8 @@ from os import getenv
 from django.views.generic.base import View
 
 from uuid import UUID
+
+from datetime import datetime, timezone
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -394,20 +395,68 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     tour = Tour.objects.filter(id=uuid).first()
     if not tour:
         return HttpResponseNotFound()
-    tour_reviews = tour.reviews.all()
+    reviews = list(tour.reviews.all())
     ratings = []
-    for review in tour_reviews:
+    account = None
+    if request.user:
+        account = Account.objects.get(account=request.user)
+    user_review = None
+    for review in reviews:
         ratings.append(review.rating)
+        if review.account == account:
+            user_review = review
+            break
+    if user_review:
+        reviews.remove(user_review)
+    initial_data = {
+        'text': user_review.text if user_review else '',
+        'rating': str(user_review.rating) if user_review else ''
+    }
+
+    if request.method == 'POST':
+        form = UserReviewForm(request.POST, initial=initial_data)
+        if form.is_valid():
+            rating = form.cleaned_data['rating']
+            text = form.cleaned_data['text']
+            filter_data = {
+                'tour': tour,
+                'account': account,
+            }
+            if Review.objects.filter(**filter_data).exists():
+                review = Review.objects.get(**filter_data)
+                review.text = text
+                review.rating = rating
+                review.edited = datetime.now(timezone.utc)
+                review.save()
+            else:
+                filter_data['rating'] = rating
+                filter_data['text'] = text
+                filter_data['created'] = get_datetime()
+                Review.objects.create(**filter_data)
+            return redirect(f'/tour/{tour.id}')
+        else:
+            print(form.errors)
+    else:
+        print(initial_data)
+        form = UserReviewForm(initial=initial_data)
+
     return render(
         request,
         'pages/tour.html',
         {
+            'user_review': user_review,
+            'review_form': form,
             'ratings': ratings,
+            'reviews': reviews,
             'tour': tour,
+            'request': request,
             'style_files': [
                 'css/header.css',
                 'css/body.css',
                 'css/tour.css',
+                'css/reviews.css',
+                'css/rating.css',
+                'css/review_create.css'
             ],
         }
     )
