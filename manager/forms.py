@@ -21,9 +21,6 @@ ADDRESS_WIDGETS = {
         'flat_number': forms.NumberInput(attrs={name_min: 1, name_step: 1}),
         'point': gis_forms.OSMWidget(attrs={'map_width': 800, 'map_height': 500}),
     }
-REVIEW_WIDGETS = {
-    'rating': forms.NumberInput(attrs={name_min: 1, name_max: 5, name_step: 0.1}),
-}
 
 
 class AddressForm(forms.ModelForm):
@@ -38,14 +35,31 @@ class AddressForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
-    """Class for review form."""
+    RATING_CHOICES = [
+        (5, '5 звезд'),
+        (4, '4 звезды'),
+        (3, '3 звезды'),
+        (2, '2 звезды'),
+        (1, '1 звезда'),
+    ]
 
+    rating = forms.ChoiceField(
+        choices=RATING_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'rating rating_input'}),
+    )
+    text = forms.CharField(
+        widget=forms.Textarea,
+    )
+    
     class Meta:
-        """Form meta class with settings."""
-
         model = Review
         fields = '__all__'
-        widgets = REVIEW_WIDGETS
+
+
+class UserReviewForm(ReviewForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'text']
 
 
 class FindToursForm(forms.Form):

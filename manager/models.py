@@ -6,9 +6,10 @@ from django.conf.global_settings import AUTH_USER_MODEL
 from django.contrib.gis.db import models as gismodels
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import now
 
 from .validators import (house_number_validator, phone_number_validator,
-                         street_name_validator)
+                         street_name_validator, date_validator, get_datetime)
 
 NAME_MAX_LEN = 255
 PHONE_NUMBER_MAX_LEN = 12
@@ -296,12 +297,28 @@ class Review(UUIDMixin, models.Model):
         verbose_name=_('account'),
         on_delete=models.CASCADE,
     )
-    rating = models.FloatField(
+    rating = models.IntegerField(
         _('rating'),
     )
     text = models.TextField(
         _('text'),
         max_length=REVIEW_TEXT_MAX_LEN,
+        null=True,
+        blank=True,
+    )
+    created = models.DateTimeField(
+        _('creation date and time'),
+        default=get_datetime,
+        validators=[
+            date_validator
+        ]
+    )
+    edited = models.DateTimeField(
+        _('last edit date and time'),
+        default=None,
+        validators=[
+            date_validator
+        ],
         null=True,
         blank=True,
     )

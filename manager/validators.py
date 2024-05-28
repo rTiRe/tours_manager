@@ -5,7 +5,13 @@ import re
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from datetime import datetime, timezone
+
 contains_illegal_characters = _('field contains illegal characters.')
+
+
+def get_datetime():
+    return datetime.now(timezone.utc)
 
 
 def street_name_validator(name: str) -> None:
@@ -86,3 +92,11 @@ def check_str(field: str) -> None:
     if not isinstance(field, str):
         field_type = type(field).__name__
         raise TypeError(_(f'field must be string, not {field_type}'))
+
+
+def date_validator(date: datetime) -> None:
+    if not isinstance(date, datetime):
+        field_type = type(date).__name__
+        raise TypeError(_(f'Field must be datetime, not {field_type}'))
+    if date > get_datetime():
+        raise ValueError(_(f'Time cannot be in future.'))
