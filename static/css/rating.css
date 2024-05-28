@@ -1,0 +1,17 @@
+.rating {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.rating .fa-star {
+    color: lightgrey;
+}
+
+.rating .checked {
+    color: orange;
+}
+
+.rating .num_rating {
+    font-size: 18px;    ;
+}

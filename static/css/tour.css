@@ -15,28 +15,14 @@
 .home > .container {
     box-sizing: border-box;
     display: flex;
-    flex-direction: row;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 50px;
-}
-
-.home > .container .left {
-    box-sizing: border-box;
-    display: flex;
-    align-items: start;
     flex-direction: column;
     gap: 10px;
+    letter-spacing: 0.025em;
 }
 
-.home > .container .right {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.home > .container .right button {
+.home > .container button.edit {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -49,18 +35,26 @@
     color: white;
 }
 
-.home > .container .right button:hover {
+.home > .container button.edit:hover {
     outline: rgba(255, 255, 255, 0.4) solid 3px;
 }
 
-main {
-    padding: 15px;
+main .container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 30px;
+}
+
+.profile {
+    width: 100%;
 }
 
 .profile .tourheader {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .profile .avatar {
@@ -68,6 +62,7 @@ main {
     height: 200px;
     border-radius: 8px;
     overflow: hidden;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.35);
 }
 
 .profile .avatar img {
@@ -80,20 +75,25 @@ main {
     display: inline-flex;
     flex-direction: column;
     gap: 5px;
+    padding: 25px;
+    border-radius: 8px;
+    color: white;
+    backdrop-filter: blur(7px);
+    background-color: rgb(0, 0, 0, 0.25);
+    max-width: 100%;
+    flex: 1;
+    position: relative
 }
 
 .profile .tourheader h2 {
-    color: white;
     font: 600 22px "Roboto", sans-serif;
 }
 
 .profile .tourheader h4 {
-    color: white;
     font: 600 16px "Roboto", sans-serif;
 }
 
 .profile .tourheader h5 {
-    color: white;
     font: 400 14px "Roboto", sans-serif;
 }
 
@@ -102,28 +102,16 @@ main {
     text-decoration: underline;
 }
 
-.profile .rating {
-    display: inline;
-    font-size: 16px;
-}
-
-.profile .fa-star {
-    color: lightgrey;
-}
-
-.profile .checked {
-    color: orange;
-}
-
 .tour_info {
     display: flex;
-    gap: 5px;
+    gap: 15px;
     flex-direction: column;
     font-family: "Roboto", sans-serif;
-}
-
-.tour_info .addresses, .tour_info .description {
+    background-color: #fff;
+    border-radius: 14px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     font-size: 16px;
+    padding: 35px;
 }
 
 .tour_info h3 {
@@ -131,11 +119,49 @@ main {
     font-weight: 600;
 }
 
-.tour_info .addresses ul {
-    margin: 10px;
+.tour_info ul {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
 
-.tour_info .description p {
+.tour_info p {
     line-height: 1.2em;
-    margin: 10px;
+    margin-top: 10px;
+    letter-spacing: 0.025em;
+}
+
+.info_header {
+    width: 100%;
+    padding: 0 15px;
+    background-color: #fff;
+    border-radius: 14px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    font: 500 16px "Roboto", sans-serif;
+}
+
+.info_header ul {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.info_header ul li {
+    height: 100%;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.info_header ul li span {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 3px 15px;
+}
+
+.info_header ul li:last-child span {
+    border-right: none;
+}
+
+.info_header ul li:hover {
+    color: #ea2e9f;
 }

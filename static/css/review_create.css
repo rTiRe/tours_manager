@@ -1,0 +1,51 @@
+.rating_input {
+    display: inline-flex;
+    flex-direction: row-reverse;
+}
+
+.rating_input input[type="radio"] {
+    display: none; /* Скрыть радиокнопки */
+}
+
+.rating_input label {
+    padding: 0 2px;
+    cursor: pointer;
+}
+
+.rating_input input[type="radio"]:checked ~ label,
+.rating_input label:hover,
+.rating_input label:hover ~ label {
+    color: orange;; /* Цвет звезды при выборе или наведении */
+}
+
+.edit_form {
+    font: 400 14px "Roboto", sans-serif;
+    letter-spacing: 0.025em;
+}
+
+.edit_form textarea {
+    max-width: 100%;
+    width: 100%;
+    position: relative;
+    resize: vertical;
+    font: inherit;
+}
+
+.edit_form button {
+    margin-left: 50px;
+    background-color: transparent;
+    font: 400 14px "Roboto", sans-serif;
+    display: block;
+}
+
+.edit_form button:hover {
+    text-decoration: underline;
+}
+
+.edit_form .title {
+    font-family: "Roboto", sans-serif;
+}
+
+.edit_form .rating .title {
+    padding-bottom: 0;
+}
