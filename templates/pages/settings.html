@@ -7,23 +7,43 @@
     <section class="home">
         <div class="container">
             {% if user.account.is_active %}
-                <div class="left">
-                    <div class="profile">
-                        <h3>Пользователь</h3>
-                        <div class="userinfo">
-                            <div class="avatar">
-                                <img src="{{ user.email|gravatar_url }}" alt="gravatar">
-                            </div>
-                            <section>
+                <div class="profile">
+                    <div class="userinfo">
+                        <div class="avatar">
+                            <img src="https://www.gravatar.com/avatar/fae1608cbe17adc88d295be1d0dbe5c1081b08129ec4bda41841278a09f67504?d=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2F5%2F5f%2FGravatar-default-logo.jpg&amp;s=55" alt="gravatar">
+                        </div>
+                        <section>
+                            <div class="account_form">
+                                <h3 class="title">Настройки пользователя</h3>
                                 <form method="post">
                                     {% csrf_token %}
-                                    {{ user_form.as_p }}
-                                    <a href="{% url 'password_change' %}">Change password</a>
-                                    <br/>
-                                    <button name="user_submit" type="submit">Save</button>
+                                    <div class="input_group avatar_choice">
+                                        <label for="avatar_choice">Аватар</label>
+                                        <input type="file" name="avatar_choice">
+                                    </div>
+                                    <div class="input_group username">
+                                        <label for="username">Имя пользователя</label>
+                                        {{ user_form.username }}
+                                    </div>
+                                    <div class="person_group">
+                                        <div class="input_group firstname">
+                                            <label for="first_name">Имя</label>
+                                            {{ user_form.first_name }}
+                                        </div>
+                                        <div class="input_group lastname">
+                                            <label for="last_name">Фамилия</label>
+                                            {{ user_form.last_name }}
+                                        </div>
+                                    </div>
+                                    <div class="input_group email">
+                                        <label for="email">Email</label>
+                                        {{ user_form.email }}
+                                    </div>
+                                    <p class="form_redirect"><a href="{% url 'password_change' %}">Сменить пароль</a></p>
+                                    <button name="user_submit" type="submit">Сохранить</button>
                                 </form>
-                            </section>
-                        </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
             {% endif %}
@@ -33,41 +53,87 @@
         <div class="container">
         {% if user.account.is_active %}
             {% if user.agency %}
-                <div class="agency_info">
-                    <h3>Турагенство</h3>
+                <div class="account_form agency_info">
+                    <h3 class="title">Настройки турагенства</h3>
                     <form method="post">
                         {% csrf_token %}
-                        {{ agency_form.as_p }}
-                        {{ address_form.as_p }}
-                        <button name="agency_submit" type="submit">Save</button>
+                        <div class="input_group name">
+                            <label for="name">Имя</label>
+                            {{ agency_form.name }}
+                        </div>
+                        <div class="input_group phone_number">
+                            <label for="phone_number">Номер телефона</label>
+                            {{ agency_form.phone_number }}
+                        </div>
+                        <div class="input_group city">
+                            <label for="city">Город</label>
+                            {{ address_form.city }}
+                        </div>
+                        <div class="input_group street_name">
+                            <label for="street_name">Улица</label>
+                            {{ address_form.street }}
+                        </div>
+                        <div class="input_group house_number">
+                            <label for="house_number">Номер дома</label>
+                            {{ address_form.house_number }}
+                        </div>
+                        <div class="address_form">
+                            <div class="input_group entrance_number">
+                                <label for="entrance_number">Подъезд</label>
+                                {{ address_form.entrance_number }}
+                            </div>
+                            <div class="input_group floor">
+                                <label for="floor">Этаж</label>
+                                {{ address_form.floor }}
+                            </div>
+                            <div class="input_group flat_number">
+                                <label for="flat_number">Квартира</label>
+                                {{ address_form.flat_number }}
+                            </div>
+                        </div>
+                        <div class="input_group point">
+                            <style>
+                                #id_point_map {
+                                    width: 100% !important;
+                                    border-radius: 8px;
+                                    border: 2px solid white;
+                                }
+                                .clear_features > a {
+                                    font: 400 14px Roboto, "sans-serif";
+                                    color: white;
+                                    text-decoration: underline;
+                                }
+                            </style>
+                            <label for="point">Геоточка</label>
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@6.14.1/ol.css" type="text/css">
+                            {{ address_form.point }}
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js"></script>
+                            <script src="{% static 'gis/js/OLMapWidget.js' %}"></script>
+                            <script>
+                                var base_layer = new ol.layer.Tile({
+                                    source: new ol.source.OSM()
+                                });
+                                var options = {
+                                    base_layer: base_layer,
+                                    geom_name: 'Point',
+                                    id: 'id_point',
+                                    map_id: 'id_point_map',
+                                    map_srid: 3857,
+                                    name: 'point'
+                                };
+                        
+                                options['default_lon'] = 5;
+                                options['default_lat'] = 47;
+                                options['default_zoom'] = 12;
+                        
+                                var geodjango_point = new MapWidget(options);
+                            </script>
+                        </div>
+                        <button name="agency_submit" type="submit">Сохранить</button>
                     </form>
                 </div>
             {% endif %}
         {% endif %}
         </div>
     </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js"></script>
-    <script src="http://openlayers.org/en/v3.11.2/build/ol.js"></script>
-    <script src="{% static 'gis/js/OLMapWidget.js' %}"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@6.14.1/ol.css" type="text/css">
-    <script src="https://cdn.jsdelivr.net/npm/ol@6.14.1/dist/ol.js" defer></script>
-    <script>
-        var base_layer = new ol.layer.Tile({
-            source: new ol.source.OSM()
-        });
-        var options = {
-            base_layer: base_layer,
-            geom_name: 'Point',
-            id: 'id_point',
-            map_id: 'id_point_map',
-            map_srid: 3857,
-            name: 'point'
-        };
-
-        options['default_lon'] = 5;
-        options['default_lat'] = 47;
-        options['default_zoom'] = 12;
-
-        var geodjango_point = new MapWidget(options);
-    </script>
 {% endblock %}

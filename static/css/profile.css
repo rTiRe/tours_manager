@@ -19,6 +19,7 @@
     align-items: flex-start;
     justify-content: flex-start;
     gap: 50px;
+    flex-wrap: wrap;
 }
 
 .home > .container .left {
@@ -64,6 +65,7 @@ main {
 
 .profile .avatar {
     width: 55px;
+    min-width: 55px;
     height: 55px;
     border-radius: 50%;
     overflow: hidden;

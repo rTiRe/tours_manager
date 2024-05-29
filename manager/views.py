@@ -293,6 +293,8 @@ def settings(request: HttpRequest) -> HttpResponse:
                     new_address = Address.objects.create(**cleaned_data)
                     user.agency.address = new_address
                 agency_form.save()
+            else:
+                print(address_form.errors)
         if 'user_submit' in post_request:
             user_form = SettingsUserForm(data=post_request, instance=request_user)
             if user_form.is_valid():
@@ -311,8 +313,10 @@ def settings(request: HttpRequest) -> HttpResponse:
             'style_files': [
                 'css/header.css',
                 'css/body.css',
-                'css/tours.css',
+                'css/account_form.css',
                 'css/profile.css',
+                'css/settings.css',
+                'css/rating.css',
             ],
         },
     )

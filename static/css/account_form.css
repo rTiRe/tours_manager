@@ -9,9 +9,6 @@
     overflow: hidden;
     position: relative;
     border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 50px 40px 40px 40px;
     backdrop-filter: blur(7px);
     display: inline-block;
@@ -42,7 +39,7 @@
     max-width: 100%;
 }
 
-.account_form form button {
+.account_form form button:not(#id_point_div_map button) {
     background-color: #ff157e;
     border: none;
     border-radius: 5px;
@@ -57,11 +54,11 @@
     margin: auto;
 }
 
-.account_form form button:hover {
+.account_form form button:hover:not(#id_point_div_map button) {
     transform: translate(0, -5px)
 }
 
-.account_form > form button:active {
+.account_form > form button:active:not(#id_point_div_map button) {
     transition: .1s;
     transform: scale(0.95)
 }
@@ -108,7 +105,7 @@
 
 .account_form form .person_group .input_group {
     max-width: calc(50% - 5px);
-}   
+}
 
 .account_form form .password_group .input_group {
     max-width: calc(50% - 5px);
