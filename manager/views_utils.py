@@ -85,7 +85,7 @@ def render_reviews(
         if user_review:
             reviews.remove(user_review)
             reviews.insert(0, user_review)
-        elif request.user.is_authenticated:
+        elif request.user.is_authenticated and account.agency == None:
             reviews.insert(0, None)
     rendered_reviews = []
     for review in reviews:

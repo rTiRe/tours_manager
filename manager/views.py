@@ -424,7 +424,7 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     tour = Tour.objects.filter(id=uuid).first()
     if not tour:
         return HttpResponseNotFound()
-    reviews = list(tour.reviews.all())
+    reviews = list(tour.reviews.filter(account__agency=None))
     for review in reviews:
         ratings.append(review.rating)
     reviews = render_reviews(request, reviews)
