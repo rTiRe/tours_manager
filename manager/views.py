@@ -261,6 +261,7 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
 
 
 def settings(request: HttpRequest) -> HttpResponse:
+    errors = {}
     request_user = request.user
     if not request_user.is_authenticated:
         return redirect('manager-login')
@@ -294,13 +295,20 @@ def settings(request: HttpRequest) -> HttpResponse:
                     user.agency.address = new_address
                 agency_form.save()
             else:
-                print(address_form.errors)
+                address_errors = address_form.errors.as_data()
+                agency_errors = agency_form.errors.as_data()
+                address_errors = convert_errors(address_errors)
+                agency_errors = convert_errors(agency_errors)
+                errors.update(address_errors)
+                errors.update(agency_errors)
         if 'user_submit' in post_request:
             user_form = SettingsUserForm(data=post_request, instance=request_user)
             if user_form.is_valid():
                 user_form.save()
             else:
-                print(user_form.errors)
+                user_errors = user_form.errors.as_data()
+                user_errors = convert_errors(user_errors)
+                errors.update(user_errors)
     return render(
         request,
         'pages/settings.html',
@@ -310,6 +318,7 @@ def settings(request: HttpRequest) -> HttpResponse:
             'user_form': user_form,
             'agency_form': agency_form,
             'address_form': address_form,
+            'errors': errors,
             'style_files': [
                 'css/header.css',
                 'css/body.css',

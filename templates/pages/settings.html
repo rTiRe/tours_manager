@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load template_filters %}
+{% load errors_writer %}
 {% load gravatar %}
 {% block header %}{% include 'parts/header.html' %}{% endblock %}
 {% block content %}
@@ -24,20 +25,24 @@
                                     <div class="input_group username">
                                         <label for="username">Имя пользователя</label>
                                         {{ user_form.username }}
+                                        {{ errors|get_errors_html:user_form.username.name }}
                                     </div>
                                     <div class="person_group">
                                         <div class="input_group firstname">
                                             <label for="first_name">Имя</label>
                                             {{ user_form.first_name }}
+                                            {{ errors|get_errors_html:user_form.first_name.name }}
                                         </div>
                                         <div class="input_group lastname">
                                             <label for="last_name">Фамилия</label>
                                             {{ user_form.last_name }}
+                                            {{ errors|get_errors_html:user_form.last_name.name }}
                                         </div>
                                     </div>
                                     <div class="input_group email">
                                         <label for="email">Email</label>
                                         {{ user_form.email }}
+                                        {{ errors|get_errors_html:user_form.email.name }}
                                     </div>
                                     <p class="form_redirect"><a href="{% url 'password_change' %}">Сменить пароль</a></p>
                                     <button name="user_submit" type="submit">Сохранить</button>
@@ -60,35 +65,43 @@
                         <div class="input_group name">
                             <label for="name">Имя</label>
                             {{ agency_form.name }}
+                            {{ errors|get_errors_html:agency_form.name.name }}
                         </div>
                         <div class="input_group phone_number">
                             <label for="phone_number">Номер телефона</label>
                             {{ agency_form.phone_number }}
+                            {{ errors|get_errors_html:agency_form.phone_number.name }}
                         </div>
                         <div class="input_group city">
                             <label for="city">Город</label>
                             {{ address_form.city }}
+                            {{ errors|get_errors_html:address_form.city.name }}
                         </div>
                         <div class="input_group street_name">
                             <label for="street_name">Улица</label>
                             {{ address_form.street }}
+                            {{ errors|get_errors_html:address_form.street.name }}
                         </div>
                         <div class="input_group house_number">
                             <label for="house_number">Номер дома</label>
                             {{ address_form.house_number }}
+                            {{ errors|get_errors_html:address_form.house_number.name }}
                         </div>
                         <div class="address_form">
                             <div class="input_group entrance_number">
                                 <label for="entrance_number">Подъезд</label>
                                 {{ address_form.entrance_number }}
+                                {{ errors|get_errors_html:address_form.entrance_number.name }}
                             </div>
                             <div class="input_group floor">
                                 <label for="floor">Этаж</label>
                                 {{ address_form.floor }}
+                                {{ errors|get_errors_html:address_form.floor.name }}
                             </div>
                             <div class="input_group flat_number">
                                 <label for="flat_number">Квартира</label>
                                 {{ address_form.flat_number }}
+                                {{ errors|get_errors_html:address_form.flat_number.name }}
                             </div>
                         </div>
                         <div class="input_group point">
@@ -107,6 +120,7 @@
                             <label for="point">Геоточка</label>
                             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@6.14.1/ol.css" type="text/css">
                             {{ address_form.point }}
+                            {{ errors|get_errors_html:address_form.point.name }}
                             <script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js"></script>
                             <script src="{% static 'gis/js/OLMapWidget.js' %}"></script>
                             <script>
@@ -121,11 +135,9 @@
                                     map_srid: 3857,
                                     name: 'point'
                                 };
-                        
                                 options['default_lon'] = 5;
                                 options['default_lat'] = 47;
                                 options['default_zoom'] = 12;
-                        
                                 var geodjango_point = new MapWidget(options);
                             </script>
                         </div>
