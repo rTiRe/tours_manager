@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 def render_review(request: HttpRequest, review: Review, form_create: bool = False) -> str:
     initial_data = {
         'text': review.text if review else '',
-        'rating': str(review.rating) if review else ''
+        'rating': review.rating if review else ''
     }
     if request.method == 'POST' and form_create:
         form = UserReviewForm(request.POST, initial=initial_data)

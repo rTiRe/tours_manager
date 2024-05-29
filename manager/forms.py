@@ -97,6 +97,7 @@ class FindAgenciesForm(forms.Form):
         agencies_objects = Agency.objects.all()
         agencies_cities = [agency.address.city for agency in agencies_objects.all()]
         city_choice_list += [(city.id, city.name) for city in agencies_cities]
+        city_choice_list = list(set(city_choice_list))
         self.fields['city'].choices = city_choice_list
         if request and request.method == 'GET':
             self.fields['city'].initial = request.GET.get('city')
