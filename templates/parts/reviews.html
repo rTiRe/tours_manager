@@ -1,0 +1,12 @@
+{% load template_filters %}
+{% include 'parts/connect_css_files.html' with style_files=style_files %}
+<div class="reviews" style="display: none">
+    <div class="title">
+        <h3>{{ reviews_title_literal }} <span>{{ reviews_count }}</span></h3>
+    </div>
+    <div class="reviews_wrapper">
+        {% for review in reviews %}
+            {{ review }}
+        {% endfor %}
+    </div>
+</div>

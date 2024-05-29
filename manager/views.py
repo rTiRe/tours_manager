@@ -5,17 +5,19 @@ from typing import Any
 from django.contrib import auth
 from django.contrib.auth import decorators
 from django.db.models import Model
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import redirect, render
+
+from django.template.loader import render_to_string
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm, UserReviewForm, PasswordChangeRequestForm
+from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm, PasswordChangeRequestForm
 from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .validators import get_datetime
 
 from django.contrib.auth import views as auth_views
 
@@ -23,7 +25,6 @@ from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
@@ -36,7 +37,7 @@ from django.views.generic.base import View
 
 from uuid import UUID
 
-from datetime import datetime, timezone
+from .views_utils import render_reviews
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -212,7 +213,7 @@ def logout(request):
 
 def profile(request: HttpRequest, username: str = None) -> HttpResponse:
     tours_data = {}
-    reviews_data = {}
+    reviews_data = []
     if username:
         user_id = auth.models.User.objects.get(username=username).id
         profile = Account.objects.get(account=user_id)
@@ -229,6 +230,8 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
                 reviews_data[tour_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
             else:
                 reviews_data[tour_data] = 0
+    else:
+        reviews_data = list(Review.objects.filter(account=profile))
     return render(
         request,
         'pages/profile.html',
@@ -237,11 +240,13 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
             'user': profile,
             'tours_data': tours_data,
             'reviews_data': reviews_data,
+            'review_form': '',
             'style_files': [
                 'css/header.css',
                 'css/body.css',
                 'css/tours.css',
                 'css/profile.css',
+                'css/rating.css',
             ],
         },
     )
@@ -387,65 +392,25 @@ def my_profile(request: HttpRequest) -> HttpResponse:
     return profile(request)
 
 
-def csrf_failure(request, reason=""):
+def csrf_failure(request: HttpRequest, reason: str = ''):
     return redirect('index')
 
 
 def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
+    ratings = []
     tour = Tour.objects.filter(id=uuid).first()
     if not tour:
         return HttpResponseNotFound()
     reviews = list(tour.reviews.all())
-    ratings = []
-    account = None
-    if request.user:
-        account = Account.objects.get(account=request.user)
-    user_review = None
     for review in reviews:
         ratings.append(review.rating)
-        if review.account == account:
-            user_review = review
-            break
-    if user_review:
-        reviews.remove(user_review)
-    initial_data = {
-        'text': user_review.text if user_review else '',
-        'rating': str(user_review.rating) if user_review else ''
-    }
-
-    if request.method == 'POST':
-        form = UserReviewForm(request.POST, initial=initial_data)
-        if form.is_valid():
-            rating = form.cleaned_data['rating']
-            text = form.cleaned_data['text']
-            filter_data = {
-                'tour': tour,
-                'account': account,
-            }
-            if Review.objects.filter(**filter_data).exists():
-                review = Review.objects.get(**filter_data)
-                review.text = text
-                review.rating = rating
-                review.edited = datetime.now(timezone.utc)
-                review.save()
-            else:
-                filter_data['rating'] = rating
-                filter_data['text'] = text
-                filter_data['created'] = get_datetime()
-                Review.objects.create(**filter_data)
-            return redirect(f'/tour/{tour.id}')
-        else:
-            print(form.errors)
-    else:
-        print(initial_data)
-        form = UserReviewForm(initial=initial_data)
-
+    reviews = render_reviews(request, reviews)
+    if isinstance(reviews, HttpResponseRedirect):
+        return reviews
     return render(
         request,
         'pages/tour.html',
         {
-            'user_review': user_review,
-            'review_form': form,
             'ratings': ratings,
             'reviews': reviews,
             'tour': tour,
@@ -454,9 +419,7 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
                 'css/header.css',
                 'css/body.css',
                 'css/tour.css',
-                'css/reviews.css',
                 'css/rating.css',
-                'css/review_create.css'
             ],
         }
     )

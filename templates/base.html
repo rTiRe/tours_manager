@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Поиск Туров{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/reset.css' %}">
-    {% for style_file in style_files %}
-        <link rel="stylesheet" href="{% static style_file %}">
-    {% endfor %}
+    {% include 'parts/connect_css_files.html' with style_files=style_files %}
     <script src="https://kit.fontawesome.com/8f534068a4.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

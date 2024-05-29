@@ -53,16 +53,16 @@ def get_item(
 
 
 @register.filter
-def to_int(any_object: str | float | bool) -> int:
+def to_int(any_object: int | str | float | bool) -> int:
     """Convert object to int.
 
     Args:
-        any_object: str | float | bool- object for convert to int.
+        any_object: int | str | float | bool- object for convert to int.
 
     Returns:
         int: converted object.
     """
-    expected_types = (str, float, bool)
+    expected_types = (int, str, float, bool)
     check_isinstance(expected_types, any_object, 'any_object')
     return int(any_object)
 

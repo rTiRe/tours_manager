@@ -53,21 +53,7 @@
                     <p>{{ tour.description }}</p>
                 </div>
             </div>
-            <div class="reviews" style="display: none">
-                <div class="title">
-                    <h3>Отзывы <span>{% if user_review %} {{ reviews|length|add:'1' }} {% else %} {{ reviews|length }} {% endif %}</span></h3>
-                </div>
-                <div class="reviews_wrapper">
-                    {% if user_review %}
-                        {% include 'parts/review.html' with form=review_form review=user_review request=request %}
-                    {% elif request.user.is_authenticated %}
-                        {% include 'parts/review.html' with form=review_form review=None request=request %}
-                    {% endif %}
-                    {% for review in reviews %}
-                        {% include 'parts/review.html' with form=review_form review=review request=request %}
-                    {% endfor %}
-                </div>
-            </div>
+            {{ reviews }}
         </div>
     </main>
     <script>

@@ -1,0 +1,32 @@
+{% load static %}
+{% load template_filters %}
+<a href="/tour/{{ tour_data.id }}">
+    <div class="card">
+        <div class="left">
+            <img src="{% static 'img/search-banner.png' %}" alt="img"/>
+        </div>
+        <div class="right">
+            <div class="top">
+                <div class="title">{{ tour_data.name }}</div>
+                <div class="countries">
+                    {% for address in tour_data.addresses.all %}
+                        {{ address.city.country.name }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="rating">
+                {% with tour_rating=reviews_data|get_item:tour_data %}
+                    {% for num in '01234'|make_list %}
+                        <span class="fa fa-star{% if num|to_int < tour_rating|to_int %} checked{% endif %}"></span>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+            <div class="description">
+                {{ tour_data.description }}
+            </div>
+            <div class="price">
+                {{ tour_data.price }}<span>₽</span>
+            </div>
+        </div>
+    </div>
+</a>
