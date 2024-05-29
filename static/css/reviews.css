@@ -137,3 +137,25 @@
 .reviews .edit:hover {
     text-decoration: underline;
 }
+
+.reviews .delete {
+    margin: 5px 0 5px 50px;
+    color: #ea2e9f;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.reviews .delete:hover {
+    text-decoration: underline;
+}
+
+.reviews .delete button {
+    color: #ea2e9f;
+    cursor: pointer;
+    text-decoration: none;
+    background-color: transparent;
+}
+    
+.reviews .delete:hover button {
+    text-decoration: underline;
+}

@@ -6,21 +6,31 @@ from .forms import UserReviewForm
 from .models import Account, Review, Tour
 from .validators import get_datetime
 from django.shortcuts import redirect
-from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
-def render_review(request: HttpRequest, review: Review, form_create: bool = False) -> str:
+def render_review(
+    request: HttpRequest,
+    review: Review,
+    form_create: bool = False,
+    link_to_tour: bool = False,
+) -> str:
     initial_data = {
         'text': review.text if review else '',
         'rating': review.rating if review else ''
     }
     if request.method == 'POST' and form_create:
+        tour_id = request.path.split('/')[-2]
+        tour = Tour.objects.get(id=tour_id)
+        if 'delete' in request.POST.keys():
+            review.delete()
+            return redirect(f'/tour/{tour.id}')
         form = UserReviewForm(request.POST, initial=initial_data)
         if form.is_valid():
             rating = form.cleaned_data['rating']
             text = form.cleaned_data['text']
             account = Account.objects.get(account=request.user) if request.user else None
-            tour_id = request.path.split('/')[-2]
-            tour = Tour.objects.get(id=tour_id)
+            if review:
+                tour = review.tour
             if review:
                 review.text = text
                 review.rating = rating
@@ -34,7 +44,8 @@ def render_review(request: HttpRequest, review: Review, form_create: bool = Fals
                     text=text,
                     created=get_datetime(),
                 )
-            return redirect(f'/tour/{tour_id}')
+            return redirect(f'/tour/{tour.id}')
+        
     form = UserReviewForm(initial=initial_data)
     return render_to_string(
         'parts/review.html',
@@ -42,6 +53,7 @@ def render_review(request: HttpRequest, review: Review, form_create: bool = Fals
             'form': form,
             'review': review,
             'request': request,
+            'link_to_tour': link_to_tour,
             'style_files': [
                 'css/rating.css',
                 'css/review_create.css'
@@ -51,27 +63,39 @@ def render_review(request: HttpRequest, review: Review, form_create: bool = Fals
     )
 
 
-def render_reviews(request: HttpRequest, reviews: list | tuple) -> str:
-    account = Account.objects.get(account=request.user) if request.user else None
-    user_review = None
-    for review in reviews:
-        if review.account == account:
-            user_review = review
-            break
-    if user_review:
-        reviews.remove(user_review)
-        reviews.insert(0, user_review)
-    elif request.user.is_authenticated:
-        reviews.insert(0, None)
-    
+def render_reviews(
+    request: HttpRequest,
+    reviews: list | tuple,
+    display: bool = False,
+    check_user_review: bool = True,
+    link_to_tour: bool = False,
+) -> str:
+    if check_user_review:
+        account = Account.objects.get(account=request.user) if request.user else None
+        user_review = None
+        for review in reviews:
+            if review.account == account:
+                user_review = review
+                break
+        reviews_count = len(reviews)
+        if user_review:
+            reviews.remove(user_review)
+            reviews.insert(0, user_review)
+        elif request.user.is_authenticated:
+            reviews.insert(0, None)
     rendered_reviews = []
-    for review_number, review in enumerate(reviews):
-        if review_number == 0:
-            rendered_review = render_review(request, review, form_create=True)
-            if isinstance(rendered_review, HttpResponseRedirect):
-                return rendered_review
+    for review in reviews:
+        if not review or review.account.account == request.user:
+            rendered_review = render_review(
+                request,
+                review,
+                form_create=True,
+                link_to_tour=link_to_tour
+            )
         else:
-            rendered_review = render_review(request, review)
+            rendered_review = render_review(request, review, link_to_tour=link_to_tour)
+        if isinstance(rendered_review, HttpResponseRedirect):
+                return rendered_review
         rendered_reviews.append(rendered_review)
 
     return render_to_string(
@@ -79,8 +103,9 @@ def render_reviews(request: HttpRequest, reviews: list | tuple) -> str:
         {
             'reviews': rendered_reviews,
             'request': request,
+            'display': display,
             'reviews_title_literal': _('Reviews'),
-            'reviews_count': len(reviews),
+            'reviews_count': reviews_count,
             'style_files': [
                 'css/reviews.css',
             ],

@@ -232,6 +232,14 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
                 reviews_data[tour_data] = 0
     else:
         reviews_data = list(Review.objects.filter(account=profile))
+        reviews_data = render_reviews(
+            request, reviews_data,
+            display=True,
+            check_user_review=False,
+            link_to_tour=True,
+        )
+        if isinstance(reviews_data, HttpResponseRedirect):
+            return reviews_data
     return render(
         request,
         'pages/profile.html',

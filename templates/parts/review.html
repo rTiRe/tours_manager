@@ -3,14 +3,18 @@
 {% include 'parts/connect_css_files.html' with style_files=style_files %}
 <div class="review">
     {% if review %}
-        <a href="/profile/{{ review.account.account.username }}">
+        <a href="{% if not link_to_tour %}/profile/{{ review.account.account.username }}{% else %}/tour/{{ review.tour.id }}{% endif %}">
             <div class="author">
                 <div class="avatar">
                     <img src="img/avatar.png" alt="avatar">
                 </div>
                 <div class="right">
                     <div class="full_name">
-                        {{ review.account.first_name }} {{ review.account.last_name }} <span>@{{ review.account.username }}</span>
+                        {% if not link_to_tour %}
+                            {{ review.account.first_name }} {{ review.account.last_name }} <span>@{{ review.account.username }}</span>
+                        {% else %}
+                            {{ review.tour.name }}
+                        {% endif %}
                     </div>
                     <span class="created">
                         От {{ review.created.day|stringformat:'.02d' }}.{{ review.created.month|stringformat:'.02d' }}.{{ review.created.year }}{% if review.edited %}, ред. {{ review.edited.day|stringformat:'.02d' }}.{{ review.edited.month|stringformat:'.02d' }}.{{ review.edited.year }}{% endif %}
@@ -21,6 +25,12 @@
         <div class="review_data">
             {% if request.user.is_authenticated and request.user == review.account.account %}
                 <div class="edit"><i class="fa-solid fa-edit" aria-hidden="true"></i> Редактировать</div>
+                <div class="delete">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="delete"><i class="fa-solid fa-trash" aria-hidden="true"></i> Удалить</button>
+                    </form>
+                </div>
             {% endif %}
             <div class="rating">
                 <div class="title">Оценка: </div>

@@ -15,7 +15,7 @@
                         <div class="rating">
                             {% with rating=ratings|get_avg %}
                                 {% if rating %}
-                                    Оценка <span class="num_rating">{{ rating }}</span> <span class="fa fa-star checked"></span>
+                                    Оценка <span class="num_rating">{{ rating|floatformat:2 }}</span> <span class="fa fa-star checked"></span>
                                 {% else %}
                                     Оценок пока нет
                                 {% endif %}
@@ -71,11 +71,6 @@
                 console.log()
                 $('.reviews').show();
                 $('.tour_info').hide();
-            });
-            $('.edit').click(function() {
-                var reviewContainer = $(this).closest('.review');
-                reviewContainer.find('.review_data').hide();
-                reviewContainer.find('.edit_form').show();
             });
         });
         </script>
