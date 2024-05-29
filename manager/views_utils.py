@@ -19,11 +19,15 @@ def render_review(
         'rating': review.rating if review else ''
     }
     if request.method == 'POST' and form_create:
-        tour_id = request.path.split('/')[-2]
-        tour = Tour.objects.get(id=tour_id)
+        if not link_to_tour:
+            tour_id = request.path.split('/')[-2]
+            tour = Tour.objects.get(id=tour_id)
         if 'delete' in request.POST.keys():
             review.delete()
-            return redirect(f'/tour/{tour.id}')
+            if not link_to_tour:
+                return redirect(f'/tour/{tour.id}')
+            else:
+                return redirect(f'/profile/{review.account.account.userame}')
         form = UserReviewForm(request.POST, initial=initial_data)
         if form.is_valid():
             rating = form.cleaned_data['rating']
@@ -70,6 +74,7 @@ def render_reviews(
     check_user_review: bool = True,
     link_to_tour: bool = False,
 ) -> str:
+    reviews_count = len(reviews)
     if check_user_review:
         account = Account.objects.get(account=request.user) if request.user else None
         user_review = None
@@ -77,7 +82,6 @@ def render_reviews(
             if review.account == account:
                 user_review = review
                 break
-        reviews_count = len(reviews)
         if user_review:
             reviews.remove(user_review)
             reviews.insert(0, user_review)
