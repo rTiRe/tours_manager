@@ -266,8 +266,10 @@ def settings(request: HttpRequest) -> HttpResponse:
         return redirect('manager-login')
     user = Account.objects.get(account=request_user.id)
     user_form = SettingsUserForm(request)
-    agency_form = SettingsAgencyForm(request)
-    address_form = SettingsAddressForm(request)
+    agency_form, address_form = None, None
+    if user.agency:
+        agency_form = SettingsAgencyForm(request)
+        address_form = SettingsAddressForm(request)
     if request.method == 'POST':
         post_request = request.POST
         if 'agency_submit' in post_request:
