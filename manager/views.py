@@ -411,7 +411,11 @@ def confirm_password_change(request, uidb64, token):
 
 
 def create_tour(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
     account = Account.objects.get(account=request.user) if request.user else None
+    if not account.agency:
+        return HttpResponseNotFound()
     agency = account.agency
     initial_data = {'agency': str(agency.id)}
     errors = {}
