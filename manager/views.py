@@ -71,7 +71,9 @@ def tours(request: HttpRequest) -> HttpResponse:
     )
     if not request.GET:
         tours_data = Tour.objects.all()
-    reviews_data = {tour_data: Review.objects.filter(tour=tour_data) for tour_data in tours_data}
+    reviews_data = {}
+    for tour_data in tours_data:
+        reviews_data[tour_data] = Review.objects.filter(tour=tour_data, account__agency=None)
     for tour_data, tour_reviews in reviews_data.items():
         tour_ratings = [review.rating for review in tour_reviews]
         if tour_ratings:
