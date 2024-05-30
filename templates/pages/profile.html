@@ -51,6 +51,9 @@
     <main>
         <div class="container">
             {% if user.agency %}
+                <a href="/create_tour/">
+                    <div class="card create_tour">+</div>
+                </a>
                 {% for tour_data in tours_data %}
                     {% include 'parts/tour_card.html' %}
                 {% endfor %}

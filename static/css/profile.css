@@ -123,3 +123,34 @@ main {
 .agency_info .documents {
     font-size: 16px;
 }
+
+main .container a {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+main .container a .card {
+    width: 100%;
+    position: relative;
+}
+
+main .container .card.create_tour {
+    width: 300px;
+    height: 100px;
+    max-height: calc(100vw / 3);
+    border-radius: 8px;
+    border: 2px dashed #ff157e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff157e;
+    font-size: 34px;
+}
+
+main .container .card.create_tour:hover {
+    outline: rgba(255, 21, 126, 0.3) solid 3px;
+    border-style: solid;    
+}
