@@ -188,6 +188,21 @@ class SettingsAddressForm(forms.ModelForm):
         widgets = ADDRESS_WIDGETS
 
 
+class TourForm(forms.ModelForm):
+    addresses = forms.MultipleChoiceField(required=True, widget=forms.CheckboxSelectMultiple)
+    def __init__(self, *args, **kwargs) -> None:
+        address_choices = []
+        addresses = Address.objects.all()
+        for address in addresses:
+            address_choices.append((address.id, str(address)))
+        super(TourForm, self).__init__(*args, **kwargs)
+        self.fields['addresses'].choices = address_choices
+
+    class Meta:
+        model = Tour
+        fields = '__all__'
+
+
 class PasswordChangeRequestForm(forms.Form):
     new_password = forms.CharField(widget=forms.PasswordInput)
     new_password_confirm = forms.CharField(widget=forms.PasswordInput)

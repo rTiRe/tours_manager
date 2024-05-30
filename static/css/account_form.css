@@ -4,7 +4,7 @@
     align-items: center;
 }
 
-.account_form {
+.form_container {
     max-width: 450px;
     overflow: hidden;
     position: relative;
@@ -15,14 +15,14 @@
     background-color: rgb(0, 0, 0, 35%);
 }
 
-.account_form .title {
+.form_container .title {
     font: 600 24px "Roboto", sans-serif;
     color: white;
     text-decoration: underline;
     transform: translateY(-90%);
 }
 
-.account_form form {
+.form_container form {
     position: relative;
     width: 100%;
     position: relative;
@@ -32,14 +32,14 @@
     font: 400 16px "Roboto", sans-serif;
 }
 
-.account_form form .input_group {
+.form_container form .input_group {
     display: inline-flex;
     flex-direction: column;
     position: relative;
     max-width: 100%;
 }
 
-.account_form form button:not(#id_point_div_map button) {
+.form_container form button:not(#id_point_div_map button) {
     background-color: #ff157e;
     border: none;
     border-radius: 5px;
@@ -54,16 +54,16 @@
     margin: auto;
 }
 
-.account_form form button:hover:not(#id_point_div_map button) {
+.form_container form button:hover:not(#id_point_div_map button) {
     transform: translate(0, -5px)
 }
 
-.account_form > form button:active:not(#id_point_div_map button) {
+.form_container > form button:active:not(#id_point_div_map button) {
     transition: .1s;
     transform: scale(0.95)
 }
 
-.account_form form input {
+.form_container form input {
     min-width: 100px;
     position: relative;
     display: block;
@@ -76,25 +76,25 @@
     background-color: #fff;
 }
 
-.account_form form label {
+.form_container form label {
     position: absolute;
     transform: translate(10px, -110%);
     color: white;
     font-weight: 600;
 }
 
-.account_form form input:focus {
+.form_container form input:focus {
     outline: rgb(255, 255, 255, 30%) solid 3px;
 }
 
-.account_form form label.active {
+.form_container form label.active {
     color: white;
     transform: translate(10px, -110%);
     cursor: default;
     font-weight: 600;
 }
 
-.account_form .person_group, .account_form .password_group {
+.form_container .person_group, .form_container .password_group {
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -103,27 +103,27 @@
     position: relative;
 }
 
-.account_form form .person_group .input_group {
+.form_container form .person_group .input_group {
     max-width: calc(50% - 5px);
 }
 
-.account_form form .password_group .input_group {
+.form_container form .password_group .input_group {
     max-width: calc(50% - 5px);
 }
 
-.account_form .errors {
+.form_container .errors {
     display: block;
     color: white;
     font-size: 14px;
     margin-top: 3px;
 }
 
-.account_form .errors i {
+.form_container .errors i {
     font-size: 16px;
     color: #ff0073;
 }
 
-.account_form .form_redirect {
+.form_container .form_redirect {
     display: block;
     text-align: center;
     color: white;
@@ -131,6 +131,6 @@
     margin-bottom: 0;
 }
 
-.account_form .form_redirect a {
+.form_container .form_redirect a {
     color: #ff0073;
 }

@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm, PasswordChangeRequestForm
+from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm, PasswordChangeRequestForm, TourForm
 from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
@@ -275,7 +275,7 @@ def settings(request: HttpRequest) -> HttpResponse:
         post_request = request.POST
         if 'agency_submit' in post_request:
             agency_form = SettingsAgencyForm(data=post_request, instance=user.agency)
-            address_form = SettingsAddressForm(data=post_request)
+            address_form = SettingsAddressForm(data=post_request, instance=user.agency.address)
             if agency_form.is_valid() and address_form.is_valid():
                 cleaned_data = address_form.cleaned_data
                 cleaned_data = {
@@ -332,7 +332,7 @@ def settings(request: HttpRequest) -> HttpResponse:
 
 
 @decorators.login_required
-def request_password_change(request):
+def request_password_change(request: HttpRequest) -> HttpResponse:
     errors = {}
     if request.method == 'POST':
         form = PasswordChangeRequestForm(request.POST)
@@ -410,12 +410,47 @@ def confirm_password_change(request, uidb64, token):
     )
 
 
+def create_tour(request: HttpRequest) -> HttpResponse:
+    account = Account.objects.get(account=request.user) if request.user else None
+    agency = account.agency
+    initial_data = {'agency': str(agency.id)}
+    errors = {}
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        post_data['agency'] = str(agency.id)
+        form = TourForm(post_data)
+        if form.is_valid():
+            addresses = form.cleaned_data.pop('addresses')
+            tour = Tour.objects.create(**form.cleaned_data)
+            tour.addresses.add(*addresses)
+        else:
+            errors = form.errors.as_data()
+            errors = convert_errors(errors)
+            print(errors)
+    else:
+        form = TourForm(initial=initial_data)
+    return render(
+        request,
+        'pages/create_tour.html',
+        {
+            'form': form,
+            'errors': errors,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+                'css/tour_form.css',
+            ],
+        }
+    )
+
+
 @decorators.login_required
 def my_profile(request: HttpRequest) -> HttpResponse:
     return profile(request)
 
 
-def csrf_failure(request: HttpRequest, reason: str = ''):
+def csrf_failure(request: HttpRequest, reason: str = '') -> HttpResponseRedirect:
     return redirect('index')
 
 

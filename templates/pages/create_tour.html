@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load template_filters %}
+{% load errors_writer %}
+{% load gravatar %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="container">
+            <div class="form_container">
+                <h3 class="title">Создать тур</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input_group avatar_choice">
+                        <label for="avatar_choice">Аватар</label>
+                        <input type="file" name="avatar_choice">
+                    </div>
+                    <div class="input_group name">
+                        <label for="name">Название</label>
+                        {{ form.name }}
+                        {{ errors|get_errors_html:form.name.name }}
+                    </div>
+                    <div class="input_group description">
+                        <label for="description">Описание</label>
+                        {{ form.description }}
+                        {{ errors|get_errors_html:form.description.name }}
+                    </div>
+                    <div class="data_form">
+                        <div class="input_group addresses">
+                            <label for="addresses">Адреса</label>
+                            <div class="addresses_wrapper">
+                                {% for address in form.addresses %}
+                                    <div class="address_wrapper" style="display: flex;">
+                                        {{ address.tag }} <span>{{ address.choice_label }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {{ errors|get_errors_html:form.addresses.name }}
+                        </div>
+                        <div class="input_group data_form">
+                            <div class="input_group starting_city">
+                                <label for="starting_city">Город отправления</label>
+                                {{ form.starting_city }}
+                                {{ errors|get_errors_html:form.starting_city.name }}
+                            </div>
+                            <div class="input_group price">
+                                <label for="price">Цена</label>
+                                {{ form.price }}
+                                {{ errors|get_errors_html:form.price.name }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ errors|get_errors_html:'__all__' }}
+                    <button name="user_submit" type="submit">Создать</button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}

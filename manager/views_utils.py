@@ -76,7 +76,7 @@ def render_reviews(
 ) -> str:
     reviews_count = len(reviews)
     if check_user_review:
-        account = Account.objects.get(account=request.user) if request.user else None
+        account = Account.objects.get(account=request.user) if request.user.is_authenticated else None
         user_review = None
         for review in reviews:
             if review.account == account:

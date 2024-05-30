@@ -213,8 +213,6 @@ def create_api_test(model: Model, url: str, creation_attrs: dict) -> TestCase:
             self.assertEqual(self.client.get(url).status_code, status.HTTP_200_OK)
             self.assertEqual(self.client.head(url).status_code, status.HTTP_200_OK)
             self.assertEqual(self.client.options(url).status_code, status.HTTP_200_OK)
-            # if url == '/api/reviews/':
-            #     print(creation_attrs)
             attrs_with_model = create_object(model, creation_attrs)
             attrs_with_id = create_object_json_with_ids(attrs_with_model)
             post_created = self.client.post(url, attrs_with_id)

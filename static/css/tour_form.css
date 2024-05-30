@@ -1,0 +1,75 @@
+.form_container {
+    max-width: 100%;
+    width: 80%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.addresses_wrapper {
+    max-height: 105px;
+    min-width: 150px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.address_wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.addresses_wrapper input {
+    min-width: 0 !important;
+    margin: 3px 10px;
+}
+
+.form_container form select {
+    min-width: 100px;
+    position: relative;
+    display: block;
+    padding: 10px;
+    height: 20px;
+    box-sizing: content-box;
+    border-radius: 5px;
+    border-color: transparent;
+    font: 400 16px "Roboto", sans-serif;
+    background-color: #fff;
+}
+
+.form_container form select:focus {
+    outline: rgb(255, 255, 255, 30%) solid 3px;
+}
+
+.form_container form textarea {
+    height: 150px;
+    width: 100%;
+    border-radius: 8px;
+    resize: none;
+    padding: 10px;
+    font: 400 16px "Roboto", sans-serif;
+    letter-spacing: 0.025em;
+}
+
+.form_container form textarea:focus {
+    outline: rgb(255, 255, 255, 30%) solid 3px;
+}
+
+.form_container .data_form {
+    display: flex;
+    flex-direction: row;
+    row-gap: 25px;
+    column-gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.form_container form .data_form .input_group {
+    position: relative;
+    flex: 1;
+}
