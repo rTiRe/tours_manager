@@ -427,6 +427,7 @@ def create_tour(request: HttpRequest) -> HttpResponse:
             addresses = form.cleaned_data.pop('addresses')
             tour = Tour.objects.create(**form.cleaned_data)
             tour.addresses.add(*addresses)
+            return redirect('tour', uuid=tour.id)
         else:
             errors = form.errors.as_data()
             errors = convert_errors(errors)

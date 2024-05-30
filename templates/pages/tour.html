@@ -42,7 +42,7 @@
                     <h3>Остановки:</h3>
                     <p>
                         <ul>
-                            {% for address in tour_addresses %}
+                            {% for address in tour.addresses.all %}
                                 <li><i class="fa fa-map-marker" aria-hidden="true"></i> {{ address|to_str }}</li>
                             {% endfor %}
                         </ul>
