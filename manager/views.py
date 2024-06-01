@@ -94,6 +94,7 @@ def tours(request: HttpRequest) -> HttpResponse:
                 'css/body.css',
                 'css/tours.css',
                 'css/search_tours.css',
+                'css/rating.css',
             ],
         },
     )
@@ -127,6 +128,7 @@ def agencies(request: HttpRequest) -> HttpResponse:
                 'css/body.css',
                 'css/agencies.css',
                 'css/search_agencies.css',
+                'css/rating.css',
             ],
         },
     )
