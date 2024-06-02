@@ -6,6 +6,7 @@ from django.contrib import auth
 from django.contrib.auth import decorators
 from django.db.models import Model
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 
 from django.template.loader import render_to_string
@@ -37,7 +38,7 @@ from django.views.generic.base import View
 
 from uuid import UUID
 
-from .views_utils import render_reviews
+from .views_utils import render_reviews, convert_errors, render_tour_form
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -134,17 +135,6 @@ def agencies(request: HttpRequest) -> HttpResponse:
     )
 
 
-def convert_errors(errors: dict) -> dict:
-    readable_dict = {}
-    for field_name, field_errors in errors.items():
-        for error in field_errors:
-            error = str(error)
-            if error.startswith('[\'') and error.endswith('\']'):
-                error = error[2:-2]
-                readable_dict[field_name] = error
-    return readable_dict
-
-
 def registration(request):
     errors = {}
     if request.user.is_authenticated:
@@ -219,12 +209,12 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
     tours_data = {}
     reviews_data = []
     if username:
-        user_id = auth.models.User.objects.get(username=username).id
-        profile = Account.objects.get(account=user_id)
+        user = auth.models.User.objects.get(username=username)
+        profile = Account.objects.filter(account=user).first()
     else:
         if not request.user.is_authenticated:
                 return redirect('manager-login')
-        profile = Account.objects.get(account=request.user)
+        profile = Account.objects.filter(account=request.user).first()
     if profile.agency:
         tours_data = Tour.objects.filter(agency=profile.agency.id)
         reviews_data = {tour_data: Review.objects.filter(tour=tour_data) for tour_data in tours_data}
@@ -269,7 +259,7 @@ def settings(request: HttpRequest) -> HttpResponse:
     request_user = request.user
     if not request_user.is_authenticated:
         return redirect('manager-login')
-    user = Account.objects.get(account=request_user.id)
+    user = Account.objects.filter(account=request_user).first()
     user_form = SettingsUserForm(request)
     agency_form, address_form = None, None
     if user.agency:
@@ -389,11 +379,8 @@ def request_password_change(request: HttpRequest) -> HttpResponse:
 
 
 def confirm_password_change(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
+    uid = force_str(urlsafe_base64_decode(uidb64))
+    user = User.objects.filter(pk=uid).first()
     if user is not None and default_token_generator.check_token(user, token):
         new_password = request.session.get('new_password')
         if new_password:
@@ -417,38 +404,66 @@ def confirm_password_change(request, uidb64, token):
 def create_tour(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
         return HttpResponseNotFound()
-    account = Account.objects.get(account=request.user) if request.user else None
+    account = Account.objects.filter(account=request.user).first()
     if not account.agency:
-        return HttpResponseNotFound()
+        raise PermissionDenied()
     agency = account.agency
-    initial_data = {'agency': str(agency.id)}
-    errors = {}
-    if request.method == 'POST':
-        post_data = request.POST.copy()
-        post_data['agency'] = str(agency.id)
-        form = TourForm(post_data)
-        if form.is_valid():
-            addresses = form.cleaned_data.pop('addresses')
-            tour = Tour.objects.create(**form.cleaned_data)
-            tour.addresses.add(*addresses)
-            return redirect('tour', uuid=tour.id)
-        else:
-            errors = form.errors.as_data()
-            errors = convert_errors(errors)
-            print(errors)
-    else:
-        form = TourForm(initial=initial_data)
+    form_data = {'initial_data': {'agency': str(agency.id)}}
+    form = render_tour_form(
+        request,
+        agency=agency,
+        form_data=form_data,
+        literals={
+            'title': 'Создание тура',
+            'button': 'Создать',
+            'bitton_name': 'create',
+        }
+    )
     return render(
         request,
         'pages/create_tour.html',
         {
             'form': form,
-            'errors': errors,
             'style_files': [
                 'css/header.css',
                 'css/body.css',
-                'css/account_form.css',
-                'css/tour_form.css',
+            ],
+        }
+    )
+
+def edit_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
+    tour = Tour.objects.filter(id=uuid).first()
+    if not tour:
+        return HttpResponseNotFound()
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
+    account = Account.objects.filter(account=request.user).first()
+    if not account.agency:
+        return HttpResponseNotFound()
+    if tour.agency.account != account:
+        raise PermissionDenied()
+    agency = account.agency
+    initial_data = {'addresses': [str(address.id) for address in tour.addresses.all()]}
+    form_data = {'instance': tour, 'initial': initial_data}
+    form = render_tour_form(
+        request,
+        agency=agency,
+        form_data=form_data,
+        literals={
+            'title': 'Редактирование тура',
+            'button': 'Сохранить',
+            'button_name': 'edit',
+        },
+        tour=tour,
+    )
+    return render(
+        request,
+        'pages/edit_tour.html',
+        {
+            'form': form,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
             ],
         }
     )

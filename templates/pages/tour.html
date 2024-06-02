@@ -34,6 +34,9 @@
                     <ul class="info_menu">
                         <li class="see_info"><a href="#info"><span>Информация</span></a></li>
                         <li class="see_reviews"><a href="#reviews"><span>Отзывы</span></a></li>
+                        {% if tour.agency.account.account == request.user %}
+                        <li class="see_reviews"><a href="{% url 'edit_tour' tour.id %}"><span>Редактировать</span></a></li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>

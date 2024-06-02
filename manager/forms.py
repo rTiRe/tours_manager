@@ -203,6 +203,29 @@ class TourForm(forms.ModelForm):
         fields = '__all__'
 
 
+class TourEditForm(TourForm):
+    def __init__(self, *args, **kwargs) -> None:
+        super(TourEditForm, self).__init__(*args, **kwargs)
+    def clean(self):
+        name = self.cleaned_data.get('name')
+        description = self.cleaned_data.get('description')
+        agency = self.cleaned_data.get('agency')
+        if Tour.objects.filter(
+            name=name,
+            description=description,
+            agency=agency,
+        ).exclude(id=self.instance.id).exists():
+            fields = ['Name', 'Description', 'Agency']
+            error = f'A tour with the following values ​​for the\
+                {", ".join(fields)} fields already exists.'
+            self.add_error(
+                '__all__',
+                _(error),
+            )
+        else:
+            return self.cleaned_data
+
+
 class PasswordChangeRequestForm(forms.Form):
     new_password = forms.CharField(widget=forms.PasswordInput)
     new_password_confirm = forms.CharField(widget=forms.PasswordInput)
