@@ -199,6 +199,8 @@ class SettingsAddressForm(forms.ModelForm):
 
 class TourForm(forms.ModelForm):
     addresses = forms.MultipleChoiceField(required=True, widget=forms.CheckboxSelectMultiple)
+    avatar = forms.ImageField(required=False, widget=CustomImageInput(attrs={'accept': 'image/*'}))
+
     def __init__(self, *args, **kwargs) -> None:
         address_choices = []
         addresses = Address.objects.all()

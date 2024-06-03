@@ -228,6 +228,12 @@ class Agency(UUIDMixin, NameMixin, models.Model):
 class Tour(UUIDMixin, NameMixin, models.Model):
     """Tour table model."""
 
+    avatar = models.ImageField(
+        upload_to='covers/', 
+        null=True, 
+        blank=True, 
+        verbose_name=_('cover'),
+    )
     description = models.TextField(_('description'))
     agency = models.ForeignKey(
         Agency,

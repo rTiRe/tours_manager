@@ -28,8 +28,8 @@ main a {
 main .card {
     /* background-color: #000; */
     padding: 10px 30px;
-    height: 175px;
-    max-height: calc(100vw / 3.5);
+    max-height: 175px;
+    height: calc(100vw / 3.5);
     border-bottom: 1px solid grey;
     display: flex;
     gap: 15px;
@@ -49,18 +49,13 @@ main a:first-child .card {
     padding-bottom: 10px;
 }
 
-main .card > .left {
+main .card > .avatar {
     height: 100%;
-    position: relative;
+    border-radius: 8px;
+    max-width: 175px;
+    width: calc(100vw / 3.5);
 }
 
-main .card img {
-    position: relative;
-    height: 100%;
-    width: 175px;
-    max-width: calc(100vw / 3.5);
-    border-radius: 8px;
-}
 
 main .card > .right {
     height: 100%;

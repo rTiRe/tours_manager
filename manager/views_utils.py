@@ -150,6 +150,10 @@ def render_tour_form(
                 tour = Tour.objects.create(**form.cleaned_data)
             else:
                 tour = form.save(commit=False)
+                if post_data.get('avatar_clear') == 'on':
+                    tour.avatar.delete()
+                if 'avatar' in request.FILES and post_data.get('avatar_clear') != 'on':
+                    tour.avatar = request.FILES['avatar']
                 tour.save()
             addresses = form.cleaned_data.pop('addresses')
             tour.addresses.set(addresses)

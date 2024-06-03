@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load template_filters %}
+{% load avatar %}
 {% block header %}{% include 'parts/header.html' %}{% endblock %}
 {% block content %}
     <section class="home">
@@ -8,7 +9,7 @@
             <div class="profile">
                 <div class="tourheader">
                     <div class="avatar">
-                        <img src="{% static 'img/search-banner.png' %}" alt="img">
+                        <img src="{{ tour|get_tour_cover }}" alt="img">
                     </div>
                     <section>
                         <h2>{{ tour.name }}</h2>

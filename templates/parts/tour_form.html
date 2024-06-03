@@ -1,15 +1,16 @@
 {% load static %}
 {% load template_filters %}
 {% load errors_writer %}
-{% load gravatar %}
+{% load avatar %}
 {% include 'parts/connect_css_files.html' with style_files=style_files %}
 <div class="form_container">
     <h3 class="title">{{ title }}</h3>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="input_group avatar_choice">
-            <label for="avatar_choice">Аватар</label>
-            <input type="file" name="avatar_choice">
+        <div class="input_group avatar">
+            <label for="avatar">Аватар</label>
+            {{ form.avatar }}
+            {{ errors|get_errors_html:form.avatar.name }}
         </div>
         <div class="input_group name">
             <label for="name">Название</label>

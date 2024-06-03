@@ -89,13 +89,14 @@ def tours(request: HttpRequest) -> HttpResponse:
         {
             'form': form,
             'tours_data': tours_data,
-            'tours_ratings': reviews_data,
+            'reviews_data': reviews_data,
             'style_files': [
                 'css/header.css',
                 'css/body.css',
                 'css/tours.css',
                 'css/search_tours.css',
                 'css/rating.css',
+                'css/avatar.css',
             ],
         },
     )
@@ -495,6 +496,8 @@ def edit_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
         },
         tour=tour,
     )
+    if isinstance(form, HttpResponseRedirect):
+        return form
     return render(
         request,
         'pages/edit_tour.html',
@@ -541,6 +544,7 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
                 'css/body.css',
                 'css/tour.css',
                 'css/rating.css',
+                'css/avatar.css',
             ],
         }
     )

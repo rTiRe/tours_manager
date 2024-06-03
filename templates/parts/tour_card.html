@@ -1,9 +1,10 @@
 {% load static %}
+{% load avatar %}
 {% load template_filters %}
 <a href="/tour/{{ tour_data.id }}">
     <div class="card">
-        <div class="left">
-            <img src="{% static 'img/search-banner.png' %}" alt="img"/>
+        <div class="avatar">
+            <img src="{{ tour_data|get_tour_cover }}" alt="img"/>
         </div>
         <div class="right">
             <div class="top">
@@ -15,11 +16,13 @@
                 </div>
             </div>
             <div class="rating">
-                {% with tour_rating=reviews_data|get_item:tour_data %}
-                    {% for num in '01234'|make_list %}
-                        <span class="fa fa-star{% if num|to_int < tour_rating|to_int %} checked{% endif %}"></span>
-                    {% endfor %}
-                {% endwith %}
+                {% block rating %}
+                    {% with tour_rating=reviews_data|get_item:tour_data %}
+                        {% for num in '01234'|make_list %}
+                            <span class="fa fa-star{% if num|to_int < tour_rating|to_int %} checked{% endif %}"></span>
+                        {% endfor %}
+                    {% endwith %}
+                {% endblock %}
             </div>
             <div class="description">
                 {{ tour_data.description }}
