@@ -1,12 +1,13 @@
 {% load static %}
 {% load template_filters %}
+{% load avatar %}
 {% include 'parts/connect_css_files.html' with style_files=style_files %}
 <div class="review">
     {% if review %}
         <a href="{% if not link_to_tour %}/profile/{{ review.account.account.username }}{% else %}/tour/{{ review.tour.id }}{% endif %}">
             <div class="author">
                 <div class="avatar">
-                    <img src="img/avatar.png" alt="avatar">
+                    <img src="{{ review.account|get_avatar }}" alt="avatar">
                 </div>
                 <div class="right">
                     <div class="full_name">
