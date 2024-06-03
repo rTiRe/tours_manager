@@ -352,6 +352,12 @@ class Account(UUIDMixin, models.Model):
         verbose_name=_('user'),
         on_delete=models.CASCADE,
     )
+    avatar = models.ImageField(
+        upload_to='avatars/', 
+        null=True, 
+        blank=True, 
+        verbose_name=_('avatar')
+    )
     agency = models.OneToOneField(
         Agency,
         verbose_name=_('agency account'),

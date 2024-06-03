@@ -11,16 +11,16 @@
                 <div class="profile">
                     <div class="userinfo">
                         <div class="avatar">
-                            <img src="{{ user.email|gravatar_url }}" alt="gravatar">
+                            <img src="{% if user.avatar %} {% static user.avatar|to_str %} {% else %} {{ user.email|gravatar_url }} {% endif %}" alt="avatar">
                         </div>
                         <section>
                             <div class="form_container">
                                 <h3 class="title">Настройки пользователя</h3>
-                                <form method="post">
+                                <form method="post" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="input_group avatar_choice">
-                                        <label for="avatar_choice">Аватар</label>
-                                        <input type="file" name="avatar_choice">
+                                        <label for="avatar">Аватар</label>
+                                        {{ user_form.avatar }}
                                     </div>
                                     <div class="input_group username">
                                         <label for="username">Имя пользователя</label>

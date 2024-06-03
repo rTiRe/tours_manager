@@ -296,9 +296,12 @@ def settings(request: HttpRequest) -> HttpResponse:
                 errors.update(address_errors)
                 errors.update(agency_errors)
         if 'user_submit' in post_request:
-            user_form = SettingsUserForm(data=post_request, instance=request_user)
+            user_form = SettingsUserForm(request, post_request, request.FILES, instance=request.user)
             if user_form.is_valid():
                 user_form.save()
+                if 'avatar' in request.FILES:
+                    user.avatar = request.FILES['avatar']
+                    user.save()
             else:
                 user_errors = user_form.errors.as_data()
                 user_errors = convert_errors(user_errors)

@@ -11,7 +11,7 @@
                     <div class="profile">
                         <div class="userinfo">
                             <div class="avatar">
-                                <img src="{{ user.email|gravatar_url }}" alt="gravatar">
+                                <img src="{% if user.avatar %} {% static user.avatar|to_str %} {% else %} {{ user.email|gravatar_url }} {% endif %}" alt="avatar">
                             </div>
                             <section>
                                 <h2>

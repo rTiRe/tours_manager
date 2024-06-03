@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load template_filters %}
+{% load gravatar %}
 {% block header %}{% include 'parts/header.html' %}{% endblock %}
 {% block content %}
     <section class="home">
@@ -21,7 +22,7 @@
                 <a href="/profile/{{ agency_data.account.username }}">
                     <div class="card">
                         <div class="left">
-                            <img src="{% static 'img/search-banner.png' %}" alt="img"/>
+                            <img src="{% if agency_data.account.avatar %} {% static agency_data.account.avatar|to_str %} {% else %} {{ agency_data.account.email|gravatar_url }} {% endif %}" alt="img"/>
                         </div>
                         <div class="right">
                             <div class="top">

@@ -126,6 +126,7 @@ class SigninForm(forms.Form):
 
 class SettingsUserForm(auth_forms.UserChangeForm):
     email = forms.EmailField(required=True)
+    avatar = forms.ImageField(required=False)
 
     def __init__(self, request: HttpRequest = None, *args, **kwargs) -> None:
         super(SettingsUserForm, self).__init__(*args, **kwargs)
@@ -133,6 +134,9 @@ class SettingsUserForm(auth_forms.UserChangeForm):
         del self.fields['password']
         if self.request and isinstance(self.request, HttpRequest):
             user = self.request.user
+            account = Account.objects.filter(account=user).first()
+            if account and account.avatar:
+                self.fields['avatar'].initial = account.avatar
             self.fields['username'].initial = user.username
             self.fields['first_name'].initial = user.first_name
             self.fields['last_name'].initial = user.last_name
@@ -146,7 +150,7 @@ class SettingsUserForm(auth_forms.UserChangeForm):
 
     class Meta:
         model = auth_models.User
-        fields = ['username', 'first_name', 'last_name', 'email']
+        fields = ['username', 'first_name', 'last_name', 'email', 'avatar']
 
 
 class SettingsAgencyForm(forms.ModelForm):
