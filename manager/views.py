@@ -322,6 +322,7 @@ def settings(request: HttpRequest) -> HttpResponse:
             'agency_form': agency_form,
             'address_form': address_form,
             'errors': errors,
+            'ignore_special_header': True,
             'style_files': [
                 'css/header.css',
                 'css/body.css',
