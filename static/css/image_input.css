@@ -1,0 +1,27 @@
+input[type="text"] {
+    position: relative;
+    display: block;
+    padding: 10px;
+    height: 20px;
+    box-sizing: content-box;
+    border-radius: 5px;
+    border-color: transparent;
+    font: 400 16px "Roboto", sans-serif;
+    background-color: #fff;
+}
+
+.delete {
+    color: white;
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 5px;
+}
+
+.delete input[type="checkbox"] {
+    display: inline-block !important;
+    min-width: 0;
+    width: 14px;
+    height: 14px;
+    padding-right: 5px;
+}

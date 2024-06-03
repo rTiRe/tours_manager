@@ -23,6 +23,11 @@ ADDRESS_WIDGETS = {
     }
 
 
+
+class CustomImageInput(forms.ClearableFileInput):
+    template_name = 'image_input.html'
+
+
 class AddressForm(forms.ModelForm):
     """Class for address form."""
 
@@ -126,7 +131,7 @@ class SigninForm(forms.Form):
 
 class SettingsUserForm(auth_forms.UserChangeForm):
     email = forms.EmailField(required=True)
-    avatar = forms.ImageField(required=False)
+    avatar = forms.ImageField(required=False, widget=CustomImageInput(attrs={'accept': 'image/*'}))
 
     def __init__(self, request: HttpRequest = None, *args, **kwargs) -> None:
         super(SettingsUserForm, self).__init__(*args, **kwargs)

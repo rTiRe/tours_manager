@@ -2,7 +2,7 @@ import hashlib
 from urllib.parse import urlencode
 
 from django import template
-from django.utils.safestring import mark_safe
+from ..models import Account
 
 register = template.Library()
 
@@ -13,3 +13,9 @@ def gravatar_url(email, size=55):
     email_hash = hashlib.sha256(email_encoded).hexdigest()
     params = urlencode({'d': default, 's': str(size)})
     return f"https://www.gravatar.com/avatar/{email_hash}?{params}"
+
+@register.filter
+def get_avatar(user: Account) -> str:
+    if user.avatar:
+        return user.avatar.url
+    return gravatar_url(user.email)

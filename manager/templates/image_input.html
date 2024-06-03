@@ -1,0 +1,6 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/image_input.css' %}">
+<input type="{{ widget.type }}" name="{{ widget.name }}" id="{{ widget.id }}" {% if widget.attrs %} {% for attr_name, attr_value in widget.attrs.items %} {{ attr_name }}="{{ attr_value }}" {% endfor %} {% endif %}>
+<div class="delete">
+    <input type="checkbox" name="avatar_clear"> Удалить?
+</div>

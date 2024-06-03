@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'storages',
     'django_minio_backend',
+    'django.forms',
 ]
 
 REST_FRAMEWORK = {
@@ -109,6 +110,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 WSGI_APPLICATION = 'tours_manager.wsgi.application'
 

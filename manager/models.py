@@ -356,7 +356,7 @@ class Account(UUIDMixin, models.Model):
         upload_to='avatars/', 
         null=True, 
         blank=True, 
-        verbose_name=_('avatar')
+        verbose_name=_('avatar'),
     )
     agency = models.OneToOneField(
         Agency,

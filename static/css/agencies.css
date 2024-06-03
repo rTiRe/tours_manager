@@ -49,21 +49,11 @@ main a:first-child .card {
     padding-bottom: 10px;
 }
 
-main .card > .left {
+main .card > .avatar {
     height: 100%;
     width: 80px;
     max-width: calc(100vw / 3.5);
-    overflow: hidden;
     border-radius: 8px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-main .card img {
-    position: relative;
-    height: 100%;
 }
 
 main .card > .right {

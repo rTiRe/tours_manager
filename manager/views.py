@@ -130,6 +130,7 @@ def agencies(request: HttpRequest) -> HttpResponse:
                 'css/agencies.css',
                 'css/search_agencies.css',
                 'css/rating.css',
+                'css/avatar.css',
             ],
         },
     )
@@ -249,6 +250,7 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
                 'css/tours.css',
                 'css/profile.css',
                 'css/rating.css',
+                'css/avatar.css',
             ],
         },
     )
@@ -299,7 +301,10 @@ def settings(request: HttpRequest) -> HttpResponse:
             user_form = SettingsUserForm(request, post_request, request.FILES, instance=request.user)
             if user_form.is_valid():
                 user_form.save()
-                if 'avatar' in request.FILES:
+                if post_request.get('avatar_clear') == 'on':
+                    user.avatar.delete()
+                    user.save()
+                if 'avatar' in request.FILES and post_request.get('avatar_clear') != 'on':
                     user.avatar = request.FILES['avatar']
                     user.save()
             else:
@@ -323,6 +328,7 @@ def settings(request: HttpRequest) -> HttpResponse:
                 'css/profile.css',
                 'css/settings.css',
                 'css/rating.css',
+                'css/avatar.css',
             ],
         },
     )
