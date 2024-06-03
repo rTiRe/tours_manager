@@ -35,5 +35,6 @@ urlpatterns = [
     path('change/complete/', views.CustomPasswordResetCompleteView.as_view(), name='password_change_complete'),
     path('tour/<uuid:uuid>/', views.tour, name='tour'),
     path('tour/<uuid:uuid>/edit/', views.edit_tour, name='edit_tour'),
+    path('tour/<uuid:uuid>/delete/', views.delete_tour, name='delete_tour'),
     path('tour/create/', views.create_tour, name='create_tour'),
 ]

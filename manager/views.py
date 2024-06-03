@@ -440,6 +440,36 @@ def create_tour(request: HttpRequest) -> HttpResponse:
         }
     )
 
+
+def delete_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
+    tour = Tour.objects.filter(id=uuid).first()
+    if not tour:
+        return HttpResponseNotFound()
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
+    account = Account.objects.filter(account=request.user).first()
+    if not account.agency:
+        return HttpResponseNotFound()
+    if tour.agency.account != account:
+        raise PermissionDenied()
+    if request.method == 'POST':
+        if 'delete' in request.POST:
+            tour.delete()
+        return redirect('my_profile')
+    return render(
+        request,
+        'pages/delete_tour.html',
+        {
+            'tour': tour,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+            ],
+        }
+    )
+
+
 def edit_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     tour = Tour.objects.filter(id=uuid).first()
     if not tour:
