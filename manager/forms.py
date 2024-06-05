@@ -1,16 +1,16 @@
 """Classes with changed forms."""
 
 from django import forms
-from django.contrib.gis import forms as gis_forms
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import models as auth_models
-from django.http import HttpRequest
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-
-from .models import Address, Agency, Review, Tour, Account
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.gis import forms as gis_forms
+from django.core.exceptions import ValidationError
+from django.http import HttpRequest
 from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+
+from .models import Account, Address, Agency, Review, Tour
 
 name_min = 'min'
 name_max = 'max'

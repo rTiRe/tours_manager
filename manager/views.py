@@ -1,46 +1,40 @@
 """Module with page views."""
 
+from os import getenv
 from typing import Any
+from uuid import UUID
 
 from django.contrib import auth
 from django.contrib.auth import decorators
-from django.db.models import Model
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
+from django.db.models import Model
+from django.http import (HttpRequest, HttpResponse, HttpResponseNotFound,
+                         HttpResponseRedirect)
 from django.shortcuts import redirect, render
-
 from django.template.loader import render_to_string
-
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.html import strip_tags
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
+from django.views.generic.base import View
+from dotenv import load_dotenv
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .forms import FindAgenciesForm, FindToursForm, SigninForm, SignupForm, SettingsUserForm, SettingsAgencyForm, SettingsAddressForm, PasswordChangeRequestForm, TourForm
+from .forms import (FindAgenciesForm, FindToursForm, PasswordChangeRequestForm,
+                    SettingsAddressForm, SettingsAgencyForm, SettingsUserForm,
+                    SigninForm, SignupForm, TourForm)
 from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-
-from django.contrib.auth import views as auth_views
-
-from django.shortcuts import render, redirect
-from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.models import User
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.html import strip_tags
-
-from dotenv import load_dotenv
-from os import getenv
-
-from django.views.generic.base import View
-
-from uuid import UUID
-
-from .views_utils import reviews_manager, tours_manager, convert_errors, render_tour_form
-
-from django.urls import reverse
+from .views_utils import (convert_errors, render_tour_form, reviews_manager,
+                          tours_manager)
 
 
 def index(request: HttpRequest) -> HttpResponse:

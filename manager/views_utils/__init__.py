@@ -1,13 +1,15 @@
-from .reviews_manager import ReviewManager
-from .tours_manager import ToursManager
+from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
-from ..forms import UserReviewForm, TourForm, TourEditForm
-from ..models import Account, Review, Tour, Agency
+
+from ..forms import TourEditForm, TourForm, UserReviewForm
+from ..models import Account, Agency, Review, Tour
 from ..validators import get_datetime
-from django.core.paginator import Paginator
+from .reviews_manager import ReviewManager
+from .tours_manager import ToursManager
+
 
 def convert_errors(errors: dict) -> dict:
     readable_dict = {}

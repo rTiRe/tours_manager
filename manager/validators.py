@@ -1,11 +1,10 @@
 """Module with fields validators."""
 
 import re
+from datetime import datetime, timezone
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
-from datetime import datetime, timezone
 
 contains_illegal_characters = _('field contains illegal characters.')
 

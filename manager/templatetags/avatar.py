@@ -2,6 +2,7 @@ import hashlib
 from urllib.parse import urlencode
 
 from django import template
+
 from ..models import Account, Tour
 
 register = template.Library()
