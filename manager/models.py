@@ -214,6 +214,11 @@ class Agency(UUIDMixin, NameMixin, models.Model):
             str: stringified class. Name, phone_number.
         """
         return f'{self.name}, {self.phone_number}'
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        phone_number_validator()
+        self.agency.save()
 
     class Meta:
         """Meta class with Agency settings."""

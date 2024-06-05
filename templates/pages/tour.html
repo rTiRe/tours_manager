@@ -63,20 +63,19 @@
     </main>
     <script>
         $(document).ready(function() {
-            if (window.location.hash == "reviews") {
+            $('.see_info a').click(function() {
+                $('.tour_info').show();
+                $('.reviews').hide();
+            });
+            $('.see_reviews a').click(function() {
+                $('.reviews').show();
+                $('.tour_info').hide();
+            });
+            if (window.location.hash == "#reviews") {
                 $('.see_reviews a').click();
             } else {
                 $('.see_info a').click();
             }
-            $('.see_info').click(function() {
-                $('.tour_info').show();
-                $('.reviews').hide();
-            });
-            $('.see_reviews').click(function() {
-                console.log()
-                $('.reviews').show();
-                $('.tour_info').hide();
-            });
         });
-        </script>
+    </script>
 {% endblock %}

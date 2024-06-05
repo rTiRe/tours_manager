@@ -1,7 +1,7 @@
 {% load static %}
 {% load avatar %}
 {% load template_filters %}
-<a href="/tour/{{ tour_data.id }}">
+<a href="/tour/{{ tour_data.id }}" class="tour">
     <div class="card">
         <div class="avatar">
             <img src="{{ tour_data|get_tour_cover }}" alt="img"/>

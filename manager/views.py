@@ -38,7 +38,9 @@ from django.views.generic.base import View
 
 from uuid import UUID
 
-from .views_utils import render_reviews, convert_errors, render_tour_form
+from .views_utils import ReviewManager, convert_errors, render_tour_form
+
+from django.core.paginator import Paginator
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -209,7 +211,7 @@ def logout(request):
 
 def profile(request: HttpRequest, username: str = None) -> HttpResponse:
     tours_data = {}
-    reviews_data = []
+    reviews = {}
     if username:
         user = auth.models.User.objects.get(username=username)
         profile = Account.objects.filter(account=user).first()
@@ -228,14 +230,10 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
                 reviews_data[tour_data] = 0
     else:
         reviews_data = list(Review.objects.filter(account=profile))
-        reviews_data = render_reviews(
-            request, reviews_data,
-            display=True,
-            check_user_review=False,
-            link_to_tour=True,
-        )
-        if isinstance(reviews_data, HttpResponseRedirect):
-            return reviews_data
+        reviews = ReviewManager(request, reviews_data, True)
+        reviews = reviews.render_reviews_block(True, False)
+        if isinstance(reviews, HttpResponseRedirect):
+            return reviews
     return render(
         request,
         'pages/profile.html',
@@ -243,7 +241,7 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
             'request_user': request.user,
             'user': profile,
             'tours_data': tours_data,
-            'reviews_data': reviews_data,
+            'reviews_data': reviews,
             'review_form': '',
             'style_files': [
                 'css/header.css',
@@ -529,7 +527,8 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     reviews = list(tour.reviews.filter(account__agency=None))
     for review in reviews:
         ratings.append(review.rating)
-    reviews = render_reviews(request, reviews)
+    reviews = ReviewManager(request, reviews)
+    reviews = reviews.render_reviews_block()
     if isinstance(reviews, HttpResponseRedirect):
         return reviews
     return render(

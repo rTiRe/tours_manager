@@ -134,6 +134,16 @@
     text-decoration: none;
 }
 
+.reviews .edit button {
+    background-color: transparent;
+    color: #ea2e9f;
+    font: 400 14px "Roboto", sans-serif;
+}
+
 .reviews .edit:hover {
+    text-decoration: underline;
+}
+
+.reviews .edit:hover button {
     text-decoration: underline;
 }

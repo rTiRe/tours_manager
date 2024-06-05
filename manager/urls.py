@@ -2,7 +2,6 @@
 
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from django.contrib.auth import views as auth_views
 
 from . import views
 

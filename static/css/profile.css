@@ -117,7 +117,7 @@ main {
     font-size: 16px;
 }
 
-main .container a {
+main .container a.tour {
     width: 100%;
     position: relative;
     display: flex;
@@ -125,7 +125,7 @@ main .container a {
     justify-content: center;
 }
 
-main .container a .card {
+main .container a.tour .card {
     width: 100%;
     position: relative;
 }

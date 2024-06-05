@@ -5,8 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from .forms import UserReviewForm, TourForm, TourEditForm
 from .models import Account, Review, Tour, Agency
 from .validators import get_datetime
-from django.shortcuts import redirect
-from django.db.models import Model
+from django.core.paginator import Paginator
 
 
 def convert_errors(errors: dict) -> dict:
@@ -14,120 +13,160 @@ def convert_errors(errors: dict) -> dict:
     for field_name, field_errors in errors.items():
         for error in field_errors:
             error = str(error)
-            if error.startswith('[\'') and error.endswith('\']'):
+            if error.startswith("['") and error.endswith("']"):
                 error = error[2:-2]
                 readable_dict[field_name] = error
     return readable_dict
 
 
-def render_review(
-    request: HttpRequest,
-    review: Review,
-    form_create: bool = False,
-    link_to_tour: bool = False,
-) -> str:
-    initial_data = {
-        'text': review.text if review else '',
-        'rating': review.rating if review else ''
-    }
-    if request.method == 'POST' and form_create:
-        if not link_to_tour:
-            tour_id = request.path.split('/')[-2]
-            tour = Tour.objects.get(id=tour_id)
-        if 'delete' in request.POST.keys():
-            review.delete()
-            if not link_to_tour:
-                return redirect(f'/tour/{tour.id}')
-            else:
-                return redirect(f'/profile/{review.account.account.userame}')
-        form = UserReviewForm(request.POST, initial=initial_data)
-        if form.is_valid():
-            rating = form.cleaned_data['rating']
-            text = form.cleaned_data['text']
-            account = Account.objects.get(account=request.user) if request.user else None
-            if review:
-                tour = review.tour
-            if review:
-                review.text = text
-                review.rating = rating
-                review.edited = get_datetime()
-                review.save()
-            else:
-                Review.objects.create(
-                    tour=tour,
-                    account=account,
-                    rating=rating,
-                    text=text,
-                    created=get_datetime(),
-                )
-            return redirect(f'/tour/{tour.id}')
-        
-    form = UserReviewForm(initial=initial_data)
-    return render_to_string(
-        'parts/review.html',
-        {
-            'form': form,
-            'review': review,
-            'request': request,
-            'link_to_tour': link_to_tour,
-            'style_files': [
-                'css/rating.css',
-                'css/review_create.css'
-            ],
-        },
-        request=request,
-    )
+class ReviewManager:
+    def __init__(
+        self,
+        request: HttpRequest,
+        reviews: list[Review] | tuple[Review],
+        link_to_tour: bool = False,
+        items_per_page: int = 5,
+    ) -> None:
+        self.request = request
+        self.reviews = reviews
+        self.link_to_tour = link_to_tour
+        self.reviews_count = len(reviews)
+        self.paginator = Paginator(reviews, items_per_page)
 
-
-def render_reviews(
-    request: HttpRequest,
-    reviews: list | tuple,
-    display: bool = False,
-    check_user_review: bool = True,
-    link_to_tour: bool = False,
-) -> str:
-    reviews_count = len(reviews)
-    if check_user_review:
-        account = Account.objects.get(account=request.user) if request.user.is_authenticated else None
+    def get_authenticated_user_review(self) -> Review | None:
+        if self.request.user.is_authenticated:
+            account = Account.objects.get(account=self.request.user)
+        else:
+            account = None
         user_review = None
-        for review in reviews:
+        for review in self.reviews:
             if review.account == account:
                 user_review = review
                 break
-        if user_review:
-            reviews.remove(user_review)
-            reviews.insert(0, user_review)
-        elif request.user.is_authenticated and account.agency == None:
-            reviews.insert(0, None)
-    rendered_reviews = []
-    for review in reviews:
-        if not review or review.account.account == request.user:
-            rendered_review = render_review(
-                request,
-                review,
-                form_create=True,
-                link_to_tour=link_to_tour
-            )
-        else:
-            rendered_review = render_review(request, review, link_to_tour=link_to_tour)
-        if isinstance(rendered_review, HttpResponseRedirect):
-                return rendered_review
-        rendered_reviews.append(rendered_review)
+        return user_review, account
 
-    return render_to_string(
-        'parts/reviews.html',
-        {
-            'reviews': rendered_reviews,
-            'request': request,
-            'display': display,
-            'reviews_title_literal': _('Reviews'),
-            'reviews_count': reviews_count,
-            'style_files': [
-                'css/reviews.css',
-            ],
-        },
-        request=request,
-    )
+    def create(self, tour: Tour, account: Account, rating: int, text: str) -> Review:
+        return Review.objects.create(
+            tour=tour,
+            account=account,
+            rating=rating,
+            text=text,
+            created=get_datetime(),
+        )
+
+    def delete(self, review: Review) -> HttpResponseRedirect:
+        review.delete()
+        tour = review.tour
+        username = review.account.account.username
+        if not self.link_to_tour:
+            return redirect(f'/tour/{tour}')
+        return redirect(f'/profile/{username}')
+
+    def render(self, review: Review, form_create: bool = False) -> str:
+        if review:
+            tour = review.tour
+        else:
+            tour_id = self.request.path.split('/')[-2]
+            tour = Tour.objects.get(id=tour_id)
+        initial_data = {}
+        if review:
+            initial_data['text'] = review.text
+            initial_data['rating'] = review.rating
+        form = None
+        if self.request.method == 'POST' and form_create:
+            if 'delete' in self.request.POST.keys():
+                return self.delete(review)
+            form = UserReviewForm(self.request.POST, initial=initial_data)
+            if form.is_valid():
+                rating = form.cleaned_data['rating']
+                text = form.cleaned_data['text']
+                account = Account.objects.filter(account=self.request.user).first()
+                if review:
+                    review.text = text
+                    review.rating = rating
+                    review.edited = get_datetime()
+                    review.save()
+                else:
+                    self.create(tour, account, rating, text)
+                if self.link_to_tour:
+                    redirect_url = f'/profile/{review.account.account.username}'
+                else:
+                    redirect_url = f'/tour/{tour.id}'
+                return redirect(redirect_url)
+        if form_create:
+            form = UserReviewForm(initial=initial_data)
+        return render_to_string(
+            'parts/review.html',
+            {
+                'form': form,
+                'review': review,
+                'request': self.request,
+                'link_to_tour': self.link_to_tour,
+                'style_files': [
+                    'css/rating.css',
+                    'css/review_create.css'
+                ],
+            },
+            request=self.request,
+        )
+
+    def render_reviews_list(self, page: int) -> str:
+        rendered_reviews = []
+        reviews_page = self.paginator.get_page(page)
+        for review in reviews_page:
+            if not review or review.account.account == self.request.user:
+                rendered_review = self.render(review, form_create=True)
+            else:
+                rendered_review = self.render(review)
+            if isinstance(rendered_review, HttpResponseRedirect):
+                return rendered_review
+            rendered_reviews.append(rendered_review)
+        return render_to_string(
+            'parts/reviews_list.html',
+            {
+                'reviews': rendered_reviews,
+            },
+            request=self.request,
+        )
+
+    def render_reviews_block(self, display: bool = False, check_user_review: bool = True) -> str:
+        page = int(self.request.GET.get('page', 1))
+        if check_user_review:
+            user_review, account = self.get_authenticated_user_review()
+            if user_review:
+                self.reviews.remove(user_review)
+                self.reviews.insert(0, user_review)
+            elif self.request.user.is_authenticated and account.agency == None:
+                self.reviews.insert(0, None)
+        reviews_list = self.render_reviews_list(page=page)
+        if isinstance(reviews_list, HttpResponseRedirect):
+            return reviews_list
+        num_pages = int(self.paginator.num_pages)
+        pages_slice = []
+        for pg_num in range(page - 2, page + 3):
+            if pg_num in range(1, num_pages + 1):
+                pages_slice.append(str(pg_num))
+        pages_slice = ''.join(pages_slice)
+        print(pages_slice)
+        return render_to_string(
+            'parts/reviews.html',
+            {
+                'request': self.request,
+                'reviews_list': reviews_list,
+                'pages': {
+                    'current': page,
+                    'total': num_pages,
+                    'slice': pages_slice,
+                },
+                'display': display,
+                'reviews_title_literal': _('Reviews'),
+                'reviews_count': self.reviews_count,
+                'style_files': [
+                    'css/reviews.css',
+                ],
+            },
+            request=self.request,
+        )
 
 
 def render_tour_form(
@@ -179,4 +218,3 @@ def render_tour_form(
         },
         request=request,
     )
-

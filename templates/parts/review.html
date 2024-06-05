@@ -26,7 +26,7 @@
         <div class="review_data">
             {% if request.user.is_authenticated and request.user == review.account.account %}
                 <div class="edit"><i class="fa-solid fa-edit" aria-hidden="true"></i> Редактировать</div>
-                <div class="delete">
+                <div class="delete edit">
                     <form method="post">
                         {% csrf_token %}
                         <button type="submit" name="delete"><i class="fa-solid fa-trash" aria-hidden="true"></i> Удалить</button>

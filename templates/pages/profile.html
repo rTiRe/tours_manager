@@ -52,7 +52,7 @@
         <div class="container">
             {% if user.agency %}
                 {% if request_user == user.account %}
-                    <a href="{% url 'create_tour' %}">
+                    <a href="{% url 'create_tour' %}" class="tour">
                         <div class="card create_tour">+</div>
                     </a>
                 {% endif %}
