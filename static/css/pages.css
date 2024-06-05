@@ -1,0 +1,28 @@
+.pages {
+    width: 100%;
+    position: relative;
+}
+
+.pages form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.pages form button {
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.075);
+    font: 400 14px "Roboto", sans-serif;
+}
+
+.pages form button.current {
+    background-color: transparent;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.pages form button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}

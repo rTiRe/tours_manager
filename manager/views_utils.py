@@ -147,7 +147,6 @@ class ReviewManager:
             if pg_num in range(1, num_pages + 1):
                 pages_slice.append(str(pg_num))
         pages_slice = ''.join(pages_slice)
-        print(pages_slice)
         return render_to_string(
             'parts/reviews.html',
             {
@@ -163,6 +162,7 @@ class ReviewManager:
                 'reviews_count': self.reviews_count,
                 'style_files': [
                     'css/reviews.css',
+                    'css/pages.css',
                 ],
             },
             request=self.request,
