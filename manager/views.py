@@ -38,9 +38,9 @@ from django.views.generic.base import View
 
 from uuid import UUID
 
-from .views_utils import ReviewManager, convert_errors, render_tour_form
+from .views_utils import reviews_manager, tours_manager, convert_errors, render_tour_form
 
-from django.core.paginator import Paginator
+from django.urls import reverse
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -230,7 +230,12 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
                 reviews_data[tour_data] = 0
     else:
         reviews_data = list(Review.objects.filter(account=profile))
-        reviews = ReviewManager(request, reviews_data, True)
+        reviews = reviews_manager(
+            request,
+            reviews_data,
+            reverse('my_profile'),
+            'parts/tour_review.html'
+        )
         reviews_data = reviews.render_reviews_block(True, False)
         if isinstance(reviews_data, HttpResponseRedirect):
             return reviews_data
@@ -527,7 +532,7 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     reviews = list(tour.reviews.filter(account__agency=None))
     for review in reviews:
         ratings.append(review.rating)
-    reviews = ReviewManager(request, reviews)
+    reviews = reviews_manager(request, reviews, reverse('tour', kwargs={'uuid': uuid}))
     reviews = reviews.render_reviews_block()
     if isinstance(reviews, HttpResponseRedirect):
         return reviews

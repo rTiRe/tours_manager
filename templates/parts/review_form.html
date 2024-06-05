@@ -1,16 +1,15 @@
-{% if form %}
-    <form method="post" class="edit_form" {% if not display %}style="display:none;"{% endif %}>
-        {% csrf_token %}
-        <div class="rating rating_input">
-            {% for rating in form.rating %}
-                {{ rating.tag }}<label class="fa fa-star" for="{{ rating.id_for_label }}"></label>
-            {% endfor %}
-            <div class="title">Оценка:</div>
-        </div>
-        <div class="text">
-            <div class="title">Отзыв:</div>
-            {{ form.text }}
-        </div>
-        <button type="submit" class="edit"><i class="fa {{ btn_icon }}" aria-hidden="true"></i> {{ btn_text }}</button>
-    </form>
-{% endif %}
+{% include 'parts/connect_css_files.html' with style_files=style_files %}
+<form method="post" class="edit_form">
+    {% csrf_token %}
+    <div class="rating rating_input">
+        {% for rating in form.rating %}
+            {{ rating.tag }}<label class="fa fa-star" for="{{ rating.id_for_label }}"></label>
+        {% endfor %}
+        <div class="title">{{ form.rating.label }}</div>
+    </div>
+    <div class="text">
+        <div class="title">{{ form.text.label }}</div>
+        {{ form.text }}
+    </div>
+    <button type="submit" class="edit"><i class="fa {{ button_icon }}" aria-hidden="true"></i> {{ button_literal }}</button>
+</form>

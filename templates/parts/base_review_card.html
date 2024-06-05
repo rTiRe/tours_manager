@@ -1,0 +1,10 @@
+{% include 'parts/connect_css_files.html' with style_files=style_files %}
+<div class="review">
+    {% block header %}
+        This is base raw card.
+    {% endblock %}
+    {% block content %}{% endblock %}
+    {% if form %}
+        {{ form }}
+    {% endif %}
+</div>

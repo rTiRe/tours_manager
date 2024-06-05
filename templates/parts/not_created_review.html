@@ -1,0 +1,21 @@
+{% extends 'parts/base_review_card.html' %}
+{% load static %}
+{% load template_filters %}
+{% load avatar %}
+{% block header %}
+    <a href="{% url 'profile' account.username %}">
+        <div class="header">
+            <div class="avatar">
+                <img src="{{ account|get_avatar }}" alt="{{ account.username }} avatar">
+            </div>
+            <div class="right">
+                <div class="full_name">
+                    {{ account.first_name }} {{ account.last_name }} <span>@{{ account.username }}</span>
+                </div>
+                <span class="created">
+                    Вы пока не отправляли отзыв. Давайте сделаем это!
+                </span>
+            </div>
+        </div>
+    </a>
+{% endblock %}

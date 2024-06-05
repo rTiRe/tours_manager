@@ -1,0 +1,8 @@
+{% extends 'parts/review.html' %}
+{% include 'parts/connect_css_files.html' with style_files=style_files %}
+{% block header_link %}
+    {% url 'tour' review.tour.id %}
+{% endblock %}
+{% block header_name %}
+    {{ review.tour.name }}
+{% endblock %}

@@ -6,10 +6,12 @@ from django.conf.global_settings import AUTH_USER_MODEL
 from django.contrib.gis.db import models as gismodels
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import now
 
 from .validators import (house_number_validator, phone_number_validator,
                          street_name_validator, date_validator, get_datetime)
+
+from django.http import HttpRequest
+
 
 NAME_MAX_LEN = 255
 PHONE_NUMBER_MAX_LEN = 12
@@ -260,6 +262,11 @@ class Tour(UUIDMixin, NameMixin, models.Model):
         max_digits = 9,
         decimal_places = 2,
     )
+
+    def get_request_user_review(self, request: HttpRequest) -> tuple['Review', 'Account']:
+        account = Account.objects.filter(account=request.user).first()
+        user_review = self.reviews.filter(account=account, account__agency=None).first()
+        return user_review, account
 
     def __str__(self) -> str:
         """Stringify class.

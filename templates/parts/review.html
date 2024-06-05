@@ -1,69 +1,46 @@
+{% extends 'parts/base_review_card.html' %}
 {% load static %}
 {% load template_filters %}
 {% load avatar %}
-{% include 'parts/connect_css_files.html' with style_files=style_files %}
-<div class="review">
-    {% if review %}
-        <a href="{% if not link_to_tour %}/profile/{{ review.account.account.username }}{% else %}/tour/{{ review.tour.id }}{% endif %}">
-            <div class="author">
-                <div class="avatar">
-                    <img src="{{ review.account|get_avatar }}" alt="avatar">
-                </div>
-                <div class="right">
-                    <div class="full_name">
-                        {% if not link_to_tour %}
-                            {{ review.account.first_name }} {{ review.account.last_name }} <span>@{{ review.account.username }}</span>
-                        {% else %}
-                            {{ review.tour.name }}
-                        {% endif %}
-                    </div>
-                    <span class="created">
-                        От {{ review.created.day|stringformat:'.02d' }}.{{ review.created.month|stringformat:'.02d' }}.{{ review.created.year }}{% if review.edited %}, ред. {{ review.edited.day|stringformat:'.02d' }}.{{ review.edited.month|stringformat:'.02d' }}.{{ review.edited.year }}{% endif %}
-                    </span>
-                </div>
+{% block header %}
+    <a href="{% block header_link %} {% url 'profile' review.account.account.username %} {% endblock %}">
+        <div class="header">
+            <div class="avatar">
+                <img src="{{ review.account|get_avatar }}" alt="avatar">
             </div>
-        </a>
-        <div class="review_data">
-            {% if request.user.is_authenticated and request.user == review.account.account %}
-                <div class="edit"><i class="fa-solid fa-edit" aria-hidden="true"></i> Редактировать</div>
-                <div class="delete edit">
-                    <form method="post">
-                        {% csrf_token %}
-                        <button type="submit" name="delete"><i class="fa-solid fa-trash" aria-hidden="true"></i> Удалить</button>
-                    </form>
+            <div class="right">
+                <div class="full_name">
+                    {% block header_name %}
+                        {{ review.account.first_name }} {{ review.account.last_name }} <span>@{{ review.account.username }}</span>
+                    {% endblock %}
                 </div>
-            {% endif %}
-            <div class="rating">
-                <div class="title">Оценка: </div>
-                {% for num in '12345'|make_list %}
-                    <span class="fa fa-star{% if num|to_int <= review.rating|to_int %} checked{% endif %}"></span>
-                {% endfor %}
-            </div>
-            <div class="text">
-                <div class="title">Отзыв: </div>
-                {{ review.text }}
+                <span class="created">
+                    От {{ review.created.day|stringformat:'.02d' }}.{{ review.created.month|stringformat:'.02d' }}.{{ review.created.year }}{% if review.edited %}, ред. {{ review.edited.day|stringformat:'.02d' }}.{{ review.edited.month|stringformat:'.02d' }}.{{ review.edited.year }}{% endif %}
+                </span>
             </div>
         </div>
-    {% else %}
-        <a href="/profile/{{ review.account.account.username }}">
-            <div class="author">
-                <div class="avatar">
-                    <img src="img/avatar.png" alt="avatar">
-                </div>
-                <div class="right">
-                    <div class="full_name">
-                        {{ request.user.first_name }} {{ request.user.last_name }} <span>@{{ request.user.username }}</span>
-                    </div>
-                    <span class="created">
-                        Вы пока не отправляли отзыв. Давайте сделаем это!
-                    </span>
-                </div>
+    </a>
+{% endblock %}
+{% block content %}
+    <div class="review_data">
+        {% if request.user.is_authenticated and request.user == review.account.account %}
+            <div class="edit"><i class="fa-solid fa-edit" aria-hidden="true"></i> Редактировать</div>
+            <div class="delete edit">
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" name="delete" value="{{ review.id }}"><i class="fa-solid fa-trash" aria-hidden="true"></i> Удалить</button>
+                </form>
             </div>
-        </a>
-    {% endif %}
-    {% if request.user.is_authenticated and request.user == review.account.account %}
-        {% include 'parts/review_form.html' with btn_icon='fa-save' btn_text='Сохранить' %}
-    {% elif request.user.is_authenticated and not review %}
-        {% include 'parts/review_form.html' with btn_icon='fa-plus' btn_text='Отправить' display=True %}
-    {% endif %}
-</div>
+        {% endif %}
+        <div class="rating">
+            <div class="title">Оценка: </div>
+            {% for num in '12345'|make_list %}
+                <span class="fa fa-star{% if num|to_int <= review.rating|to_int %} checked{% endif %}"></span>
+            {% endfor %}
+        </div>
+        <div class="text">
+            <div class="title">Отзыв: </div>
+            {{ review.text }}
+        </div>
+    </div>
+{% endblock %}

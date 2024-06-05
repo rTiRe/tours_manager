@@ -56,7 +56,7 @@
     border-bottom: none;
 }
 
-.reviews .author {
+.reviews .header {
     max-height: 40px;
     display: flex;
     gap: 10px;

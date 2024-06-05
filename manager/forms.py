@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 
 from .models import Address, Agency, Review, Tour, Account
 from django.contrib.auth.password_validation import validate_password
+from django.template.loader import render_to_string
 
 name_min = 'min'
 name_max = 'max'
@@ -51,11 +52,35 @@ class ReviewForm(forms.ModelForm):
     rating = forms.ChoiceField(
         choices=RATING_CHOICES,
         widget=forms.RadioSelect(attrs={'class': 'rating rating_input'}),
+        label=_('Rating'),
     )
     text = forms.CharField(
         widget=forms.Textarea,
+        label=_('Text'),
+        max_length=1000,
     )
-    
+
+    def render(self, request: HttpRequest, review: Review = None) -> str:
+        if review:
+            button_icon = 'fa-save'
+            button_literal = _('Save')
+        else:
+            button_icon = 'fa-plus'
+            button_literal = _('Create')
+        return render_to_string(
+            'parts/review_form.html',
+            {
+                'form': self,
+                'button_icon': button_icon,
+                'button_literal': button_literal,
+                'style_files': [
+                    'css/review_create.css',
+                    'css/rating.css',
+                ],
+            },
+            request=request,
+        )
+
     class Meta:
         model = Review
         fields = '__all__'

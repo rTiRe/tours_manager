@@ -1,10 +1,10 @@
 .rating_input {
-    display: inline-flex;
+    display: inline-flex !important;
     flex-direction: row-reverse;
 }
 
 .rating_input input[type="radio"] {
-    display: none; /* Скрыть радиокнопки */
+    display: none !important;
 }
 
 .rating_input label {
@@ -15,7 +15,7 @@
 .rating_input input[type="radio"]:checked ~ label,
 .rating_input label:hover,
 .rating_input label:hover ~ label {
-    color: orange;; /* Цвет звезды при выборе или наведении */
+    color: orange;
 }
 
 .edit_form {

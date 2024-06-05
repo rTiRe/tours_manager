@@ -4,8 +4,6 @@ from urllib.parse import urlencode
 from django import template
 from ..models import Account, Tour
 
-from django.templatetags.static import static
-
 register = template.Library()
 
 DEFAULT = 'https://i.imgur.com/9D119KO.png'

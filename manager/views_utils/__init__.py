@@ -1,0 +1,73 @@
+from .reviews_manager import ReviewManager
+from .tours_manager import ToursManager
+from django.http import HttpRequest, HttpResponseRedirect
+from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from ..forms import UserReviewForm, TourForm, TourEditForm
+from ..models import Account, Review, Tour, Agency
+from ..validators import get_datetime
+from django.core.paginator import Paginator
+
+def convert_errors(errors: dict) -> dict:
+    readable_dict = {}
+    for field_name, field_errors in errors.items():
+        for error in field_errors:
+            error = str(error)
+            if error.startswith("['") and error.endswith("']"):
+                error = error[2:-2]
+                readable_dict[field_name] = error
+    return readable_dict
+
+reviews_manager = ReviewManager
+tours_manager = ToursManager
+
+def render_tour_form(
+        request: HttpRequest,
+        agency: Agency,
+        form_data: dict,
+        literals: dict,
+        tour: Tour = None,
+    ) -> str:
+        errors = {}
+        if request.method == 'POST':
+            post_data = request.POST.copy()
+            post_data['agency'] = str(agency.id)
+            if tour:
+                form = TourEditForm(instance=tour, data=post_data)
+            else:
+                form = TourForm(data=post_data, instance=tour)
+            if form.is_valid():
+                if not tour:
+                    tour = Tour.objects.create(**form.cleaned_data)
+                else:
+                    tour = form.save(commit=False)
+                    if post_data.get('avatar_clear') == 'on':
+                        tour.avatar.delete()
+                    if 'avatar' in request.FILES and post_data.get('avatar_clear') != 'on':
+                        tour.avatar = request.FILES['avatar']
+                    tour.save()
+                addresses = form.cleaned_data.pop('addresses')
+                tour.addresses.set(addresses)
+                return redirect('tour', uuid=tour.id)
+            else:
+                errors = form.errors.as_data()
+                errors = convert_errors(errors)
+                print(errors)
+        else:
+            form = TourForm(**form_data)
+        return render_to_string(
+            'parts/tour_form.html',
+            {
+                'form': form,
+                'errors': errors,
+                'title': literals.get('title'),
+                'button': literals.get('button'),
+                'button_name': literals.get('button_name'),
+                'style_files': [
+                    'css/account_form.css',
+                    'css/tour_form.css',
+                ],
+            },
+            request=request,
+        )
