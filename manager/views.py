@@ -231,9 +231,9 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
     else:
         reviews_data = list(Review.objects.filter(account=profile))
         reviews = ReviewManager(request, reviews_data, True)
-        reviews = reviews.render_reviews_block(True, False)
-        if isinstance(reviews, HttpResponseRedirect):
-            return reviews
+        reviews_data = reviews.render_reviews_block(True, False)
+        if isinstance(reviews_data, HttpResponseRedirect):
+            return reviews_data
     return render(
         request,
         'pages/profile.html',
@@ -241,7 +241,7 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse:
             'request_user': request.user,
             'user': profile,
             'tours_data': tours_data,
-            'reviews_data': reviews,
+            'reviews_data': reviews_data,
             'review_form': '',
             'style_files': [
                 'css/header.css',
