@@ -8,6 +8,11 @@ from django.utils.translation import gettext_lazy as _
 from ..forms import UserReviewForm
 from ..models import Account, Review, Tour
 from ..validators import get_datetime
+from .page_utils import get_pages_slice
+from dotenv import load_dotenv
+from os import getenv
+
+load_dotenv()
 
 
 class ReviewManager:
@@ -23,7 +28,7 @@ class ReviewManager:
         self.redirect_url = redirect_url
         self.review_template_name = review_template_name
         self.reviews_count = len(reviews)
-        self.paginator = Paginator(reviews, 5)
+        self.paginator = Paginator(reviews, getenv('REVIEWS_PER_PAGE'))
 
     def get_tour(self) -> Tour:
         tour_id = self.request.path.split('/')[-2]
@@ -140,10 +145,7 @@ class ReviewManager:
         if isinstance(reviews_list, HttpResponseRedirect):
             return reviews_list
         num_pages = int(self.paginator.num_pages)
-        pages_slice = []
-        for pg_num in range(page - 2, page + 3):
-            if pg_num in range(1, num_pages + 1):
-                pages_slice.append(str(pg_num))
+        pages_slice = get_pages_slice(page, num_pages)
         pages_slice = ''.join(pages_slice)
         return render_to_string(
             'parts/reviews.html',

@@ -1,10 +1,9 @@
 """Module with page views."""
 
-
 from typing import Any
 from uuid import UUID
 
-from django.core.exceptions import PermissionDenied
+from django.core import exceptions, paginator
 from django.db.models import Model
 from django.http import (HttpRequest, HttpResponse, HttpResponseNotFound,
                          HttpResponseRedirect)
@@ -17,7 +16,11 @@ from .forms import FindAgenciesForm, FindToursForm
 from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .views_utils import render_tour_form, reviews_manager
+from .views_utils import render_tour_form, reviews_manager, page_utils
+from dotenv import load_dotenv
+from os import getenv
+
+load_dotenv()
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -45,12 +48,16 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 def tours(request: HttpRequest) -> HttpResponse:
-    tours_data = Tour.objects.filter(
-        starting_city=request.GET.get('starting_city'),
-        address__city__country=request.GET.get('country'),
-    )
+    page = int(request.GET.get('page', 1))
     if not request.GET:
         tours_data = Tour.objects.all()
+    else:
+        tours_data = Tour.objects.filter(
+            starting_city=request.GET.get('starting_city'),
+            address__city__country=request.GET.get('country'),
+        )
+    tours_paginator = paginator.Paginator(tours_data, int(getenv('TOURS_PER_PAGE', 15)))
+    tours_data = tours_paginator.get_page(page)
     reviews_data = {}
     for tour_data in tours_data:
         reviews_data[tour_data] = Review.objects.filter(tour=tour_data, account__agency=None)
@@ -60,7 +67,8 @@ def tours(request: HttpRequest) -> HttpResponse:
             reviews_data[tour_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
         else:
             reviews_data[tour_data] = 0
-
+    num_pages = int(tours_paginator.num_pages)
+    pages_slice = page_utils.get_pages_slice(page, num_pages)
     form = FindToursForm(request)
     return render(
         request,
@@ -69,6 +77,11 @@ def tours(request: HttpRequest) -> HttpResponse:
             'form': form,
             'tours_data': tours_data,
             'reviews_data': reviews_data,
+            'pages': {
+                'current': page,
+                'total': num_pages,
+                'slice': pages_slice,
+            },
             'style_files': [
                 'css/header.css',
                 'css/body.css',
@@ -76,26 +89,30 @@ def tours(request: HttpRequest) -> HttpResponse:
                 'css/search_tours.css',
                 'css/rating.css',
                 'css/avatar.css',
+                'css/pages.css',
             ],
         },
     )
 
 
 def agencies(request: HttpRequest) -> HttpResponse:
-    GET_city = request.GET.get('city')
-    if not GET_city:
-        agencies_data = Agency.objects.all()
-    elif not request.GET:
+    get_city = request.GET.get('city')
+    page = int(request.GET.get('page', 1))
+    if not request.GET or not get_city:
         agencies_data = Agency.objects.all()
     else:
-        agencies_data = Agency.objects.filter(address__city=GET_city)
-    reviews_data = {agency_data: Review.objects.filter(tour__agency=agency_data) for agency_data in agencies_data}
+        agencies_data = Agency.objects.filter(address__city=get_city)
+    agencies_paginator = paginator.Paginator(agencies_data, int(getenv('AGENCIES_PER_PAGE', 15)))
+    agencies_data = agencies_paginator.get_page(page)
+    reviews_data = {agency: Review.objects.filter(tour__agency=agency) for agency in agencies_data}
     for agency_data, agency_reviews in reviews_data.items():
         tour_ratings = [review.rating for review in agency_reviews]
         if tour_ratings:
             reviews_data[agency_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
         else:
             reviews_data[agency_data] = 0
+    num_pages = int(agencies_paginator.num_pages)
+    pages_slice = page_utils.get_pages_slice(page, num_pages)
     form = FindAgenciesForm(request)
     return render(
         request,
@@ -104,6 +121,11 @@ def agencies(request: HttpRequest) -> HttpResponse:
             'form': form,
             'agencies_data': agencies_data,
             'reviews_data': reviews_data,
+            'pages': {
+                'current': page,
+                'total': num_pages,
+                'slice': pages_slice,
+            },
             'style_files': [
                 'css/header.css',
                 'css/body.css',
@@ -111,6 +133,7 @@ def agencies(request: HttpRequest) -> HttpResponse:
                 'css/search_agencies.css',
                 'css/rating.css',
                 'css/avatar.css',
+                'css/pages.css',
             ],
         },
     )
@@ -121,7 +144,7 @@ def create_tour(request: HttpRequest) -> HttpResponse:
         return HttpResponseNotFound()
     account = Account.objects.filter(account=request.user).first()
     if not account.agency:
-        raise PermissionDenied()
+        raise exceptions.PermissionDenied()
     agency = account.agency
     form_data = {'initial': {'agency': str(agency.id)}}
     form = render_tour_form(
@@ -157,7 +180,7 @@ def delete_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     if not account.agency:
         return HttpResponseNotFound()
     if tour.agency.account != account:
-        raise PermissionDenied()
+        raise exceptions.PermissionDenied()
     if request.method == 'POST':
         if 'delete' in request.POST:
             tour.delete()
@@ -186,7 +209,7 @@ def edit_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     if not account.agency:
         return HttpResponseNotFound()
     if tour.agency.account != account:
-        raise PermissionDenied()
+        raise exceptions.PermissionDenied()
     agency = account.agency
     initial_data = {'addresses': [str(address.id) for address in tour.addresses.all()]}
     form_data = {'instance': tour, 'initial': initial_data}
