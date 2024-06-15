@@ -5,15 +5,15 @@ from os import getenv
 
 from django.contrib.auth import decorators, models, tokens, views
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-from django.utils import encoding, html, http
+from django.utils import encoding, http
 from dotenv import load_dotenv
 
 from .forms import PasswordChangeRequestForm
 from .views_utils import convert_errors, profile_utils
+from .views_utils.email_utils import send_email
 
 
 @decorators.login_required
@@ -38,21 +38,14 @@ def request_password_change(request: HttpRequest) -> HttpResponse | HttpResponse
             html_message = render_to_string(
                 'registration/password_change_email.html',
                 {
-                    'pr managerotocol': getenv('SITE_PROTOCOL'),
+                    'managerprotocol': 'https' if request.is_secure() else 'http',
                     'user': user,
                     'domain': get_current_site(request).domain,
                     'uid': http.urlsafe_base64_encode(encoding.force_bytes(user.pk)),
                     'token': tokens.default_token_generator.make_token(user),
                 },
             )
-            plain_message = html.strip_tags(html_message)
-            send_mail(
-                mail_subject,
-                plain_message,
-                'zientenin@mail.ru',
-                [user.email],
-                html_message=html_message,
-            )
+            send_email(mail_subject, html_message, [user.email])
             request.session['new_password'] = new_password
             return redirect('password_change_done')
         else:

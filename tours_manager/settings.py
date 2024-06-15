@@ -189,11 +189,11 @@ LOGIN_URL = 'manager-login'
 LOGOUT_URL = 'manager-logout'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'zientenin@mail.ru'  # Ваш email на Mail.ru
-EMAIL_HOST_PASSWORD = 'XMhzdGni8bkM9yjqCPtQ'  # Пароль от вашего email на Mail.ru
-DEFAULT_FROM_EMAIL = 'zientenin@mail.ru'
+EMAIL_HOST = getenv('SMTP_HOST')
+EMAIL_PORT = getenv('SMTP_PORT')
+EMAIL_USE_SSL = getenv('SMTP_USE_SSL')
+EMAIL_HOST_USER = getenv('SMTP_HOST_USER')
+EMAIL_HOST_PASSWORD = getenv('SMTP_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = getenv('SMTP_FROM_EMAIL')
 
-PASSWORD_RESET_TIMEOUT = 900
+PASSWORD_RESET_TIMEOUT = getenv('PASSWORD_RESET_SECONDS_TIMEOUT')

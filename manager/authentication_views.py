@@ -6,10 +6,14 @@ from django.contrib.auth import logout as auth_logout
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
+from django.template.loader import render_to_string
 
 from .forms import SigninForm, SignupForm
 from .models import Account
 from .views_utils import convert_errors
+
+from .views_utils.email_utils import send_email
+from rest_framework.authtoken.models import Token
 
 
 def registration(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
@@ -29,7 +33,14 @@ def registration(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Account.objects.create(account=user)
+            created_account = Account.objects.create(account=user)
+            token = Token.objects.create(user=created_account.account)
+            mail_subject = 'Welcome! Thats your API auth key!'
+            html_message = render_to_string(
+                'registration/token_email.html',
+                {'api_key': token.key},
+            )
+            send_email(mail_subject, html_message, [user.email])
             return redirect('manager-login')
         else:
             errors = form.errors.as_data()

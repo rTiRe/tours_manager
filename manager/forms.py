@@ -156,7 +156,7 @@ class SigninForm(forms.Form):
 
 class SettingsUserForm(auth_forms.UserChangeForm):
     email = forms.EmailField(required=True)
-    avatar = forms.ImageField(required=False, widget=CustomImageInput(attrs={'accept': 'image/*'}))
+    avatar = forms.ImageField(required=False, widget=CustomImageInput)
 
     def __init__(self, request: HttpRequest = None, *args, **kwargs) -> None:
         super(SettingsUserForm, self).__init__(*args, **kwargs)
@@ -224,7 +224,7 @@ class SettingsAddressForm(forms.ModelForm):
 
 class TourForm(forms.ModelForm):
     addresses = forms.MultipleChoiceField(required=True, widget=forms.CheckboxSelectMultiple)
-    avatar = forms.ImageField(required=False, widget=CustomImageInput(attrs={'accept': 'image/*'}))
+    avatar = forms.ImageField(required=False, widget=CustomImageInput)
 
     def __init__(self, *args, **kwargs) -> None:
         address_choices = []

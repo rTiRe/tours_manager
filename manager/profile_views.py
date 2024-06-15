@@ -153,3 +153,8 @@ def my_profile(request: HttpRequest) -> HttpResponse:
         HttpResponse: _description_
     """
     return profile(request)
+
+
+@decorators.login_required
+def get_api_token(request: HttpRequest) -> HttpResponse:
+    pass

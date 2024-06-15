@@ -1,0 +1,49 @@
+{% autoescape off %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: "Roboto", sans-serif;
+                line-height: 1.6;
+                margin: 20px;
+                color: #333;
+            }
+            .container {
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                padding: 20px;
+                border-radius: 5px;
+            }
+            footer {
+                margin-top: 20px;
+                font-size: 0.8em;
+                text-align: center;
+                color: #666;
+            }
+            .notice {
+                background-color: #e8f0fe;
+                border-left: 3px solid #007BFF;
+                padding: 7px;
+                margin-top: 20px;
+                font-size: 1em;
+                color: #555;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Здравствуйте, {{ user.first_name }}</h2>
+            <h3>Благодарим Вас за регистрацию!</h3>
+            <p>Ваш API токен:</p>
+            <span>{{ api_key }}</span>
+            <div class="notice">
+                <p>Если вы получили это письмо по ошибке - проигнорируйте его.</p>
+            </div>
+            <footer>
+                С уважением,<br>команда tours-manager.
+            </footer>
+        </div>
+    </body>
+    </html>
+{% endautoescape %}
