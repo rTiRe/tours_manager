@@ -262,7 +262,10 @@ class Tour(UUIDMixin, NameMixin, models.Model):
     )
 
     def get_request_user_review(self, request: HttpRequest) -> tuple['Review', 'Account']:
-        account = Account.objects.filter(account=request.user).first()
+        if request.user.is_authenticated:
+            account = Account.objects.filter(account=request.user).first()
+        else:
+            account = None
         user_review = self.reviews.filter(account=account, account__agency=None).first()
         return user_review, account
 

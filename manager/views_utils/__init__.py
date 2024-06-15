@@ -8,7 +8,6 @@ from ..forms import TourEditForm, TourForm, UserReviewForm
 from ..models import Account, Agency, Review, Tour
 from ..validators import get_datetime
 from .reviews_manager import ReviewManager
-from .tours_manager import ToursManager
 
 
 def convert_errors(errors: dict) -> dict:
@@ -22,7 +21,6 @@ def convert_errors(errors: dict) -> dict:
     return readable_dict
 
 reviews_manager = ReviewManager
-tours_manager = ToursManager
 
 def render_tour_form(
         request: HttpRequest,

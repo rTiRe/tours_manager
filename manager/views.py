@@ -1,40 +1,23 @@
 """Module with page views."""
 
-from os import getenv
+
 from typing import Any
 from uuid import UUID
 
-from django.contrib import auth
-from django.contrib.auth import decorators
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
-from django.core.mail import send_mail
 from django.db.models import Model
 from django.http import (HttpRequest, HttpResponse, HttpResponseNotFound,
                          HttpResponseRedirect)
 from django.shortcuts import redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import force_bytes, force_str
-from django.utils.html import strip_tags
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import View
-from dotenv import load_dotenv
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.serializers import ModelSerializer
 
-from .forms import (FindAgenciesForm, FindToursForm, PasswordChangeRequestForm,
-                    SettingsAddressForm, SettingsAgencyForm, SettingsUserForm,
-                    SigninForm, SignupForm, TourForm)
+from .forms import FindAgenciesForm, FindToursForm
 from .models import Account, Address, Agency, Review, Tour
 from .serializers import (AddressSerializer, AgencySerializer,
                           ReviewSerializer, TourSerializer)
-from .views_utils import (convert_errors, render_tour_form, reviews_manager,
-                          tours_manager)
+from .views_utils import render_tour_form, reviews_manager
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -133,282 +116,6 @@ def agencies(request: HttpRequest) -> HttpResponse:
     )
 
 
-def registration(request):
-    errors = {}
-    if request.user.is_authenticated:
-        return redirect('my_profile')
-    if request.method == 'POST':
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            Account.objects.create(account=user)
-            return redirect('manager-login')
-        else:
-            errors = form.errors.as_data()
-            errors = convert_errors(errors)
-    else:
-        form = SignupForm()
-    return render(
-        request,
-        'registration/registration.html',
-        {
-            'form': form,
-            'errors': errors,
-            'style_files': [
-                'css/header.css',
-                'css/body.css',
-                'css/account_form.css',
-            ],
-        }
-    )
-
-
-def login(request):
-    errors = {}
-    if request.user.is_authenticated:
-        return redirect('my_profile')
-    if request.method == 'POST':
-        form = SigninForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = auth.authenticate(request, username=username, password=password)
-            if user:
-                auth.login(request, user)
-                return redirect('my_profile')
-            else:
-                errors['username'] = _('The username or password seems to be incorrect.')
-        else:
-            errors = form.errors.as_data()
-            errors = convert_errors(errors)
-    else:
-        form = SigninForm()
-    return render(
-        request,
-        'registration/login.html',
-        {
-            'form': form,
-            'errors': errors,
-            'style_files': [
-                'css/header.css',
-                'css/body.css',
-                'css/account_form.css',
-            ],
-        }
-    )
-
-
-def logout(request):
-    auth.logout(request)
-    return redirect('manager-login')
-
-
-def profile(request: HttpRequest, username: str = None) -> HttpResponse:
-    tours_data = {}
-    reviews = {}
-    if username:
-        user = auth.models.User.objects.get(username=username)
-        profile = Account.objects.filter(account=user).first()
-    else:
-        if not request.user.is_authenticated:
-                return redirect('manager-login')
-        profile = Account.objects.filter(account=request.user).first()
-    if profile.agency:
-        tours_data = Tour.objects.filter(agency=profile.agency.id)
-        reviews_data = {tour_data: Review.objects.filter(tour=tour_data) for tour_data in tours_data}
-        for tour_data, tour_reviews in reviews_data.items():
-            tour_ratings = [review.rating for review in tour_reviews]
-            if tour_ratings:
-                reviews_data[tour_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
-            else:
-                reviews_data[tour_data] = 0
-    else:
-        reviews_data = list(Review.objects.filter(account=profile))
-        reviews = reviews_manager(
-            request,
-            reviews_data,
-            reverse('my_profile'),
-            'parts/tour_review.html'
-        )
-        reviews_data = reviews.render_reviews_block(True, False)
-        if isinstance(reviews_data, HttpResponseRedirect):
-            return reviews_data
-    return render(
-        request,
-        'pages/profile.html',
-        {
-            'request_user': request.user,
-            'user': profile,
-            'tours_data': tours_data,
-            'reviews_data': reviews_data,
-            'review_form': '',
-            'style_files': [
-                'css/header.css',
-                'css/body.css',
-                'css/tours.css',
-                'css/profile.css',
-                'css/rating.css',
-                'css/avatar.css',
-            ],
-        },
-    )
-
-
-def settings(request: HttpRequest) -> HttpResponse:
-    errors = {}
-    request_user = request.user
-    if not request_user.is_authenticated:
-        return redirect('manager-login')
-    user = Account.objects.filter(account=request_user).first()
-    user_form = SettingsUserForm(request)
-    agency_form, address_form = None, None
-    if user.agency:
-        agency_form = SettingsAgencyForm(request)
-        address_form = SettingsAddressForm(request)
-    if request.method == 'POST':
-        post_request = request.POST
-        if 'agency_submit' in post_request:
-            agency_form = SettingsAgencyForm(data=post_request, instance=user.agency)
-            address_form = SettingsAddressForm(data=post_request, instance=user.agency.address)
-            if agency_form.is_valid() and address_form.is_valid():
-                cleaned_data = address_form.cleaned_data
-                cleaned_data = {
-                    'city': cleaned_data['city'],
-                    'street': cleaned_data['street'],
-                    'house_number': cleaned_data['house_number'],
-                    'entrance_number': cleaned_data['entrance_number'],
-                    'floor': cleaned_data['floor'],
-                    'flat_number': cleaned_data['flat_number'],
-                    'point': cleaned_data['point'],
-                }
-                existing_address = Address.objects.filter(**cleaned_data).first()
-                if existing_address:
-                    user.agency.address = existing_address
-                else:
-                    new_address = Address.objects.create(**cleaned_data)
-                    user.agency.address = new_address
-                agency_form.save()
-            else:
-                address_errors = address_form.errors.as_data()
-                agency_errors = agency_form.errors.as_data()
-                address_errors = convert_errors(address_errors)
-                agency_errors = convert_errors(agency_errors)
-                errors.update(address_errors)
-                errors.update(agency_errors)
-        if 'user_submit' in post_request:
-            user_form = SettingsUserForm(request, post_request, request.FILES, instance=request.user)
-            if user_form.is_valid():
-                user_form.save()
-                if post_request.get('avatar_clear') == 'on':
-                    user.avatar.delete()
-                    user.save()
-                if 'avatar' in request.FILES and post_request.get('avatar_clear') != 'on':
-                    user.avatar = request.FILES['avatar']
-                    user.save()
-            else:
-                user_errors = user_form.errors.as_data()
-                user_errors = convert_errors(user_errors)
-                errors.update(user_errors)
-    return render(
-        request,
-        'pages/settings.html',
-        {
-            'request_user': request_user,
-            'user': user,
-            'user_form': user_form,
-            'agency_form': agency_form,
-            'address_form': address_form,
-            'errors': errors,
-            'ignore_special_header': True,
-            'style_files': [
-                'css/header.css',
-                'css/body.css',
-                'css/account_form.css',
-                'css/profile.css',
-                'css/settings.css',
-                'css/rating.css',
-                'css/avatar.css',
-            ],
-        },
-    )
-
-
-@decorators.login_required
-def request_password_change(request: HttpRequest) -> HttpResponse:
-    errors = {}
-    if request.method == 'POST':
-        form = PasswordChangeRequestForm(request.POST)
-        if form.is_valid():
-            user = request.user
-            new_password = form.cleaned_data['new_password']
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            current_site = get_current_site(request)
-            mail_subject = 'Confirm your password change'
-            load_dotenv()
-            html_message = render_to_string(
-                'registration/password_change_email.html',
-                {
-                    'protocol': getenv('SITE_PROTOCOL'),
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': uid,
-                    'token': token,
-                },
-            )
-            plain_message = strip_tags(html_message)
-            send_mail(
-                mail_subject,
-                plain_message,
-                'zientenin@mail.ru',
-                [user.email],
-                html_message=html_message
-            )
-            request.session['new_password'] = new_password
-            return redirect('password_change_done')
-        else:
-            errors = form.errors.as_data()
-            errors = convert_errors(errors)
-    else:
-        form = PasswordChangeRequestForm()
-    return render(
-        request,
-        'registration/password_change_form.html',
-        {
-            'form': form,
-            'errors': errors,
-            'style_files': [
-                'css/header.css',
-                'css/body.css',
-                'css/account_form.css',
-            ],
-        }
-    )
-
-
-def confirm_password_change(request, uidb64, token):
-    uid = force_str(urlsafe_base64_decode(uidb64))
-    user = User.objects.filter(pk=uid).first()
-    if user is not None and default_token_generator.check_token(user, token):
-        new_password = request.session.get('new_password')
-        if new_password:
-            user.set_password(new_password)
-            user.save()
-            del request.session['new_password']
-            return redirect('password_change_complete')
-    return render(
-        request,
-        'registration/password_change_invalid.html',
-        {
-            'style_files': [
-                'css/header.css',
-                'css/body.css',
-                'css/account_form.css',
-            ],
-        }
-    )
-
-
 def create_tour(request: HttpRequest) -> HttpResponse:
     if not request.user.is_authenticated:
         return HttpResponseNotFound()
@@ -416,7 +123,7 @@ def create_tour(request: HttpRequest) -> HttpResponse:
     if not account.agency:
         raise PermissionDenied()
     agency = account.agency
-    form_data = {'initial_data': {'agency': str(agency.id)}}
+    form_data = {'initial': {'agency': str(agency.id)}}
     form = render_tour_form(
         request,
         agency=agency,
@@ -509,11 +216,6 @@ def edit_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     )
 
 
-@decorators.login_required
-def my_profile(request: HttpRequest) -> HttpResponse:
-    return profile(request)
-
-
 def csrf_failure(request: HttpRequest, reason: str = '') -> HttpResponseRedirect:
     return redirect('index')
 
@@ -547,50 +249,6 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
             ],
         }
     )
-
-
-def create_stylized_auth_view(style_files: list | tuple) -> View:
-    def class_decorator(original_class: object) -> View:
-        class CustomView(original_class):
-            def get_context_data(self, **kwargs):
-                errors = {}
-                context = super().get_context_data(**kwargs)
-                form = context.get('form')
-                if form:
-                    errors = form.errors.as_data()
-                    errors = convert_errors(errors)
-                context['errors'] = errors
-                context['style_files'] = style_files
-                return context
-        return CustomView
-    return class_decorator
-
-
-account_form_styles = [
-    'css/header.css',
-    'css/body.css',
-    'css/account_form.css',
-]
-
-@create_stylized_auth_view(account_form_styles)
-class CustomPasswordResetView(auth_views.PasswordResetView):
-    html_email_template_name='registration/password_reset_email_html.html'
-
-@create_stylized_auth_view(account_form_styles)
-class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
-    pass
-
-@create_stylized_auth_view(account_form_styles)
-class CustomPasswordResetDoneView(auth_views.PasswordResetDoneView):
-    pass
-
-@create_stylized_auth_view(account_form_styles)
-class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
-    pass
-
-@create_stylized_auth_view(account_form_styles)
-class CustomPasswordChangeDoneView(auth_views.PasswordChangeDoneView):
-    template_name='registration/password_change_done.html'
 
 
 class CustomViewSetPermission(permissions.BasePermission):

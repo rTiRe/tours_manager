@@ -56,7 +56,7 @@ class ReviewManager:
         return render_to_string(
             'parts/not_created_review.html',
             {
-                'form': form.render(self.request),
+                'form': form.my_render(self.request),
                 'account': account,
                 'style_files': [
                     'css/rating.css',
@@ -92,7 +92,7 @@ class ReviewManager:
             form = UserReviewForm(initial=initial_data)
         style_files = ['css/rating.css', 'css/review_create.css']
         if form:
-            form = form.render(self.request, review)
+            form = form.my_render(self.request, review)
             style_files.append('css/review_edit.css')
         return render_to_string(
             self.review_template_name,

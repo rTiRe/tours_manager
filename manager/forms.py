@@ -60,7 +60,7 @@ class ReviewForm(forms.ModelForm):
         max_length=1000,
     )
 
-    def render(self, request: HttpRequest, review: Review = None) -> str:
+    def my_render(self, request: HttpRequest, review: Review = None) -> str:
         if review:
             button_icon = 'fa-save'
             button_literal = _('Save')
