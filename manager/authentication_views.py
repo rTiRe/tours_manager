@@ -5,15 +5,14 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.utils.translation import gettext_lazy as _
 from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from rest_framework.authtoken.models import Token
 
 from .forms import SigninForm, SignupForm
 from .models import Account
 from .views_utils import convert_errors
-
 from .views_utils.email_utils import send_email
-from rest_framework.authtoken.models import Token
 
 
 def registration(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:

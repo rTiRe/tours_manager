@@ -1,7 +1,8 @@
 from os import getenv
-from dotenv import load_dotenv
-from django.utils import html
+
 from django.core import mail
+from django.utils import html
+from dotenv import load_dotenv
 
 load_dotenv()
 

@@ -1,16 +1,17 @@
+from os import getenv
+
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from dotenv import load_dotenv
 
 from ..forms import UserReviewForm
 from ..models import Account, Review, Tour
 from ..validators import get_datetime
 from .page_utils import get_pages_slice
-from dotenv import load_dotenv
-from os import getenv
 
 load_dotenv()
 
