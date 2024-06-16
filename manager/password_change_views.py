@@ -12,8 +12,7 @@ from django.utils import encoding, http
 from dotenv import load_dotenv
 
 from .forms import PasswordChangeRequestForm
-from .views_utils import convert_errors, profile_utils
-from .views_utils.email_utils import send_email
+from .views_utils import errors_utils, profile_utils, email_utils
 
 
 @decorators.login_required
@@ -45,12 +44,12 @@ def request_password_change(request: HttpRequest) -> HttpResponse | HttpResponse
                     'token': tokens.default_token_generator.make_token(user),
                 },
             )
-            send_email(mail_subject, html_message, [user.email])
+            email_utils.send_email(mail_subject, html_message, [user.email])
             request.session['new_password'] = new_password
             return redirect('password_change_done')
         else:
             errors = form.errors.as_data()
-            errors = convert_errors(errors)
+            errors = errors_utils.convert_errors(errors)
     else:
         form = PasswordChangeRequestForm()
     return render(

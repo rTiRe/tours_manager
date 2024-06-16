@@ -2,7 +2,7 @@
 
 from django.views.generic.base import View
 
-from . import convert_errors
+from .errors_utils import convert_errors
 
 
 def create_stylized_auth_view(style_files: list | tuple) -> View:

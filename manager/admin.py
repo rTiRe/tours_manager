@@ -3,8 +3,8 @@
 from django.contrib import admin
 
 from .forms import AddressForm, ReviewForm
-from .models import (Account, Address, Agency, City, Country, Review, Tour,
-                     TourAddress, AgencyRequests)
+from .models import (Account, Address, Agency, AgencyRequests, City, Country,
+                     Review, Tour, TourAddress)
 
 name = 'name'
 agency = 'agency'

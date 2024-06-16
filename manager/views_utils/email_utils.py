@@ -1,3 +1,5 @@
+"""Module with functions for work with email."""
+
 from os import getenv
 
 from django.core import mail
@@ -12,7 +14,15 @@ def send_email(
     message: str,
     recipient_list: list | tuple,
     render_message_to_html: bool = True,
-):
+) -> None:
+    """Send email to the specified address.
+
+    Args:
+        mail_subject: str - subject of email.
+        message: str - email message.
+        recipient_list: list | tuple - list of recipients.
+        render_message_to_html: bool, optional - If needs render message to html. Defaults to True.
+    """
     if render_message_to_html:
         plain_message = html.strip_tags(message)
     else:

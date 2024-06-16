@@ -8,12 +8,14 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseNotFound,
                          HttpResponseRedirect)
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 from .forms import FindAgenciesForm, FindToursForm
 from .models import Account, Agency, Review, Tour
-from .views_utils import page_utils, render_tour_form, reviews_list_manager, tours_list_manager, address_form_utils
-from django.utils.translation import gettext_lazy as _
+from .views_utils import (address_form_utils, page_utils, tour_utils,
+                          reviews_list_manager, tours_list_manager)
+
 load_dotenv()
 
 
@@ -128,7 +130,7 @@ def create_tour(request: HttpRequest) -> HttpResponse:
         raise exceptions.PermissionDenied()
     agency = account.agency
     form_data = {'initial': {'agency': str(agency.id)}}
-    form = render_tour_form(
+    form = tour_utils.render_tour_form(
         request,
         agency=agency,
         form_data=form_data,
@@ -194,7 +196,7 @@ def edit_tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     agency = account.agency
     initial_data = {'addresses': [str(address.id) for address in tour.addresses.all()]}
     form_data = {'instance': tour, 'initial': initial_data}
-    form = render_tour_form(
+    form = tour_utils.render_tour_form(
         request,
         agency=agency,
         form_data=form_data,

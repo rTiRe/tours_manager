@@ -2,13 +2,15 @@
 
 from django.contrib.auth import decorators
 from django.contrib.auth import models as auth_models
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import (HttpRequest, HttpResponse, HttpResponseNotFound,
+                         HttpResponseRedirect)
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .forms import SettingsAddressForm, SettingsAgencyForm, SettingsUserForm
-from .models import Account, Address, Review, Tour, Agency, AgencyRequests
-from .views_utils import convert_errors, reviews_list_manager, tours_list_manager, requests_list_manager
+from .models import Account, Address, Agency, AgencyRequests, Review, Tour
+from .views_utils import (errors_utils, requests_list_manager,
+                          reviews_list_manager, tours_list_manager)
 
 
 def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpResponseRedirect:
@@ -96,8 +98,8 @@ def agency_update(request: HttpRequest, user: Account, errors: dict) -> Agency |
     else:
         address_errors = address_form.errors.as_data()
         agency_errors = agency_form.errors.as_data()
-        address_errors = convert_errors(address_errors)
-        agency_errors = convert_errors(agency_errors)
+        address_errors = errors_utils.convert_errors(address_errors)
+        agency_errors = errors_utils.convert_errors(agency_errors)
         errors.update(address_errors)
         errors.update(agency_errors)
         return None
@@ -130,7 +132,7 @@ def settings(request: HttpRequest) -> HttpResponse:
                     user.save()
             else:
                 user_errors = user_form.errors.as_data()
-                user_errors = convert_errors(user_errors)
+                user_errors = errors_utils.convert_errors(user_errors)
                 errors.update(user_errors)
     return render(
         request,

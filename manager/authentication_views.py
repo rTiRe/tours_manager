@@ -11,8 +11,7 @@ from rest_framework.authtoken.models import Token
 
 from .forms import SigninForm, SignupForm
 from .models import Account
-from .views_utils import convert_errors
-from .views_utils.email_utils import send_email
+from .views_utils import errors_utils, email_utils
 
 
 def registration(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
@@ -39,11 +38,11 @@ def registration(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
                 'registration/token_email.html',
                 {'api_key': token.key},
             )
-            send_email(mail_subject, html_message, [user.email])
+            email_utils.send_email(mail_subject, html_message, [user.email])
             return redirect('manager-login')
         else:
             errors = form.errors.as_data()
-            errors = convert_errors(errors)
+            errors = errors_utils.convert_errors(errors)
     else:
         form = SignupForm()
     return render(
@@ -87,7 +86,7 @@ def login(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
                 errors['username'] = _('The username or password seems to be incorrect.')
         else:
             errors = form.errors.as_data()
-            errors = convert_errors(errors)
+            errors = errors_utils.convert_errors(errors)
     else:
         form = SigninForm()
     return render(
