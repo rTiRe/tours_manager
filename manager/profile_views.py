@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from .forms import SettingsAddressForm, SettingsAgencyForm, SettingsUserForm
 from .models import Account, Address, Review, Tour
-from .views_utils import convert_errors, reviews_manager
+from .views_utils import convert_errors, reviews_list_manager, tours_list_manager
 
 
 def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpResponseRedirect:
@@ -23,8 +23,9 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpRe
         account = Account.objects.filter(account=request.user).first()
     if account.agency:
         tours_data = Tour.objects.filter(agency=account.agency.id)
-        review_objects = Review.objects
-        reviews_data = {tour_data: review_objects.filter(tour=tour_data) for tour_data in tours_data}
+        reviews_data = {tour: Review.objects.filter(tour=tour) for tour in tours_data}
+        tours_manager = tours_list_manager.ToursListManager(request, tours_data, reviews_data)
+        tours_block = tours_manager.render_tours_block()
         for tour_data, tour_reviews in reviews_data.items():
             tour_ratings = [review.rating for review in tour_reviews]
             if tour_ratings:
@@ -33,13 +34,13 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpRe
                 reviews_data[tour_data] = 0
     else:
         reviews_data = list(Review.objects.filter(account=account))
-        reviews = reviews_manager(
+        reviews = reviews_list_manager.ReviewsListManager(
             request,
             reviews_data,
             reverse('my_profile'),
             'parts/tour_review.html',
         )
-        reviews_data = reviews.render_reviews_block(disply=True, check_user_review=False)
+        reviews_data = reviews.render_reviews_block(display=True, check_user_review=False)
         if isinstance(reviews_data, HttpResponseRedirect):
             return reviews_data
     return render(
@@ -48,13 +49,12 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpRe
         {
             'request_user': request.user,
             'user': account,
-            'tours_data': tours_data,
+            'tours_block': tours_block,
             'reviews_data': reviews_data,
             'review_form': '',
             'style_files': [
                 'css/header.css',
                 'css/body.css',
-                'css/tours.css',
                 'css/profile.css',
                 'css/rating.css',
                 'css/avatar.css',

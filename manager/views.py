@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 from .forms import FindAgenciesForm, FindToursForm
 from .models import Account, Agency, Review, Tour
-from .views_utils import page_utils, render_tour_form, reviews_manager
+from .views_utils import page_utils, render_tour_form, reviews_list_manager, tours_list_manager
 
 load_dotenv()
 
@@ -42,48 +42,34 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 def tours(request: HttpRequest) -> HttpResponse:
-    page = int(request.GET.get('page', 1))
-    if not request.GET:
+    if not request.GET or not set(('starting_city', 'country')).issubset(request.GET):
         tours_data = Tour.objects.all()
     else:
         tours_data = Tour.objects.filter(
             starting_city=request.GET.get('starting_city'),
             address__city__country=request.GET.get('country'),
         )
-    tours_paginator = paginator.Paginator(tours_data, int(getenv('TOURS_PER_PAGE', 15)))
-    tours_data = tours_paginator.get_page(page)
+    print(tours_data)
     reviews_data = {}
     for tour_data in tours_data:
         reviews_data[tour_data] = Review.objects.filter(tour=tour_data, account__agency=None)
-    for tour_data, tour_reviews in reviews_data.items():
-        tour_ratings = [review.rating for review in tour_reviews]
-        if tour_ratings:
-            reviews_data[tour_data] = round(sum(tour_ratings) / len(tour_ratings), 2)
-        else:
-            reviews_data[tour_data] = 0
-    num_pages = int(tours_paginator.num_pages)
-    pages_slice = page_utils.get_pages_slice(page, num_pages)
+    tours_manager = tours_list_manager.ToursListManager(request, tours_data, reviews_data)
+    print(tours_manager.paginator)
+    tours_block = tours_manager.render_tours_block()
     form = FindToursForm(request)
     return render(
         request,
         'pages/tours.html',
         {
             'form': form,
-            'tours_data': tours_data,
+            'tours_block': tours_block,
             'reviews_data': reviews_data,
-            'pages': {
-                'current': page,
-                'total': num_pages,
-                'slice': pages_slice,
-            },
             'style_files': [
                 'css/header.css',
                 'css/body.css',
-                'css/tours.css',
                 'css/search_tours.css',
                 'css/rating.css',
                 'css/avatar.css',
-                'css/pages.css',
             ],
         },
     )
@@ -239,13 +225,13 @@ def csrf_failure(request: HttpRequest, reason: str = '') -> HttpResponseRedirect
 
 def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
     ratings = []
-    tour = Tour.objects.filter(id=uuid).first()
-    if not tour:
+    tour_data = Tour.objects.filter(id=uuid).first()
+    if not tour_data:
         return HttpResponseNotFound()
-    reviews = list(tour.reviews.filter(account__agency=None))
+    reviews = list(tour_data.reviews.filter(account__agency=None))
     for review in reviews:
         ratings.append(review.rating)
-    reviews = reviews_manager(request, reviews, reverse('tour', kwargs={'uuid': uuid}))
+    reviews = reviews_list_manager.ReviewsListManager(request, reviews, reverse('tour', kwargs={'uuid': uuid}))
     reviews = reviews.render_reviews_block()
     if isinstance(reviews, HttpResponseRedirect):
         return reviews
@@ -255,7 +241,7 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
         {
             'ratings': ratings,
             'reviews': reviews,
-            'tour': tour,
+            'tour': tour_data,
             'request': request,
             'style_files': [
                 'css/header.css',

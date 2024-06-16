@@ -56,9 +56,7 @@
                         <div class="card create_tour">+</div>
                     </a>
                 {% endif %}
-                {% for tour_data in tours_data %}
-                    {% include 'parts/tour_card.html' %}
-                {% endfor %}
+                {{ tours_block }}
             {% else %}
                 {{ reviews_data }}
             {% endif %}

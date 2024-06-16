@@ -16,7 +16,7 @@ from .page_utils import get_pages_slice
 load_dotenv()
 
 
-class ReviewManager:
+class ReviewsListManager:
     def __init__(
         self,
         request: HttpRequest,
@@ -29,7 +29,7 @@ class ReviewManager:
         self.redirect_url = redirect_url
         self.review_template_name = review_template_name
         self.reviews_count = len(reviews)
-        self.paginator = Paginator(reviews, getenv('REVIEWS_PER_PAGE'))
+        self.paginator = Paginator(reviews, getenv('REVIEWS_PER_PAGE', 10))
 
     def get_tour(self) -> Tour:
         tour_id = self.request.path.split('/')[-2]

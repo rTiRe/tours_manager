@@ -1,9 +1,8 @@
 .home {
     background-image: none;
     min-height: 80px;
-    height: fit-content;
-    padding: 90px 80px 40px 80px;
-    box-sizing: border-box;
+    height: fit-content !important;
+    padding: 90px 80px 40px 80px !important;
     box-sizing: border-box;
     background: hsla(324, 82%, 55%, 1);
     background: radial-gradient(circle, hsla(324, 82%, 55%, 1) 0%, hsla(269, 93%, 59%, 1) 68%);
@@ -15,9 +14,9 @@
 .home > .container {
     box-sizing: border-box;
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
     gap: 50px;
     flex-wrap: wrap;
 }

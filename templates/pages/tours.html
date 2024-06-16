@@ -10,26 +10,7 @@
     </section>
     <main>
         <div class="container">
-            {% for tour_data in tours_data %}
-                {% include 'parts/tour_card.html' %}
-            {% endfor %}
-            {% if pages|get_item:'total' != 1 %}
-                <div class="pages">
-                    <form method="get">
-                        {% if pages|get_item:'current' != 1 %}
-                            <button type="submit" name="page" value="1"><i class="fa fa-angle-double-left" aria-hidden="true"></i> Первая</button>
-                            <button type="submit" name="page" value="{{ pages|get_item:'current'|to_int|add:'-1' }}"><i class="fa-solid fa-arrow-left"></i> Предыдущая</button>
-                        {% endif %}
-                        {% for page in pages|get_item:'slice' %}
-                            <button type="submit" name="page" value="{{ page }}" {% if page|to_int == pages|get_item:'current' %} class="current" {% endif %}>{{ page }}</button>
-                        {% endfor %}
-                        {% if pages|get_item:'current' != pages|get_item:'total'|to_int %}
-                            <button type="submit" name="page" value="{{ pages|get_item:'current'|to_int|add:'1' }}">Следующая <i class="fa-solid fa-arrow-right"></i></button>
-                            <button type="submit" name="page" value="{{ pages|get_item:'total'|to_int }}">Последняя <i class="fa fa-angle-double-right" aria-hidden="true"></i></button>
-                        {% endif %}
-                    </form>
-                </div>
-            {% endif %}
+            {{ tours_block }}
         </div>
     </main>
 {% endblock %}

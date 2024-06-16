@@ -1,0 +1,6 @@
+{% load template_filters %}
+{% include 'parts/connect_css_files.html' with style_files=style_files %}
+<div class="tours">
+    {{ tours_list }}
+    {% include 'parts/pages_buttons.html' %}
+</div>
