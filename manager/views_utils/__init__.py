@@ -48,12 +48,12 @@ def render_tour_form(
             else:
                 errors = form.errors.as_data()
                 errors = convert_errors(errors)
-                print(errors)
         else:
             form = TourForm(**form_data)
         return render_to_string(
             'parts/tour_form.html',
             {
+                'request': request,
                 'form': form,
                 'errors': errors,
                 'title': literals.get('title'),

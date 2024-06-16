@@ -48,6 +48,8 @@
             </div>
         </div>
         {{ errors|get_errors_html:'__all__' }}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <span class="add_address">Нет нужного адреса? <a href="{% url 'create_address' %}?next={{ request.path }}">Добавить</a></span>
         <button name="{{ button_name }}" type="submit">{{ button }}</button>
     </form>
 </div>

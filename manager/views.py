@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 
 from .forms import FindAgenciesForm, FindToursForm
 from .models import Account, Agency, Review, Tour
-from .views_utils import page_utils, render_tour_form, reviews_list_manager, tours_list_manager
-
+from .views_utils import page_utils, render_tour_form, reviews_list_manager, tours_list_manager, address_form_utils
+from django.utils.translation import gettext_lazy as _
 load_dotenv()
 
 
@@ -253,3 +253,34 @@ def tour(request: HttpRequest, uuid: UUID) -> HttpResponse:
             ],
         }
     )
+
+
+def create_address(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
+    account = Account.objects.filter(account=request.user).first()
+    if not account.agency and not request.user.is_staff:
+        raise exceptions.PermissionDenied()
+    form = address_form_utils.render_address_form(
+        request,
+        {
+            'title': _('Create address'),
+            'button_name': 'create',
+            'button': _('Create')
+        },
+    )
+    if isinstance(form, HttpResponseRedirect):
+        return form
+    return render(
+        request,
+        'pages/create_address.html',
+        {
+            'form': form,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+            ],
+        }
+    )
+
+

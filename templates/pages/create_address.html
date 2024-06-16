@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load template_filters %}
+{% load errors_writer %}
+{% load avatar %}
+{% block header %}{% include 'parts/header.html' %}{% endblock %}
+{% block content %}
+    <section class="home">
+        <div class="container">
+            {{ form }}
+        </div>
+    </section>
+{% endblock %}

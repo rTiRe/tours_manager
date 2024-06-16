@@ -40,6 +40,12 @@ class AddressForm(forms.ModelForm):
         widgets = ADDRESS_WIDGETS
 
 
+class AddressFormForCreate(AddressForm):
+    class Meta:
+        model = Address
+        fields = ['city', 'street', 'house_number', 'entrance_number', 'floor', 'flat_number', 'point']
+        widgets = ADDRESS_WIDGETS
+
 class ReviewForm(forms.ModelForm):
     RATING_CHOICES = [
         (5, '5 звезд'),
@@ -279,3 +285,9 @@ class PasswordChangeRequestForm(forms.Form):
             raise forms.ValidationError(_('Passwords do not match.'))
         
         return cleaned_data
+
+
+# class AddressForm(forms.Form):
+#     class Meta:
+#         model = Address
+#         fields = '__all__'
