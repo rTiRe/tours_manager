@@ -1,7 +1,6 @@
 """Module with views for password change."""
 
 import uuid
-from os import getenv
 
 from django.contrib.auth import decorators, models, tokens, views
 from django.contrib.sites.shortcuts import get_current_site
@@ -11,8 +10,8 @@ from django.template.loader import render_to_string
 from django.utils import encoding, http
 from dotenv import load_dotenv
 
-from .forms import PasswordChangeRequestForm
-from .views_utils import errors_utils, profile_utils, email_utils
+from ..forms import PasswordChangeRequestForm
+from ..views_utils import email_utils, errors_utils, profile_utils
 
 
 @decorators.login_required

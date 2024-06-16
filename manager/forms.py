@@ -285,9 +285,3 @@ class PasswordChangeRequestForm(forms.Form):
             raise forms.ValidationError(_('Passwords do not match.'))
         
         return cleaned_data
-
-
-# class AddressForm(forms.Form):
-#     class Meta:
-#         model = Address
-#         fields = '__all__'

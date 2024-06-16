@@ -1,4 +1,4 @@
-"""Module with views for API viewsets"""
+"""Module with views for API viewsets."""
 
 from typing import Any
 
@@ -6,9 +6,9 @@ from django.db.models import Model
 from django.http import HttpRequest
 from rest_framework import authentication, permissions, serializers, viewsets
 
-from .models import Address, Agency, Review, Tour
-from .serializers import (AddressSerializer, AgencySerializer,
-                          ReviewSerializer, TourSerializer)
+from ..models import Address, Agency, Review, Tour
+from ..serializers import (AddressSerializer, AgencySerializer,
+                           ReviewSerializer, TourSerializer)
 
 
 class CustomViewSetPermission(permissions.BasePermission):

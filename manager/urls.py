@@ -3,8 +3,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from . import (authentication_views, password_change_views, profile_views,
-               views, viewset_views)
+from .views import (authentication_views, password_change_views, profile_views,
+                    views, viewset_views)
 
 router = DefaultRouter()
 router.register('agencies', viewset_views.AgencyViewSet)

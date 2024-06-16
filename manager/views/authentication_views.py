@@ -9,9 +9,9 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authtoken.models import Token
 
-from .forms import SigninForm, SignupForm
-from .models import Account
-from .views_utils import errors_utils, email_utils
+from ..forms import SigninForm, SignupForm
+from ..models import Account
+from ..views_utils import email_utils, errors_utils
 
 
 def registration(request: HttpRequest) -> HttpResponse | HttpResponseRedirect:
