@@ -217,8 +217,8 @@ class Agency(UUIDMixin, NameMixin, models.Model):
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        phone_number_validator()
-        self.agency.save()
+        phone_number_validator(self.phone_number)
+        self.address.save()
 
     class Meta:
         """Meta class with Agency settings."""
@@ -441,3 +441,18 @@ class Account(UUIDMixin, models.Model):
             str: account email.
         """
         return self.account.email
+
+
+class AgencyRequests(UUIDMixin, models.Model):
+    account = models.ForeignKey(
+        Account,
+        verbose_name=_('account'),
+        on_delete=models.CASCADE,
+        related_name='request',
+    )
+    agency = models.ForeignKey(
+        Agency,
+        verbose_name=_('agency'),
+        on_delete=models.CASCADE,
+        related_name='request',
+    )

@@ -43,6 +43,14 @@
                                 <p><i class="fa-solid fa-phone" aria-hidden="true"></i> Телефон: <a href="tel:{{ user.agency.phone_number }}">{{ user.agency.phone_number }}</a></p>
                             </div>
                         </div>
+                    {% elif not user.account.is_staff %}
+                        <div class="agency_info">
+                            {% if user.request is not None %}
+                                <a href="{% url 'create_agency' %}">Стать турагенством</a>
+                            {% else %}
+                                Ожидайте одобрения заявки
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
             {% endif %}
@@ -58,7 +66,34 @@
                 {% endif %}
                 {{ tours_block }}
             {% else %}
+                {% if user.account.is_staff and request_user == user.account %}
+                    <div class="info_header">
+                        <nav>
+                            <ul class="info_menu">
+                                <li class="see_reviews"><a href="#reviews"><span>Отзывы</span></a></li>
+                                <li class="see_requests"><a href="#requests"><span>Заявки</span></a></li>                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
                 {{ reviews_data }}
+                {{ requests_block }}
+                <script>
+                    $(document).ready(function() {
+                        $('.see_reviews a').click(function() {
+                            $('.reviews').show();
+                            $('.requests').hide();
+                        });
+                        $('.see_requests a').click(function() {
+                            $('.requests').show();
+                            $('.reviews').hide();
+                        });
+                        if (window.location.hash == "#requests") {
+                            $('.see_requests a').click();
+                        } else {
+                            $('.see_reviews a').click();
+                        }
+                    });
+                </script>
             {% endif %}
         </div>
     </main>

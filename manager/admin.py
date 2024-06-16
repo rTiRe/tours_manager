@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from .forms import AddressForm, ReviewForm
 from .models import (Account, Address, Agency, City, Country, Review, Tour,
-                     TourAddress)
+                     TourAddress, AgencyRequests)
 
 name = 'name'
 agency = 'agency'
@@ -116,3 +116,8 @@ class AccountAdmin(admin.ModelAdmin):
     model = Account
     list_display = [account]
     search_fields = [account]
+
+
+@admin.register(AgencyRequests)
+class AgencyRequestsAdmin(admin.ModelAdmin):
+    model = AgencyRequests

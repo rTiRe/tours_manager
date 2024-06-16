@@ -37,4 +37,5 @@ urlpatterns = [
     path('tour/<uuid:uuid>/edit/', views.edit_tour, name='edit_tour'),
     path('tour/<uuid:uuid>/delete/', views.delete_tour, name='delete_tour'),
     path('tour/create/', views.create_tour, name='create_tour'),
+    path('agencies/create/', profile_views.create_agency_form, name='create_agency'),
 ]

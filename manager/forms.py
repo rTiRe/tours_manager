@@ -188,8 +188,9 @@ class SettingsAgencyForm(forms.ModelForm):
         super(SettingsAgencyForm, self).__init__(*args, **kwargs)
         if request and isinstance(request, HttpRequest):
             user = Account.objects.get(account=request.user.id)
-            self.fields['name'].initial = user.agency.name
-            self.fields['phone_number'].initial = user.agency.phone_number
+            if user.agency:
+                self.fields['name'].initial = user.agency.name
+                self.fields['phone_number'].initial = user.agency.phone_number
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
@@ -207,13 +208,14 @@ class SettingsAddressForm(forms.ModelForm):
         super(SettingsAddressForm, self).__init__(*args, **kwargs)
         if request and isinstance(request, HttpRequest):
             user = Account.objects.get(account=request.user.id)
-            self.fields['city'].initial = user.agency.address.city
-            self.fields['street'].initial = user.agency.address.street
-            self.fields['house_number'].initial = user.agency.address.house_number
-            self.fields['entrance_number'].initial = user.agency.address.entrance_number
-            self.fields['floor'].initial = user.agency.address.floor
-            self.fields['flat_number'].initial = user.agency.address.flat_number
-            self.fields['point'].initial = user.agency.address.point
+            if user.agency:
+                self.fields['city'].initial = user.agency.address.city
+                self.fields['street'].initial = user.agency.address.street
+                self.fields['house_number'].initial = user.agency.address.house_number
+                self.fields['entrance_number'].initial = user.agency.address.entrance_number
+                self.fields['floor'].initial = user.agency.address.floor
+                self.fields['flat_number'].initial = user.agency.address.flat_number
+                self.fields['point'].initial = user.agency.address.point
             
 
     class Meta:

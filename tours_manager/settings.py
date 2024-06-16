@@ -8,6 +8,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+load_dotenv()
+
 if name == 'nt':
     VENV_BASE = environ['VIRTUAL_ENV']
     PATH = f';{environ["PATH"]}'
@@ -118,8 +120,6 @@ WSGI_APPLICATION = 'tours_manager.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-load_dotenv()
 
 DATABASES = {
     'default': {

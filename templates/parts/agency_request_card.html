@@ -1,0 +1,22 @@
+{% load static %}
+{% load avatar %}
+{% load template_filters %}
+<div class="card">
+    <a href="{% url 'profile' agency_request.account.account.username %}" class="account">
+        <div class="avatar">
+            <img src="{{ agency_request.account|get_avatar }}" alt="avatar">
+        </div>
+        <div class="right">
+            <div class="full_name">
+                {{ agency_request.account.account.first_name }} {{ agency_request.account.account.last_name }} <span>@{{ agency_request.account.account.username }}</span>
+            </div>
+        </div>
+    </a>
+    {{ agency_request.agency.name }}
+    <form method="post">
+        {% csrf_token %}
+        <input name="id" value="{{ agency_request.account.id }}" type="hidden"></input>
+        <button type="submit" name="accept">accept</button>
+        <button type="submit" name="decline">decline</button>
+    </form>
+</div>

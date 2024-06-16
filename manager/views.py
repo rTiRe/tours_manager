@@ -82,6 +82,7 @@ def agencies(request: HttpRequest) -> HttpResponse:
         agencies_data = Agency.objects.all()
     else:
         agencies_data = Agency.objects.filter(address__city=get_city)
+    agencies_data = [agency for agency in agencies_data if hasattr(agency, 'account')]
     agencies_paginator = paginator.Paginator(agencies_data, int(getenv('AGENCIES_PER_PAGE', 15)))
     agencies_data = agencies_paginator.get_page(page)
     reviews_data = {agency: Review.objects.filter(tour__agency=agency) for agency in agencies_data}

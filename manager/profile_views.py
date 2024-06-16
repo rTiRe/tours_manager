@@ -2,17 +2,19 @@
 
 from django.contrib.auth import decorators
 from django.contrib.auth import models as auth_models
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .forms import SettingsAddressForm, SettingsAgencyForm, SettingsUserForm
-from .models import Account, Address, Review, Tour
-from .views_utils import convert_errors, reviews_list_manager, tours_list_manager
+from .models import Account, Address, Review, Tour, Agency, AgencyRequests
+from .views_utils import convert_errors, reviews_list_manager, tours_list_manager, requests_list_manager
 
 
 def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpResponseRedirect:
     tours_data = {}
+    tours_block = ''
+    requests_block = ''
     reviews = {}
     if username:
         user = auth_models.User.objects.get(username=username)
@@ -43,6 +45,12 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpRe
         reviews_data = reviews.render_reviews_block(display=True, check_user_review=False)
         if isinstance(reviews_data, HttpResponseRedirect):
             return reviews_data
+        if account.account.is_staff:
+            agency_requests = list(AgencyRequests.objects.all())
+            requests_manager = requests_list_manager.AgencyRequestsListManager(request, agency_requests)
+            requests_block = requests_manager.render_agency_requests_block()
+            if isinstance(requests_block, HttpResponseRedirect):
+                return requests_block
     return render(
         request,
         'pages/profile.html',
@@ -50,17 +58,49 @@ def profile(request: HttpRequest, username: str = None) -> HttpResponse | HttpRe
             'request_user': request.user,
             'user': account,
             'tours_block': tours_block,
+            'requests_block': requests_block,
             'reviews_data': reviews_data,
             'review_form': '',
             'style_files': [
                 'css/header.css',
                 'css/body.css',
+                'css/tour.css',
                 'css/profile.css',
                 'css/rating.css',
                 'css/avatar.css',
             ],
         },
     )
+
+
+def agency_update(request: HttpRequest, user: Account, errors: dict) -> Agency | None:
+    post_request = request.POST
+    agency_form = SettingsAgencyForm(data=post_request)
+    address_form = SettingsAddressForm(data=post_request)
+    if agency_form.is_valid() and address_form.is_valid():
+        cleaned_address_data = address_form.cleaned_data
+        existing_address = Address.objects.filter(**cleaned_address_data).first()
+        agency = user.agency
+        if existing_address:
+            address = existing_address
+        else:
+            address = Address.objects.create(**cleaned_address_data)
+        if not agency:
+            cleaned_agency_data = agency_form.cleaned_data
+            cleaned_agency_data['address'] = address
+            agency = Agency.objects.create(**cleaned_agency_data)
+        else:
+            agency.address = address
+            agency_form.save()
+        return agency
+    else:
+        address_errors = address_form.errors.as_data()
+        agency_errors = agency_form.errors.as_data()
+        address_errors = convert_errors(address_errors)
+        agency_errors = convert_errors(agency_errors)
+        errors.update(address_errors)
+        errors.update(agency_errors)
+        return None
 
 
 def settings(request: HttpRequest) -> HttpResponse:
@@ -77,33 +117,7 @@ def settings(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         post_request = request.POST
         if 'agency_submit' in post_request:
-            agency_form = SettingsAgencyForm(data=post_request, instance=user.agency)
-            address_form = SettingsAddressForm(data=post_request, instance=user.agency.address)
-            if agency_form.is_valid() and address_form.is_valid():
-                cleaned_data = address_form.cleaned_data
-                cleaned_data = {
-                    'city': cleaned_data['city'],
-                    'street': cleaned_data['street'],
-                    'house_number': cleaned_data['house_number'],
-                    'entrance_number': cleaned_data['entrance_number'],
-                    'floor': cleaned_data['floor'],
-                    'flat_number': cleaned_data['flat_number'],
-                    'point': cleaned_data['point'],
-                }
-                existing_address = Address.objects.filter(**cleaned_data).first()
-                if existing_address:
-                    user.agency.address = existing_address
-                else:
-                    new_address = Address.objects.create(**cleaned_data)
-                    user.agency.address = new_address
-                agency_form.save()
-            else:
-                address_errors = address_form.errors.as_data()
-                agency_errors = agency_form.errors.as_data()
-                address_errors = convert_errors(address_errors)
-                agency_errors = convert_errors(agency_errors)
-                errors.update(address_errors)
-                errors.update(agency_errors)
+            agency_update(request, user, errors)
         if 'user_submit' in post_request:
             user_form = SettingsUserForm(request, post_request, request.FILES, instance=request.user)
             if user_form.is_valid():
@@ -155,6 +169,34 @@ def my_profile(request: HttpRequest) -> HttpResponse:
     return profile(request)
 
 
-@decorators.login_required
-def get_api_token(request: HttpRequest) -> HttpResponse:
-    pass
+def create_agency_form(request: HttpRequest) -> HttpResponse:
+    is_authenticated = request.user.is_authenticated
+    is_staff = request.user.is_staff
+    account = Account.objects.filter(account = request.user).first()
+    sended_request = AgencyRequests.objects.filter(account=account).first()
+    if not is_authenticated or is_staff or account.agency or sended_request:
+        return HttpResponseNotFound()
+    errors = {}
+    agency_form = SettingsAgencyForm(request)
+    address_form = SettingsAddressForm(request)
+    if request.method == 'POST':
+        agency = agency_update(request, account, errors)
+        if agency:
+            AgencyRequests.objects.create(account=account, agency=agency)
+    return render(
+        request,
+        'pages/create_agency.html',
+        {
+            'request_user': request.user,
+            'user': account,
+            'agency_form': agency_form,
+            'address_form': address_form,
+            'errors': errors,
+            'ignore_special_header': True,
+            'style_files': [
+                'css/header.css',
+                'css/body.css',
+                'css/account_form.css',
+            ],
+        },
+    )
