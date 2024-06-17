@@ -214,8 +214,14 @@ class Agency(UUIDMixin, NameMixin, models.Model):
             str: stringified class. Name, phone_number.
         """
         return f'{self.name}, {self.phone_number}'
-    
-    def save(self, *args, **kwargs):
+
+    def save(self, *args, **kwargs) -> None:
+        """Save model.
+
+        Args:
+            args: Any - arguments.
+            kwargs: Any - key word arguments.
+        """
         super().save(*args, **kwargs)
         phone_number_validator(self.phone_number)
         self.address.save()
@@ -234,9 +240,9 @@ class Tour(UUIDMixin, NameMixin, models.Model):
     """Tour table model."""
 
     avatar = models.ImageField(
-        upload_to='covers/', 
-        null=True, 
-        blank=True, 
+        upload_to='covers/',
+        null=True,
+        blank=True,
         verbose_name=_('cover'),
     )
     description = models.TextField(_('description'))
@@ -257,11 +263,19 @@ class Tour(UUIDMixin, NameMixin, models.Model):
     )
     price = models.DecimalField(
         _('price'),
-        max_digits = 9,
-        decimal_places = 2,
+        max_digits=9,
+        decimal_places=2,
     )
 
     def get_request_user_review(self, request: HttpRequest) -> tuple['Review', 'Account']:
+        """Get user review bu request user.
+
+        Args:
+            request: HttpRequest - user request.
+
+        Returns:
+            tuple[Review, Account]: user review and user account.
+        """
         if request.user.is_authenticated:
             account = Account.objects.filter(account=request.user).first()
         else:
@@ -329,14 +343,14 @@ class Review(UUIDMixin, models.Model):
         _('creation date and time'),
         default=get_datetime,
         validators=[
-            date_validator
-        ]
+            date_validator,
+        ],
     )
     edited = models.DateTimeField(
         _('last edit date and time'),
         default=None,
         validators=[
-            date_validator
+            date_validator,
         ],
         null=True,
         blank=True,
@@ -351,7 +365,7 @@ class Review(UUIDMixin, models.Model):
         rating = self.rating
         username = self.account.username
         tour = self.tour
-        return f'{rating} ({username}) for {tour}'  
+        return f'{rating} ({username}) for {tour}'
 
     class Meta:
         """Meta class with Review settings."""
@@ -372,9 +386,9 @@ class Account(UUIDMixin, models.Model):
         on_delete=models.CASCADE,
     )
     avatar = models.ImageField(
-        upload_to='avatars/', 
-        null=True, 
-        blank=True, 
+        upload_to='avatars/',
+        null=True,
+        blank=True,
         verbose_name=_('avatar'),
     )
     agency = models.OneToOneField(
@@ -444,6 +458,8 @@ class Account(UUIDMixin, models.Model):
 
 
 class AgencyRequests(UUIDMixin, models.Model):
+    """Agency table model."""
+
     account = models.ForeignKey(
         Account,
         verbose_name=_('account'),

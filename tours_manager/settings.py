@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'storages',
     'django_minio_backend',
     'django.forms',
+    'django.profile_forms',
 ]
 
 REST_FRAMEWORK = {
