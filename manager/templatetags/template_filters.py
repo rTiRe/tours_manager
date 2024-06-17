@@ -33,7 +33,7 @@ def check_isinstance(
 @register.filter
 def get_item(
     dictionary: dict,
-    key: str | int | float | tuple | frozenset | object
+    key: str | int | float | tuple | frozenset | object,
 ) -> Any | None:
     """Get item from dictionary by key.
 
