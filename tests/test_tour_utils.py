@@ -10,20 +10,20 @@ from manager.views_utils.tour_utils import render_tour_form, save_tour
 class TourFunctionTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
-        country = Country.objects.create(name="USA")
+        country = Country.objects.create(name='USA')
         city = City.objects.create(
-            name="New York",
+            name='New York',
             country=country,
             point=Point(-74.0060, 40.7128)
         )
         self.agency_address = Address.objects.create(
             city=city,
-            street="Liberty St",
-            house_number="1700", 
+            street='Liberty St',
+            house_number='1700', 
             point=Point(-74.0061, 40.7129),
         )
-        self.agency = Agency.objects.create(name="TravelFun", phone_number="+79999999999", address=self.agency_address)
-        self.tour = Tour.objects.create(name="Sample Tour", agency=self.agency, starting_city=city, price=400)
+        self.agency = Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=self.agency_address)
+        self.tour = Tour.objects.create(name='Sample Tour', agency=self.agency, starting_city=city, price=400)
         self.form_data = {'name': 'Updated Tour', 'description': 'Updated Description', 'agency': self.agency, 'starting_city': city, 'price': 400}
         self.literals = {'title': 'Edit Tour', 'button': 'Save Changes', 'button_name': 'submit'}
 

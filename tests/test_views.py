@@ -15,20 +15,20 @@ def create_successful_page_test(page_url: str, page_name: str, template: str, au
         Account.objects.create(account=other_user)
         url = page_url
         if auth:
-            country = Country.objects.create(name="USA")
+            country = Country.objects.create(name='USA')
             city = City.objects.create(
-                name="New York",
+                name='New York',
                 country=country,
                 point=Point(-74.0060, 40.7128)
             )
             agency_address = Address.objects.create(
                 city=city,
-                street="Liberty St",
-                house_number="1700", 
+                street='Liberty St',
+                house_number='1700', 
                 point=Point(-74.0061, 40.7129),
             )
-            agency = Agency.objects.create(name="TravelFun", phone_number="+79999999999", address=agency_address)
-            tour = Tour.objects.create(name=f"Tour 1", description="Sample", agency=agency, price=400, starting_city=city)
+            agency = Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=agency_address)
+            tour = Tour.objects.create(name=f'Tour 1', description='Sample', agency=agency, price=400, starting_city=city)
             user = User.objects.create(username='user', password='user', is_staff=True)
             account = Account.objects.create(account=user, agency=agency)
             self.client.force_login(user)

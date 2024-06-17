@@ -1,8 +1,10 @@
-from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from django.contrib.gis.geos import Point
-from manager.models import Account, Review, Tour, Country, City, Address, Agency
+from django.core.paginator import Paginator
+from django.test import RequestFactory, TestCase
+
+from manager.models import (Account, Address, Agency, City, Country, Review,
+                            Tour)
 from manager.views_utils.reviews_list_manager import ReviewsListManager
 
 

@@ -32,4 +32,4 @@ jobs:
     - name: Тесты api
       run: |
         chmod +x tests/test.sh
-        ./tests/test.sh tests.test_api
+        ./tests/test.sh tests

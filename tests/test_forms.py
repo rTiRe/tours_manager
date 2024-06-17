@@ -10,7 +10,7 @@ from manager.models import Account, Address, Agency, City, Country, Tour
 
 class AddressFormFormCreateTest(TestCase):
     def test_valid_data(self):
-        country = Country.objects.create(name="USA")
+        country = Country.objects.create(name='USA')
         city = City.objects.create(
             name="New York",
             country=country,
@@ -41,20 +41,20 @@ class AddressFormFormCreateTest(TestCase):
 
 class ReviewFormTest(TestCase):
     def test_review_form_valid(self):
-        country = Country.objects.create(name="USA")
+        country = Country.objects.create(name='USA')
         city = City.objects.create(
-            name="New York",
+            name='New York',
             country=country,
             point=Point(-74.0060, 40.7128)
         )
         agency_address = Address.objects.create(
             city=city,
-            street="Liberty St",
-            house_number="1700", 
+            street='Liberty St',
+            house_number='1700', 
             point=Point(-74.0061, 40.7129),
         )
-        agency = Agency.objects.create(name="TravelFun", phone_number="+79999999999", address=agency_address)
-        tour = Tour.objects.create(name=f"Tour 1", description="Sample", agency=agency, price=400, starting_city=city)
+        agency = Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=agency_address)
+        tour = Tour.objects.create(name=f'Tour 1', description='Sample', agency=agency, price=400, starting_city=city)
         user = User.objects.create(username='user', password='user', is_staff=True)
         account = Account.objects.create(account=user, agency=agency)
         form = ReviewForm(data={

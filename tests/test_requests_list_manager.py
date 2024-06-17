@@ -13,7 +13,7 @@ class AgencyRequestsListManagerTest(TestCase):
         self.factory = RequestFactory()
         user = User.objects.create_user(username='tester', password='123')
         self.account = Account.objects.create(account=user)
-        country = Country.objects.create(name="USA")
+        country = Country.objects.create(name='USA')
         city = City.objects.create(
             name="New York",
             country=country,
@@ -21,11 +21,11 @@ class AgencyRequestsListManagerTest(TestCase):
         )
         agency_address = Address.objects.create(
             city=city,
-            street="Liberty St",
-            house_number="1700", 
+            street='Liberty St',
+            house_number='1700', 
             point=Point(-74.0061, 40.7129),
         )
-        agency = Agency.objects.create(name="TravelFun", phone_number="+79999999999", address=agency_address)
+        agency = Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=agency_address)
         self.agency_request = AgencyRequests.objects.create(account=self.account, agency=agency)
         self.agency_requests = [self.agency_request]
         self.request = self.factory.get('/fake-url')
