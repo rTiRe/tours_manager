@@ -26,7 +26,7 @@ class StylizedAuthViewTests(TestCase):
 
             def get_context_data(subself, **kwargs):
                 context = super().get_context_data(**kwargs)
-                context['form'] = self.get_form({'field': ''})
+                context['form'] = subself.get_form({'field': ''})
                 return context
 
             def get_form(subself, form_data):
