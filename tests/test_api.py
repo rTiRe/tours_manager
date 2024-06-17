@@ -27,6 +27,15 @@ SUPERUSER_PASSWORD = getenv('DJANGO_TESTS_SUPERUSER_PASSWORD')
 
 
 def create_many_to_many(model: Model, attrs_with_model: dict) -> Model:
+    """Create many to many relationship.
+
+    Args:
+        model: Model - model for create many to many.
+        attrs_with_model: dict - attrs for create relationship.
+
+    Returns:
+        Model: model with many to many.
+    """
     many_to_many = {}
     for field, attr in attrs_with_model.items():
         if isinstance(attr, list):
@@ -40,17 +49,32 @@ def create_many_to_many(model: Model, attrs_with_model: dict) -> Model:
 
 
 def filter_many_to_many(json: dict) -> dict:
+    """Filter many to mnay json.
+
+    Args:
+        json: dict - json for filter.
+
+    Returns:
+        dict: filtered json.
+    """
     json_copy = json.copy()
     fields_to_change = {}
     for field_key, field_data in json_copy.items():
         if isinstance(field_data, list):
             fields_to_change[field_key] = field_data
-    for field_key, field_data in fields_to_change.items():
-        json_copy.pop(field_key)
-        json_copy[f'{field_key}__in'] = [field.id for field in field_data]
+    for field_change_key, field_change_data in fields_to_change.items():
+        json_copy.pop(field_change_key)
+        json_copy[f'{field_change_key}__in'] = [field.id for field in field_change_data]
     return json_copy
-        
 
+
+def _set_json_objects(obj_model: Model, json: dict) -> dict:
+    try:
+        json_objects = obj_model.objects.filter(**json)
+    except ValidationError:
+        json_for_filter = filter_many_to_many(json)
+        json_objects = obj_model.objects.filter(**json_for_filter)
+    return json_objects
 
 
 def create_object(
@@ -80,12 +104,8 @@ def create_object(
                 json_ob = create_object(model, jsons, return_json=False)
             json_copy[key] = json_ob
     if not return_json:
-        try:
-            objects = obj_model.objects.filter(**json_copy)
-        except ValidationError:
-            json_for_filter = filter_many_to_many(json_copy)
-            objects = obj_model.objects.filter(**json_for_filter)
-        if objects.exists():
+        json_objects = _set_json_objects(obj_model, json_copy)
+        if json_objects.exists():
             return obj_model.objects.get(**json_copy)
         return create_many_to_many(obj_model, json_copy)
     return json_copy
@@ -277,7 +297,6 @@ tour_data = {
     'starting_city': [City, city_data],
     'price': 4,
 }
-# print(tour_data)
 TourApiTest = create_api_test(Tour, f'{url}tours/', tour_data)
 
 user_data = {
