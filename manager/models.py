@@ -169,7 +169,7 @@ class Address(UUIDMixin, models.Model):
         nullable_parts = []
         for part in parts_for_check:
             if part:
-                nullable_parts.append(part)
+                nullable_parts.append(str(part))
         nullable_parts = ' '.join(nullable_parts)
         return f'{not_null_part} {nullable_parts}'.strip()
 
