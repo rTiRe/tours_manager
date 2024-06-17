@@ -1,3 +1,7 @@
+"""Views test."""
+
+from typing import Callable
+
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.test import TestCase
@@ -46,8 +50,25 @@ def _get_url(
     return url, reversed_url
 
 
-def create_successful_page_test(page_url: str, page_name: str, template: str, auth: bool = True):
+def create_successful_page_test(
+    page_url: str,
+    page_name: str,
+    template: str,
+    auth: bool = True,
+) -> Callable:
+    """Decorate creating a successful page test.
+
+    Args:
+        page_url (str): url to page.
+        page_name (str): url name.
+        template (str): path to template.
+        auth: bool, optional - if needs auth. Defaults to True.
+
+    Returns:
+        Callable: test method.
+    """
     def test(self):
+        """Test method."""
         self.client = Client()
         other_user = User.objects.create(username='other_user', password='user')
         user = None
@@ -91,8 +112,17 @@ def create_successful_page_test(page_url: str, page_name: str, template: str, au
     return test
 
 
-def create_redirect_page_test(page_name):
+def create_redirect_page_test(page_name: str) -> Callable:
+    """Decorate creating redirect tests.
+
+    Args:
+        page_name (str): url page name.
+
+    Returns:
+        Callable: test method.
+    """
     def test(self):
+        """Test method."""
         self.client = Client()
         self.client.logout()
         self.assertEqual(self.client.get(reverse(page_name)).status_code, status.HTTP_302_FOUND)

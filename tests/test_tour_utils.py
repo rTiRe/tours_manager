@@ -1,3 +1,5 @@
+"""Tour utils tests."""
+
 from django.contrib.gis.geos import Point
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -11,7 +13,10 @@ POINT = -74.0061, 40.7129
 
 
 class TourFunctionTests(TestCase):
+    """Tour functions tests."""
+
     def setUp(self):
+        """Set up tests."""
         self.factory = RequestFactory()
         country = Country.objects.create(name='USA')
         city = City.objects.create(

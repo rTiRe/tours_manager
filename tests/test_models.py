@@ -1,3 +1,5 @@
+"""Models tests."""
+
 from django.contrib.gis.geos import Point
 from django.test import TestCase
 
@@ -7,20 +9,28 @@ PRICE = 400
 
 
 class CountryModelTest(TestCase):
+    """Country model tests class."""
+
     def test_create_country(self):
+        """Test create country."""
         country = Country.objects.create(name='Russia')
         self.assertEqual(country.name, 'Russia')
 
     def test_string_representation(self):
+        """Test string representation."""
         country = Country(name='France')
         self.assertEqual(str(country), 'France')
 
 
 class CityModelTest(TestCase):
+    """City model tests class."""
+
     def setUp(self):
+        """Set up first tests."""
         self.country = Country.objects.create(name='Germany')
 
     def test_create_city(self):
+        """Test create city."""
         city = City.objects.create(
             name='Berlin',
             country=self.country,
@@ -30,6 +40,7 @@ class CityModelTest(TestCase):
         self.assertEqual(city.country, self.country)
 
     def test_string_representation(self):
+        """Test string representation."""
         city = City(
             name='Munich',
             country=self.country,
@@ -40,7 +51,10 @@ class CityModelTest(TestCase):
 
 
 class AgencyModelTest(TestCase):
+    """Agency model tests class."""
+
     def setUp(self):
+        """Set up first tests."""
         country = Country.objects.create(name='USA')
         city = City.objects.create(
             name='New York',
@@ -55,11 +69,15 @@ class AgencyModelTest(TestCase):
         )
 
     def test_agency_creation(self):
+        """Tests agency creation."""
         Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=self.address)
 
 
 class AddressModelTest(TestCase):
+    """Address model tests class."""
+
     def setUp(self):
+        """Set up tests."""
         country = Country.objects.create(name='USA')
         self.city = City.objects.create(
             name='New York',
@@ -68,6 +86,7 @@ class AddressModelTest(TestCase):
         )
 
     def test_address_creation(self):
+        """Test address creation."""
         address = Address.objects.create(
             city=self.city,
             street='Wall Street',
@@ -80,7 +99,10 @@ class AddressModelTest(TestCase):
 
 
 class TourModelTest(TestCase):
+    """Tours Models tests class."""
+
     def setUp(self):
+        """Set up tests."""
         country = Country.objects.create(name='USA')
         self.city = City.objects.create(
             name='New York',
@@ -104,6 +126,7 @@ class TourModelTest(TestCase):
         )
 
     def test_tour_creation(self):
+        """Test tour creation."""
         tour = Tour.objects.create(
             name='Exciting NY Tour',
             description='Discover NY with us!',

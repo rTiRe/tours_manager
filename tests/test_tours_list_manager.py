@@ -1,3 +1,5 @@
+"""Tours list manager tests."""
+
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.test import RequestFactory, TestCase
@@ -11,7 +13,10 @@ POINT = -74.0061, 40.7129
 
 
 class ToursListManagerTest(TestCase):
+    """Class with manager tests."""
+
     def setUp(self):
+        """Set up tests."""
         self.factory = RequestFactory()
         self.request = self.factory.get('/fake-url')
         user = User.objects.create_user(username='tester', password='123')
@@ -50,10 +55,12 @@ class ToursListManagerTest(TestCase):
         self.manager = ToursListManager(self.request, self.tours, self.reviews)
 
     def test_initialization(self):
+        """Test init manager."""
         self.assertIsInstance(self.manager, ToursListManager)
         self.assertEqual(len(self.manager.tours), 5)
 
     def test_render_tour_card(self):
+        """Test render tour card."""
         tour = self.tours[0]
         rating = 5
         render_result = self.manager.render_tour_card(tour, rating)
@@ -61,11 +68,13 @@ class ToursListManagerTest(TestCase):
         self.assertNotIn('<span class="fa fa-star"></span>', render_result)
 
     def test_render_tours_list(self):
+        """Test render tours list."""
         render_result = self.manager.render_tours_list(1)
         self.assertIn('Tour 0', render_result)
         self.assertIn('Tour 1', render_result)
 
     def test_render_tours_block(self):
+        """Tests rendere tours block."""
         render_result = self.manager.render_tours_block()
         self.assertIn('css/tours.css', render_result)
         self.assertIn('css/pages.css', render_result)

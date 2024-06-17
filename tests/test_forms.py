@@ -1,3 +1,5 @@
+"""Forms tests."""
+
 from datetime import datetime, timezone
 
 from django.contrib.auth.models import User
@@ -11,7 +13,10 @@ POINT = -74.0061, 40.7129
 
 
 class AddressFormFormCreateTest(TestCase):
+    """Address form tests class."""
+
     def test_valid_data(self):
+        """Test with valid data."""
         country = Country.objects.create(name='USA')
         city = City.objects.create(
             name='New York',
@@ -30,11 +35,13 @@ class AddressFormFormCreateTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_invalid_data(self):
+        """Test with invalid data."""
         form = AddressFormForCreate(data={})
         self.assertFalse(form.is_valid())
         self.assertIn('city', form.errors)
 
     def test_floor_negative(self):
+        """Test floor negative nmber."""
         form = AddressFormForCreate(data={
             'floor': -2,
         })
@@ -42,7 +49,10 @@ class AddressFormFormCreateTest(TestCase):
 
 
 class ReviewFormTest(TestCase):
+    """Review form test class."""
+
     def test_review_form_valid(self):
+        """Test review form valid data."""
         country = Country.objects.create(name='USA')
         city = City.objects.create(
             name='New York',
@@ -73,6 +83,7 @@ class ReviewFormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_review_form_invalid_rating(self):
+        """Test review form invalid rating."""
         form = ReviewForm(data={
             'rating': 6,
             'text': 'Good!',
@@ -80,6 +91,7 @@ class ReviewFormTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_review_form_text_length(self):
+        """Test review form text length."""
         form = ReviewForm(data={
             'rating': 4,
             'text': 'a' * 1001,

@@ -1,3 +1,5 @@
+"""Profile utils tests."""
+
 from django import forms
 from django.test import RequestFactory, TestCase
 from django.views.generic import TemplateView
@@ -8,10 +10,14 @@ STYLE = 'style.css'
 
 
 class StylizedAuthViewTests(TestCase):
+    """Stylized auth view tests class."""
+
     def setUp(self):
+        """Set up tests."""
         self.factory = RequestFactory()
 
     def test_stylized_view_without_errors(self):
+        """Test stylized view without errors."""
         @create_stylized_auth_view([STYLE])
         class TestView(TemplateView):
             template_name = 'test.html'
@@ -20,6 +26,7 @@ class StylizedAuthViewTests(TestCase):
         self.assertEqual(response.context_data['style_files'], [STYLE])
 
     def test_stylized_view_with_errors(self):
+        """Test stylized view with errors."""
         @create_stylized_auth_view([STYLE])
         class TestView(TemplateView):
             template_name = 'test.html'

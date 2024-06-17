@@ -1,3 +1,5 @@
+"""Requests manager tests."""
+
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.test import RequestFactory, TestCase
@@ -12,7 +14,10 @@ POINT = -74.0061, 40.7129
 
 
 class AgencyRequestsListManagerTest(TestCase):
+    """Requests manager tests."""
+
     def setUp(self):
+        """Set up tests."""
         self.factory = RequestFactory()
         user = User.objects.create_user(username='tester', password='123')
         self.account = Account.objects.create(account=user)

@@ -1,3 +1,5 @@
+"""Reviews manager tests."""
+
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.test import RequestFactory, TestCase
@@ -11,8 +13,10 @@ POINT = -74.0061, 40.7129
 
 
 class ReviewsListManagerTest(TestCase):
+    """Reviews manager test class."""
 
     def setUp(self):
+        """Set up tests."""
         self.factory = RequestFactory()
         self.user = User.objects.create_user(username='tester', password='123')
         account = Account.objects.create(account=self.user)
@@ -40,16 +44,19 @@ class ReviewsListManagerTest(TestCase):
         self.redirect_url = '/redirect/'
 
     def test_get_tour(self):
+        """Test get tour."""
         manager = ReviewsListManager(self.request, self.reviews, self.redirect_url)
         tour = manager.get_tour()
         self.assertEqual(tour, self.tour)
 
     def test_render_review(self):
+        """Test render review."""
         manager = ReviewsListManager(self.request, self.reviews, self.redirect_url)
         render_result = manager.render_review(self.review, render_form=True)
         self.assertIn('<div class="review">', render_result)
 
     def test_review_form_post(self):
+        """Test get review from POST method."""
         form_data = {'rating': 4, 'text': 'Updated review text'}
         request = self.factory.post('/tour/{id}/reviews/'.format(id=self.tour.id), form_data)
         request.user = self.user
@@ -60,6 +67,7 @@ class ReviewsListManagerTest(TestCase):
         self.assertEqual(updated_review.rating, 4)
 
     def test_delete_review_post(self):
+        """Test delete review post."""
         request = self.factory.post(
             '/tour/{id}/reviews/'.format(id=self.tour.id), {'delete': self.review.id},
         )
