@@ -9,14 +9,46 @@
         <div class="right">
             <div class="full_name">
                 {{ agency_request.account.account.first_name }} {{ agency_request.account.account.last_name }} <span>@{{ agency_request.account.account.username }}</span>
+                <br>
+                <br>
+                Agency name: {{ agency_request.agency.name }}
+                <br>
+                Agency address: {{ agency_request.agency.address.city }}, {{ agency_request.agency.address.street }}, д. {{ agency_request.agency.address.house_number }}, {% if agency_request.agency.address.entrance_number %} {{ agency_request.agency.address.entrance_number }} {% endif %}{% if agency_request.agency.address.flat %}, квартира {{ agency_request.agency.address.flat }} {% endif %}
             </div>
         </div>
     </a>
-    {{ agency_request.agency.name }}
     <form method="post">
         {% csrf_token %}
         <input name="id" value="{{ agency_request.account.id }}" type="hidden"></input>
         <button type="submit" name="accept">accept</button>
         <button type="submit" name="decline">decline</button>
     </form>
+    <style>
+        .card {
+            max-height: 150px !important;
+        }
+        a {
+            height: 100%;
+        }
+        .avatar {
+            height: 100%;
+            border-radius: 20%;
+        }
+        .card a {
+            display: inline-flex;
+        }
+        .right {
+            margin-left: 10px;
+        }
+        .card form {
+            display: block;
+        }
+        .card form button {
+            padding: 10px 20px;
+            background-color: #ff157e;
+            color: white;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+    </style>
 </div>
