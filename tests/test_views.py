@@ -7,49 +7,82 @@ from rest_framework import status
 
 from manager.models import Account, Address, Agency, City, Country, Tour
 
+POINT = -74.0061, 40.7129
+PRICE = 400
+
+
+def _get_tour_url(page_name: str, tour: Tour, url: str) -> str:
+    if page_name == 'tour':
+        url = f'{url}{tour.id}/'
+    elif page_name == 'edit_tour':
+        url = f'{url}{tour.id}/edit/'
+    elif page_name == 'delete_tour':
+        url = f'{url}{tour.id}/delete/'
+    return url
+
+
+def _get_url(
+    page_name: str,
+    page_url: str,
+    tour: Tour,
+    user: User,
+    account: Account,
+) -> tuple[str, str]:
+    url = page_url
+    if page_name == 'profile':
+        username = page_url.split('/')[-2]
+        reversed_url = reverse(page_name, kwargs={'username': username})
+    elif page_name in {'tour', 'edit_tour', 'delete_tour'}:
+        url = _get_tour_url(page_name, tour, url)
+        reversed_url = reverse(page_name, kwargs={'uuid': tour.id})
+    elif page_name == 'create_agency':
+        user.is_staff = False
+        user.save()
+        account.agency = None
+        account.save()
+        reversed_url = reverse(page_name)
+    else:
+        reversed_url = reverse(page_name)
+    return url, reversed_url
+
 
 def create_successful_page_test(page_url: str, page_name: str, template: str, auth: bool = True):
     def test(self):
         self.client = Client()
         other_user = User.objects.create(username='other_user', password='user')
+        user = None
+        account = None
+        tour = None
         Account.objects.create(account=other_user)
-        url = page_url
         if auth:
             country = Country.objects.create(name='USA')
             city = City.objects.create(
                 name='New York',
                 country=country,
-                point=Point(-74.0060, 40.7128)
+                point=Point(*POINT),
             )
             agency_address = Address.objects.create(
                 city=city,
                 street='Liberty St',
-                house_number='1700', 
-                point=Point(-74.0061, 40.7129),
+                house_number='1700',
+                point=Point(*POINT),
             )
-            agency = Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=agency_address)
-            tour = Tour.objects.create(name=f'Tour 1', description='Sample', agency=agency, price=400, starting_city=city)
+            agency = Agency.objects.create(
+                name='TravelFun',
+                phone_number='+79999999999',
+                address=agency_address,
+            )
+            tour = Tour.objects.create(
+                name='Tour 1',
+                description='Sample',
+                agency=agency,
+                price=PRICE,
+                starting_city=city,
+            )
             user = User.objects.create(username='user', password='user', is_staff=True)
             account = Account.objects.create(account=user, agency=agency)
             self.client.force_login(user)
-        if page_name == 'profile':
-            reversed_url = reverse(page_name, kwargs={'username': page_url.split('/')[-2]})
-        elif page_name in ('tour', 'edit_tour', 'delete_tour'):
-            if page_name == 'tour':
-                url = f'{url}{tour.id}/'
-            elif page_name == 'edit_tour':
-                url = f'{url}{tour.id}/edit/'
-            elif page_name == 'delete_tour':
-                url = f'{url}{tour.id}/delete/'
-            reversed_url = reverse(page_name, kwargs={'uuid': tour.id})
-        elif page_name == 'create_agency':
-            user.is_staff = False
-            user.save()
-            account.agency = None
-            account.save()
-            reversed_url = reverse(page_name)
-        else:
-            reversed_url = reverse(page_name)
+        url, reversed_url = _get_url(page_name, page_url, tour, user, account)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTemplateUsed(response, template)
@@ -75,7 +108,9 @@ casual_pages = (
     ('/profile/other_user/', 'profile', 'pages/profile.html', False),
 )
 
-casual_pages_methods = {f'test_{page[1]}': create_successful_page_test(*page) for page in casual_pages}
+casual_pages_methods = {
+    f'test_{page}': create_successful_page_test(*page) for page in casual_pages
+}
 TestCasualPages = type('TestCasualPages', (TestCase,), casual_pages_methods)
 
 auth_pages = (
@@ -91,10 +126,12 @@ auth_pages = (
     ('/addresses/create/', 'create_address', 'pages/create_address.html'),
 )
 
-auth_pages_methods = {f'test_{page[1]}': create_successful_page_test(*page) for page in auth_pages}
+auth_pages_methods = {f'test_{page}': create_successful_page_test(*page) for page in auth_pages}
 TestAuthPages = type('TestAuthPages', (TestCase,), auth_pages_methods)
 
-redirect_pages = ('my_profile', 'settings', )
+redirect_pages = ('my_profile', 'settings')
 
-redirect_pages_methods = {f'test_{page}': create_redirect_page_test(page) for page in redirect_pages}
+redirect_pages_methods = {
+    f'test_{page}': create_redirect_page_test(page) for page in redirect_pages
+}
 TestRedirectPages = type('TestRedirectPages', (TestCase,), redirect_pages_methods)

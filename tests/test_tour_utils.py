@@ -6,6 +6,9 @@ from manager.forms import TourForm
 from manager.models import Address, Agency, City, Country, Tour
 from manager.views_utils.tour_utils import render_tour_form, save_tour
 
+PRICE = 400
+POINT = -74.0061, 40.7129
+
 
 class TourFunctionTests(TestCase):
     def setUp(self):
@@ -14,17 +17,27 @@ class TourFunctionTests(TestCase):
         city = City.objects.create(
             name='New York',
             country=country,
-            point=Point(-74.0060, 40.7128)
+            point=Point(*POINT),
         )
         self.agency_address = Address.objects.create(
             city=city,
             street='Liberty St',
-            house_number='1700', 
-            point=Point(-74.0061, 40.7129),
+            house_number='1700',
+            point=Point(*POINT),
         )
-        self.agency = Agency.objects.create(name='TravelFun', phone_number='+79999999999', address=self.agency_address)
-        self.tour = Tour.objects.create(name='Sample Tour', agency=self.agency, starting_city=city, price=400)
-        self.form_data = {'name': 'Updated Tour', 'description': 'Updated Description', 'agency': self.agency, 'starting_city': city, 'price': 400}
+        self.agency = Agency.objects.create(
+            name='TravelFun', phone_number='+79999999999', address=self.agency_address,
+        )
+        self.tour = Tour.objects.create(
+            name='Sample Tour', agency=self.agency, starting_city=city, price=PRICE,
+        )
+        self.form_data = {
+            'name': 'Updated Tour',
+            'description': 'Updated Description',
+            'agency': self.agency,
+            'starting_city': city,
+            'price': PRICE,
+        }
         self.literals = {'title': 'Edit Tour', 'button': 'Save Changes', 'button_name': 'submit'}
 
     def test_save_tour_create(self):
@@ -38,7 +51,9 @@ class TourFunctionTests(TestCase):
 
     def test_render_tour_form_get(self):
         """Test rendering the tour form on GET request."""
-        request = self.factory.get(reverse('edit_tour', kwargs={'uuid': self.tour.pk}))
+        request = self.factory.get(
+            reverse('edit_tour', kwargs={'uuid': self.tour.pk}),
+        )
         rendered_form = render_tour_form(request, self.agency, {}, self.literals, self.tour)
         self.assertIn('form', rendered_form)
 
@@ -46,13 +61,17 @@ class TourFunctionTests(TestCase):
         """Test POST request with valid form data to save tour."""
         post_data = self.form_data.copy()
         post_data.update({'agency': str(self.agency.id), 'addresses': []})
-        request = self.factory.post(reverse('edit_tour', kwargs={'uuid': self.tour.pk}), post_data)
+        request = self.factory.post(
+            reverse('edit_tour', kwargs={'uuid': self.tour.pk}), post_data,
+        )
         rendered_response = render_tour_form(request, self.agency, {}, self.literals, self.tour)
         self.assertIn('form', rendered_response)
 
     def test_render_tour_form_post_invalid(self):
         """Test POST request with invalid form data."""
         post_data = {'name': '', 'description': 'No name provided'}
-        request = self.factory.post(reverse('edit_tour', kwargs={'uuid': self.tour.pk}), post_data)
+        request = self.factory.post(
+            reverse('edit_tour', kwargs={'uuid': self.tour.pk}), post_data,
+        )
         rendered_response = render_tour_form(request, self.agency, {}, self.literals, self.tour)
         self.assertIn('errors', rendered_response)
