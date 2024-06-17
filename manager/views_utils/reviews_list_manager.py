@@ -126,7 +126,7 @@ class ReviewsListManager:
         errors = {}
         if self.request.method == 'POST' and render_form:
             delete_key_in_post = 'delete' in self.request.POST.keys()
-            id_in_delete = str(review.id) == self.request.POST['delete']
+            id_in_delete = str(review.id) == self.request.POST.get('delete')
             request_user_equals_account = self.request.user == review.account.account
             if delete_key_in_post and id_in_delete and request_user_equals_account:
                 return self.delete(review, self.redirect_url)
