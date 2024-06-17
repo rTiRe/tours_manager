@@ -9,7 +9,12 @@ from django.utils.translation import gettext_lazy as _
 contains_illegal_characters = _('field contains illegal characters.')
 
 
-def get_datetime():
+def get_datetime() -> datetime:
+    """Get current datetime
+
+    Returns:
+        datetime: current datetime.
+    """
     return datetime.now(timezone.utc)
 
 
@@ -94,8 +99,17 @@ def check_str(field: str) -> None:
 
 
 def date_validator(date: datetime) -> None:
+    """Validate date.
+
+    Args:
+        date: datetime - date for validation.
+
+    Raises:
+        TypeError: if date not datetime.
+        ValueError: if datetime in future.
+    """
     if not isinstance(date, datetime):
         field_type = type(date).__name__
         raise TypeError(_(f'Field must be datetime, not {field_type}'))
     if date > get_datetime():
-        raise ValueError(_(f'Time cannot be in future.'))
+        raise ValueError(_('Time cannot be in future.'))
