@@ -120,4 +120,6 @@ class AccountAdmin(admin.ModelAdmin):
 
 @admin.register(AgencyRequests)
 class AgencyRequestsAdmin(admin.ModelAdmin):
+    """Agency Requests admin."""
+
     model = AgencyRequests

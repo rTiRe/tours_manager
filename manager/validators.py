@@ -10,7 +10,7 @@ contains_illegal_characters = _('field contains illegal characters.')
 
 
 def get_datetime() -> datetime:
-    """Get current datetime
+    """Get current datetime.
 
     Returns:
         datetime: current datetime.

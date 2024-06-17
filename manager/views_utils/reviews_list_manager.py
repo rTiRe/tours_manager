@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from ..forms import UserReviewForm
 from ..models import Account, Review, Tour
 from ..validators import get_datetime
-from .page_utils import get_pages_slice
+from . import errors_utils, page_utils
 
 load_dotenv()
 DEFAULT_REVIEWS_PER_PAGE = 10
@@ -75,6 +75,7 @@ class ReviewsListManager:
         Returns:
             str: rendered card.
         """
+        errors = {}
         account = Account.objects.filter(account=self.request.user).first()
         if self.request.method == 'POST':
             form = UserReviewForm(self.request.POST)
@@ -90,13 +91,14 @@ class ReviewsListManager:
                 redirect_url = reverse('tour', kwargs={'uuid': tour.id})
                 return redirect(f'{redirect_url}#reviews')
             else:
-                ...
-                # TODO: errors print
+                errors = form.errors.as_data()
+                errors = errors_utils.convert_errors(errors)
         else:
             form = UserReviewForm()
         return render_to_string(
             'parts/not_created_review.html',
             {
+                'errors': errors,
                 'form': form.my_render(self.request),
                 'account': account,
                 'style_files': [
@@ -121,6 +123,7 @@ class ReviewsListManager:
         initial_data['rating'] = review.rating
         initial_data['text'] = review.text
         form = None
+        errors = {}
         if self.request.method == 'POST' and render_form:
             delete_key_in_post = 'delete' in self.request.POST.keys()
             id_in_delete = str(review.id) == self.request.POST['delete']
@@ -137,21 +140,24 @@ class ReviewsListManager:
                 review.save()
                 return redirect(self.redirect_url)
             else:
-                ...
-                # TODO: errors print
+                errors = form.errors.as_data()
+                errors = errors_utils.convert_errors(errors)
         if render_form:
             form = UserReviewForm(initial=initial_data)
-        style_files = ['css/rating.css', 'css/review_create.css']
         if form:
             form = form.my_render(self.request, review)
-            style_files.append('css/review_edit.css')
         return render_to_string(
             self.review_template_name,
             {
+                'errors': errors,
                 'form': form,
                 'review': review,
                 'request': self.request,
-                'style_files': style_files,
+                'style_files': [
+                    'css/rating.css',
+                    'css/review_create.css',
+                    'css/review_edit.css',
+                ],
             },
             request=self.request,
         )
@@ -208,7 +214,7 @@ class ReviewsListManager:
         if isinstance(reviews_list, HttpResponseRedirect):
             return reviews_list
         num_pages = int(self.paginator.num_pages)
-        pages_slice = get_pages_slice(page, num_pages)
+        pages_slice = page_utils.get_pages_slice(page, num_pages)
         pages_slice = ''.join(pages_slice)
         return render_to_string(
             'parts/reviews.html',

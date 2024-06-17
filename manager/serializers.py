@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from .models import Address, Agency, Country, Review, Tour
+from .models import Address, Agency, Review, Tour
 
 id_field = 'id'
 
@@ -38,8 +38,10 @@ class AddressSerializer(serializers.ModelSerializer):
 
         model = Address
         fields = [
-            id_field, 'city',
-            'street', 'house_number',
+            id_field,
+            'city',
+            'street',
+            'house_number',
             'point',
         ]
         optional_fields = ['entrance_number', 'floor', 'flat_number']

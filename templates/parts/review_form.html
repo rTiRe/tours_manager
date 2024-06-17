@@ -1,3 +1,4 @@
+{% load errors_writer %}
 {% include 'parts/connect_css_files.html' with style_files=style_files %}
 <form method="post" class="edit_form">
     {% csrf_token %}
@@ -6,10 +7,12 @@
             {{ rating.tag }}<label class="fa fa-star" for="{{ rating.id_for_label }}"></label>
         {% endfor %}
         <div class="title">{{ form.rating.label }}</div>
+        {{ errors|get_errors_html:form.rating.name }}
     </div>
     <div class="text">
         <div class="title">{{ form.text.label }}</div>
         {{ form.text }}
+        {{ errors|get_errors_html:form.text.name }}
     </div>
     <button type="submit" class="edit"><i class="fa {{ button_icon }}" aria-hidden="true"></i> {{ button_literal }}</button>
 </form>
