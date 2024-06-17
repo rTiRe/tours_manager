@@ -171,7 +171,7 @@ class ReviewsListManager:
             if not review:
                 tour = self.get_tour()
                 rendered_review = self.render_not_existing_review(tour)
-            if review.account.account == self.request.user:
+            elif review.account.account == self.request.user:
                 rendered_review = self.render_review(review, render_form=True)
             else:
                 rendered_review = self.render_review(review)

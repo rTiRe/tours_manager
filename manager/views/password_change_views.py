@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from django.utils import encoding, http
 from dotenv import load_dotenv
 
-from ..forms import PasswordChangeRequestForm
+from ..profile_forms import PasswordChangeRequestForm
 from ..views_utils import email_utils, errors_utils, profile_utils
 
 

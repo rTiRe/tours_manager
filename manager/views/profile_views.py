@@ -7,8 +7,9 @@ from django.http import (HttpRequest, HttpResponse, HttpResponseNotFound,
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from ..forms import SettingsAddressForm, SettingsAgencyForm, SettingsUserForm
 from ..models import Account, Address, Agency, AgencyRequests, Review, Tour
+from ..profile_forms import (SettingsAddressForm, SettingsAgencyForm,
+                             SettingsUserForm)
 from ..views_utils import (errors_utils, requests_list_manager,
                            reviews_list_manager, tours_list_manager)
 
