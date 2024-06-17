@@ -64,7 +64,7 @@ class SettingsUserForm(auth_forms.UserChangeForm):
         """
         super().__init__(*args, **kwargs)
         self.request = request
-        self.fields.remove('password')
+        self.fields.pop('password')
         if self.request and isinstance(self.request, HttpRequest):
             user = self.request.user
             account = Account.objects.filter(account=user).first()
